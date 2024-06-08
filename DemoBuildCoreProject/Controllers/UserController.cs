@@ -1,12 +1,15 @@
-﻿using DemoBuildCoreProject.Model;
-using DemoBuildCoreProject.Service.IService;
-using Microsoft.AspNetCore.Http;
+﻿using DemoBuildCoreProject.Business.IService;
 using Microsoft.AspNetCore.Mvc;
+using DemoBuildCoreProject.Constant;
+using DemoBuildCoreProject.Request.User;
+using DemoBuildCoreProject.Response.User;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DemoBuildCoreProject.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -16,10 +19,26 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<UserModel>>> GetData()
+    [HttpGet(APIName.GetAllData)]
+    public async Task<ActionResult<GetListUserResponse>> GetData([FromQuery] GetListUserRequest request)
     {
-        var data = await _userService.GetAllUserList();
-        return Ok(data);
+        var response = await _userService.GetAllUserData(request);
+        return Ok(response);
+    }
+
+    [HttpPost(APIName.Login)]
+    [AllowAnonymous]
+    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
+    {
+        var response = await _userService.Login(request);
+        return Ok(response);
+    }
+
+    [HttpPost(APIName.RefreshToken)]
+    [AllowAnonymous]
+    public async Task<ActionResult<LoginResponse>> RefreshToken([FromBody] RefreshTokenRequest request)
+    {
+        var response = await _userService.RefreshToken(request);
+        return Ok(response);
     }
 }

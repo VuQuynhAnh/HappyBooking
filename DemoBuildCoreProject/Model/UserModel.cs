@@ -4,18 +4,18 @@ namespace DemoBuildCoreProject.Model;
 
 public class UserModel
 {
-    public UserModel(int id, string name, string password, string description)
+    public UserModel(long userId, string userName, string password, string description)
     {
-        Id = id;
-        Name = name;
+        UserId = userId;
+        UserName = userName;
         Password = password;
         Description = description;
     }
 
     public UserModel(User entity)
     {
-        Id = entity.Id;
-        Name = entity.Name;
+        UserId = entity.UserId;
+        UserName = entity.UserName;
         Password = entity.Password;
         Description = entity.Description;
     }
@@ -24,9 +24,9 @@ public class UserModel
     {
     }
 
-    public int Id { get; private set; }
+    public long UserId { get; private set; }
 
-    public string Name { get; private set; } = string.Empty;
+    public string UserName { get; private set; } = string.Empty;
 
     public string Password { get; private set; } = string.Empty;
 

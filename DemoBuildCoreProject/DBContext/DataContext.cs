@@ -11,4 +11,6 @@ public class DataContext : DbContext
     }
 
     public DbSet<User> UserRepository { get; set; }
+
+    public DbSet<RefreshToken> RefreshTokenRepository { get; set; }
 }

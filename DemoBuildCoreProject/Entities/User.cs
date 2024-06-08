@@ -4,12 +4,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DemoBuildCoreProject.Entities;
 
 [Table("Users")]
-public class User
+public class User : BaseEntity
 {
     [Key]
-    public int Id { get; set; }
+    public long UserId { get; set; }
 
-    public required string Name { get; set; }
+    public required string UserName { get; set; }
 
     public required string Password { get; set; }
 
