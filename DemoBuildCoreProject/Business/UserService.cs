@@ -29,11 +29,6 @@ public class UserService : IUserService
             var data = await _userRepository.GetAllData(request.KeyWord, request.PageIndex, request.PageSize);
             userList = data.Select(item => new UserDto(item)).ToList();
         }
-        catch (Exception ex)
-        {
-            message = ex.Message;
-            status = CommonStatus.Failed;
-        }
         finally
         {
             await _userRepository.ReleaseResource();
@@ -57,11 +52,6 @@ public class UserService : IUserService
                 refeshToken = tokenResponse.RefreshToken;
             }
         }
-        catch (Exception ex)
-        {
-            message = ex.Message;
-            status = CommonStatus.Failed;
-        }
         finally
         {
             await _userRepository.ReleaseResource();
@@ -76,20 +66,11 @@ public class UserService : IUserService
         string refeshToken = string.Empty;
         string message = string.Empty;
         CommonStatus status = CommonStatus.Successed;
-        try
+        var result = await _tokenService.RefreshTokenAsync(request.JwtToken, request.RefreshToken);
+        if (result != null)
         {
-            var result = await _tokenService.RefreshTokenAsync(request.JwtToken, request.RefreshToken);
-            if (result != null)
-            {
-                token = result.JwtToken;
-                refeshToken = result.RefreshToken;
-            }
-
-        }
-        catch (Exception ex)
-        {
-            message = ex.Message;
-            status = CommonStatus.Failed;
+            token = result.JwtToken;
+            refeshToken = result.RefreshToken;
         }
 
         return new LoginResponse(token, refeshToken, message, status);

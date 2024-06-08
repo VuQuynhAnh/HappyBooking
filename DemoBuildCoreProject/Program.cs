@@ -1,10 +1,10 @@
 ﻿using DemoBuildCoreProject.DBContext;
 using Microsoft.EntityFrameworkCore;
-using DemoBuildCoreProject;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using DemoBuildCoreProject.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,6 +86,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication(); // Thêm middleware Authentication
 app.UseAuthorization();
+app.UseExceptionMiddleware(); // Xử lý exception
 
 app.MapControllers();
 
