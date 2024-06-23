@@ -1,7 +1,7 @@
-﻿using DemoBuildCoreProject.Model;
-using DemoBuildCoreProject.Response.User;
+﻿using HappyBookingShare.Model;
+using HappyBookingShare.Response.User;
 
-namespace DemoBuildCoreProject.Business.IService;
+namespace HappyBookingServer.Business.IService;
 
 public interface ITokenService
 {

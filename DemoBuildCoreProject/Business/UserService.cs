@@ -1,12 +1,11 @@
-﻿using DemoBuildCoreProject.Interface;
-using DemoBuildCoreProject.Response.Dtos;
-using DemoBuildCoreProject.Response.Status;
-using DemoBuildCoreProject.Business.IService;
-using DemoBuildCoreProject.Request.User;
-using DemoBuildCoreProject.Response.User;
-using DemoBuildCoreProject.Entities;
+﻿using HappyBookingServer.Interface;
+using HappyBookingServer.Business.IService;
+using HappyBookingShare.Response.User;
+using HappyBookingShare.Request.User;
+using HappyBookingShare.Response.Status;
+using HappyBookingShare.Response.Dtos;
 
-namespace DemoBuildCoreProject.Business;
+namespace HappyBookingServer.Business;
 
 public class UserService : IUserService
 {

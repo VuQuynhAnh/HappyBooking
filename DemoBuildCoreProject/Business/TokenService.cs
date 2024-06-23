@@ -1,16 +1,16 @@
-﻿using DemoBuildCoreProject.Business.IService;
-using DemoBuildCoreProject.DBContext;
-using DemoBuildCoreProject.Entities;
-using DemoBuildCoreProject.Interface;
-using DemoBuildCoreProject.Model;
-using DemoBuildCoreProject.Response.User;
+﻿using HappyBookingServer.Business.IService;
+using HappyBookingServer.DBContext;
+using HappyBookingServer.Interface;
+using HappyBookingShare.Entities;
+using HappyBookingShare.Model;
+using HappyBookingShare.Response.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace DemoBuildCoreProject.Business;
+namespace HappyBookingServer.Business;
 
 public class TokenService : ITokenService
 {
@@ -37,9 +37,9 @@ public class TokenService : ITokenService
     {
         var principal = GetPrincipalFromExpiredToken(jwtToken);
         long userId = 0;
-        long.TryParse(principal.Identity?.Name, out userId);
+        long.TryParse(principal.FindFirst("UserId")?.Value, out userId);
         var user = await _userRepository.GetUserByUserId(userId);
-        if (user == null)
+        if (user.UserId != userId)
         {
             return null;
         }

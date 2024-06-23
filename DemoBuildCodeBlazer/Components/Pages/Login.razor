@@ -1,0 +1,46 @@
+﻿@page "/login"
+@using Blazored.LocalStorage
+@using DemoBuildCodeBlazer.Middleware
+@using DemoBuildCodeBlazer.Request
+@inject HttpClient Http
+@inject CustomAuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorageService
+
+<h3>Login</h3>
+
+<EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Username</label>
+        <InputText id="username" @bind-Value="loginModel.UserName" />
+    </div>
+    <div>
+        <label>Password</label>
+        <InputText id="password" @bind-Value="loginModel.Password" type="password" />
+    </div>
+    <button type="submit">Login</button>
+</EditForm>
+
+@code {
+    private LoginRequest loginModel = new();
+
+    private async Task HandleLogin()
+    {
+        var response = await Http.PostAsJsonAsync("api/auth/login", loginModel);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var jwtToken = await response.Content.ReadAsStringAsync();
+            await LocalStorageService.SetItemAsync("authToken", jwtToken);
+            AuthenticationStateProvider.MarkUserAsAuthenticated(jwtToken);
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            // Handle error response
+        }
+    }
+}

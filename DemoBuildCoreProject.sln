@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34616.47
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoBuildCoreProject", "DemoBuildCoreProject\DemoBuildCoreProject.csproj", "{2E4E4A25-922F-4F27-AB46-E351FCF973A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HappyBookingServer", "DemoBuildCoreProject\HappyBookingServer.csproj", "{2E4E4A25-922F-4F27-AB46-E351FCF973A5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HappyBookingShare", "DemoBuildCoreShare\HappyBookingShare.csproj", "{971A2424-34F0-4397-AF67-916D43CCEE50}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HappyBookingClient", "HappyBookingClient\HappyBookingClient.csproj", "{6755AFAA-8848-4CB5-8756-04494949468E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{2E4E4A25-922F-4F27-AB46-E351FCF973A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E4E4A25-922F-4F27-AB46-E351FCF973A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E4E4A25-922F-4F27-AB46-E351FCF973A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{971A2424-34F0-4397-AF67-916D43CCEE50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{971A2424-34F0-4397-AF67-916D43CCEE50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{971A2424-34F0-4397-AF67-916D43CCEE50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{971A2424-34F0-4397-AF67-916D43CCEE50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6755AFAA-8848-4CB5-8756-04494949468E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6755AFAA-8848-4CB5-8756-04494949468E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6755AFAA-8848-4CB5-8756-04494949468E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6755AFAA-8848-4CB5-8756-04494949468E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,10 +1,9 @@
-﻿using DemoBuildCoreProject.DBContext;
-using DemoBuildCoreProject.Interface;
-using DemoBuildCoreProject.Model;
+﻿using HappyBookingServer.DBContext;
+using HappyBookingServer.Interface;
+using HappyBookingShare.Model;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
-namespace DemoBuildCoreProject.Repository;
+namespace HappyBookingServer.Repository;
 
 public class UserRepository : IUserRepository
 {

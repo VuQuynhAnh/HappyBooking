@@ -1,13 +1,12 @@
-﻿using DemoBuildCoreProject.Entities;
+﻿using HappyBookingShare.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace DemoBuildCoreProject.DBContext;
+namespace HappyBookingServer.DBContext;
 
 public class DataContext : DbContext
 {
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
-
     }
 
     public DbSet<User> UserRepository { get; set; }

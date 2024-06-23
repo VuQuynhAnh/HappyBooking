@@ -1,7 +1,7 @@
-﻿using DemoBuildCoreProject.Request.User;
-using DemoBuildCoreProject.Response.User;
+﻿using HappyBookingShare.Request.User;
+using HappyBookingShare.Response.User;
 
-namespace DemoBuildCoreProject.Business.IService;
+namespace HappyBookingServer.Business.IService;
 
 public interface IUserService
 {

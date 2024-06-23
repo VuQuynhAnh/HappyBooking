@@ -1,0 +1,42 @@
+﻿@page "/user"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using HappyBookingShare.Request.User
+@using HappyBookingShare.Response.Dtos
+@inject HappyBookingClient.Service.IService.IUserService _userService
+
+<h3>Product List</h3>
+
+@if (userList.Any())
+{
+    <ul>
+        @foreach (var user in userList)
+        {
+            <li>@user.UserId - @user.UserName</li>
+        }
+    </ul>
+}
+else
+{
+    <p><em>Loading...</em></p>
+}
+
+@code {
+    private List<UserDto> userList = new();
+    private string accessToken = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            accessToken = await _userService.GetTokenFromLocalStorageAsync();
+            GetListUserRequest request = new();
+            request.PageIndex = 1;
+            request.PageSize = 20;
+            var response = await _userService.GetAllUserData(request);
+            userList = response?.Data ?? new();
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+}

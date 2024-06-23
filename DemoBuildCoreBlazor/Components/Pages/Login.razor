@@ -1,0 +1,54 @@
+﻿@page "/login"
+@using DemoBuildCoreBlazor.ApiService.Interface
+@using DemoBuildCoreShare.Request.User
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using MudBlazor
+@inject IUserService _userService
+@inject NavigationManager Navigation
+
+<h3>Login</h3>
+
+<MudGrid>
+    <MudItem xs="12" sm="7">
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <EditForm Model="loginModel">
+                <MudTextField T="string" Label="Username" @bind-Value="@loginModel.UserName" Required="true" RequiredError="User name is required!" />
+                <MudTextField T="string" Label="Password" @bind-Value="@loginModel.Password"
+                              InputType="InputType.Password"
+                              Required="true"
+                              RequiredError="Password is required!" />
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async () => await HandleLogin())" Class="ml-auto">Login</MudButton>
+            </EditForm>
+        </MudForm>
+    </MudItem>
+</MudGrid>
+
+
+@code {
+
+    bool success;
+    string[] errors = { };
+    MudForm form;
+    public LoginRequest loginModel = new();
+
+
+    private async Task HandleLogin()
+    {
+        Console.WriteLine($"Username: {loginModel.UserName}, Password: {loginModel.Password}");
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+            var token = await _userService.Login(loginModel.UserName, loginModel.Password);
+            if (token != null)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                // Hiển thị thông báo lỗi
+            }
+        }
+    }
+}

@@ -1,0 +1,89 @@
+﻿@page "/login"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using Blazored.LocalStorage
+@using HappyBookingClient.Service.IService
+@using HappyBookingShare.Request.User
+@using HappyBookingShare.Response.Status
+@inject NavigationManager Navigation
+@inject ILocalStorageService localStorage
+@inject IUserService _userService
+
+<h3>Login</h3>
+
+
+@if (isConnected)
+{
+    <EditForm Model="@request" OnSubmit="HandleValidSubmit" FormName="loginForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label for="userName">UserName:</label>
+            <InputText id="userName" @bind-Value="request.UserName" />
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <InputText id="password" @bind-Value="request.Password" type="password" />
+        </div>
+        <button type="submit">Login</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div>@message</div>
+    }
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+@code {
+    [SupplyParameterFromForm(FormName = "loginForm")]
+    public LoginRequest request { get; set; } = new();
+    private string message = string.Empty;
+    private bool isConnected = false;
+    private string returnUrl = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(Navigation.Uri);
+        if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var value))
+        {
+            returnUrl = value.ToString();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isConnected = true;
+            var result = await _userService.GetTokenFromLocalStorageAsync();
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        message = string.Empty;
+        try
+        {
+            var response = await _userService.Login(request);
+            if (response != null)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                message = "Invalid username or password.";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+    }
+}
