@@ -4,17 +4,16 @@ using Microsoft.AspNetCore.Authorization;
 using HappyBookingShare.Response.User;
 using HappyBookingShare.Constant;
 using HappyBookingShare.Request.User;
+using DemoBuildCoreProject.Controllers;
 
 namespace HappyBookingServer.Controllers;
 
 [Route("api/[controller]")]
-[ApiController]
-[Authorize]
-public class UserController : ControllerBase
+public class UserController : BaseController
 {
     private readonly IUserService _userService;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
     {
         _userService = userService;
     }
@@ -39,6 +38,21 @@ public class UserController : ControllerBase
     public async Task<ActionResult<LoginResponse>> RefreshToken([FromBody] RefreshTokenRequest request)
     {
         var response = await _userService.RefreshToken(request);
+        return Ok(response);
+    }
+
+    [HttpPost(APIName.RegisterUser)]
+    [AllowAnonymous]
+    public async Task<ActionResult<SaveUserResponse>> RegisterUser([FromBody] RegisterUserRequest request)
+    {
+        var response = await _userService.RegisterUser(UserId, request);
+        return Ok(response);
+    }
+
+    [HttpPost(APIName.UpdateUser)]
+    public async Task<ActionResult<SaveUserResponse>> UpdateUser([FromBody] UpdateUserRequest request)
+    {
+        var response = await _userService.UpdateUser(UserId, request);
         return Ok(response);
     }
 }

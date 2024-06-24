@@ -8,5 +8,15 @@ public interface IUserRepository : IRepositoryBase
 
     Task<UserModel> GetUserByUserId(long userId);
 
+    Task<UserModel> GetUserByEmail(string email);
+
+    Task<UserModel> GetUserByPhone(string phoneNumber);
+
+    Task<UserModel> GetUserByCitizenIdentificationNumber(string citizenIdentificationNumber);
+
+    Task<UserModel> GetUserByUserIdAndPassword(long userId, string password);
+
     Task<UserModel> GetUserByLoginInfor(string userName, string password);
+
+    Task<bool> SaveUser(long userId, UserModel userModel);
 }

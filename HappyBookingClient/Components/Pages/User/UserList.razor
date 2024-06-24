@@ -1,4 +1,4 @@
-﻿@page "/user"
+﻿@page "/user-list"
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @using HappyBookingShare.Request.User
 @using HappyBookingShare.Response.Dtos
@@ -11,7 +11,7 @@
     <ul>
         @foreach (var user in userList)
         {
-            <li>@user.UserId - @user.UserName</li>
+            <li>@user.UserId - @user.FullName</li>
         }
     </ul>
 }

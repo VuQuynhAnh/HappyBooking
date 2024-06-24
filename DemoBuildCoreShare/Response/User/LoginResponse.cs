@@ -1,14 +1,13 @@
-﻿using HappyBookingShare.Response.Status;
+﻿using HappyBookingShare.Constant;
 
 namespace HappyBookingShare.Response.User;
 
 public class LoginResponse
 {
-    public LoginResponse(string token, string refeshToken, string message, CommonStatus status)
+    public LoginResponse(string token, string refeshToken, StatusEnum status)
     {
         Token = token;
         RefeshToken = refeshToken;
-        Message = message;
         Status = status;
     }
 
@@ -16,7 +15,10 @@ public class LoginResponse
 
     public string RefeshToken { get; private set; }
 
-    public string Message { get; private set; }
+    public StatusEnum Status { get; private set; }
 
-    public CommonStatus Status { get; private set; }
+    public string Message
+    {
+        get => MessageConstant.GetMessage(Status);
+    }
 }

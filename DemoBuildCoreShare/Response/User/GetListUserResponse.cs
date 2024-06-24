@@ -1,25 +1,13 @@
-﻿using HappyBookingShare.Response.Dtos;
-using HappyBookingShare.Response.Status;
+﻿using HappyBookingShare.Constant;
+using HappyBookingShare.Response.Dtos;
 using System.Text.Json.Serialization;
 
 namespace HappyBookingShare.Response.User;
 
-public class GetListUserResponse : IResponse<List<UserDto>>
+public class GetListUserResponse : BaseResponse<List<UserDto>>
 {
     [JsonConstructor]
-    public GetListUserResponse(List<UserDto> data, string message, CommonStatus status)
+    public GetListUserResponse(List<UserDto> data, StatusEnum status) : base(data, status)
     {
-        Data = data;
-        Message = message;
-        Status = status;
     }
-
-    [JsonPropertyName("data")]
-    public List<UserDto> Data { get; set; }
-
-    [JsonPropertyName("message")]
-    public string Message { get; set; }
-
-    [JsonPropertyName("status")]
-    public CommonStatus Status { get; set; }
 }

@@ -1,14 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace HappyBookingShare.Request.User;
 
-namespace HappyBookingShare.Entities;
-
-[Table("Users")]
-public class User : BaseEntity
+public class RegisterUserRequest
 {
-    [Key]
-    public long UserId { get; set; }
-
     public string FullName { get; set; } = string.Empty;
 
     public string Email { get; set; } = string.Empty;

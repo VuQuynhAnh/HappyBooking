@@ -10,4 +10,8 @@ public interface IUserService
     Task<LoginResponse> Login(LoginRequest request);
 
     Task<LoginResponse> RefreshToken(RefreshTokenRequest request);
+
+    Task<SaveUserResponse> RegisterUser(long userId, RegisterUserRequest request);
+
+    Task<SaveUserResponse> UpdateUser(long userId, UpdateUserRequest request);
 }

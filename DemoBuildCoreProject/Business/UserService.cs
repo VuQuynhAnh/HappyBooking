@@ -2,8 +2,9 @@
 using HappyBookingServer.Business.IService;
 using HappyBookingShare.Response.User;
 using HappyBookingShare.Request.User;
-using HappyBookingShare.Response.Status;
 using HappyBookingShare.Response.Dtos;
+using HappyBookingShare.Model;
+using HappyBookingShare.Constant;
 
 namespace HappyBookingServer.Business;
 
@@ -18,11 +19,15 @@ public class UserService : IUserService
         _tokenService = tokenService;
     }
 
+    /// <summary>
+    /// get all user data
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     public async Task<GetListUserResponse> GetAllUserData(GetListUserRequest request)
     {
         List<UserDto> userList = new();
-        string message = string.Empty;
-        CommonStatus status = CommonStatus.Successed;
+        StatusEnum status = StatusEnum.Successed;
         try
         {
             var data = await _userRepository.GetAllData(request.KeyWord, request.PageIndex, request.PageSize);
@@ -32,15 +37,19 @@ public class UserService : IUserService
         {
             await _userRepository.ReleaseResource();
         }
-        return new GetListUserResponse(userList, message, status);
+        return new GetListUserResponse(userList, status);
     }
 
+    /// <summary>
+    /// login
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     public async Task<LoginResponse> Login(LoginRequest request)
     {
         string token = string.Empty;
         string refeshToken = string.Empty;
-        string message = string.Empty;
-        CommonStatus status = CommonStatus.Successed;
+        StatusEnum status = StatusEnum.Successed;
         try
         {
             var user = await _userRepository.GetUserByLoginInfor(request.UserName, request.Password);
@@ -56,15 +65,19 @@ public class UserService : IUserService
             await _userRepository.ReleaseResource();
         }
 
-        return new LoginResponse(token, refeshToken, message, status);
+        return new LoginResponse(token, refeshToken, status);
     }
 
+    /// <summary>
+    /// refresh token
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     public async Task<LoginResponse> RefreshToken(RefreshTokenRequest request)
     {
         string token = string.Empty;
         string refeshToken = string.Empty;
-        string message = string.Empty;
-        CommonStatus status = CommonStatus.Successed;
+        StatusEnum status = StatusEnum.Successed;
         var result = await _tokenService.RefreshTokenAsync(request.JwtToken, request.RefreshToken);
         if (result != null)
         {
@@ -72,6 +85,117 @@ public class UserService : IUserService
             refeshToken = result.RefreshToken;
         }
 
-        return new LoginResponse(token, refeshToken, message, status);
+        return new LoginResponse(token, refeshToken, status);
     }
+
+    /// <summary>
+    /// register user
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public async Task<SaveUserResponse> RegisterUser(long userId, RegisterUserRequest request)
+    {
+        var userModel = new UserModel(
+                            0,
+                            request.FullName,
+                            request.Email,
+                            request.PhoneNumber,
+                            request.CitizenIdentificationNumber,
+                            request.Address,
+                            request.AvatarImage,
+                            request.Password);
+        StatusEnum status = await ValidateUserInformation(userModel);
+        if (status != StatusEnum.Successed)
+        {
+            return new SaveUserResponse(false, status);
+        }
+        var result = await _userRepository.SaveUser(userId, userModel);
+        return new SaveUserResponse(result, status);
+    }
+
+    /// <summary>
+    /// update user
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public async Task<SaveUserResponse> UpdateUser(long userId, UpdateUserRequest request)
+    {
+        var userModel = new UserModel(
+                            request.UserId,
+                            request.FullName,
+                            request.Email,
+                            request.PhoneNumber,
+                            request.CitizenIdentificationNumber,
+                            request.Address,
+                            request.AvatarImage,
+                            request.Password);
+        StatusEnum status = await ValidateUserInformation(userModel);
+        if (status != StatusEnum.Successed)
+        {
+            return new SaveUserResponse(false, status);
+        }
+        var result = await _userRepository.SaveUser(userId, userModel);
+        return new SaveUserResponse(result, status);
+    }
+
+    #region private function
+    /// <summary>
+    /// validate user information
+    /// </summary>
+    /// <param name="userModel"></param>
+    /// <returns></returns>
+    private async Task<StatusEnum> ValidateUserInformation(UserModel userModel)
+    {
+        bool isAddNewUser = true;
+        if (userModel.UserId > 0)
+        {
+            isAddNewUser = false;
+            var userExist = await _userRepository.GetUserByUserIdAndPassword(userModel.UserId, userModel.Password);
+            if (userExist.UserId != userModel.UserId)
+            {
+                return StatusEnum.InvalidPassword;
+            }
+        }
+        if (!string.IsNullOrEmpty(userModel.Email))
+        {
+            var userExist = await _userRepository.GetUserByEmail(userModel.Email);
+            if (isAddNewUser && userExist.Email.Trim() == userModel.Email.Trim())
+            {
+                return StatusEnum.InvalidEmail;
+            }
+            if (!isAddNewUser && userExist.UserId != userModel.UserId)
+            {
+                return StatusEnum.InvalidEmail;
+            }
+        }
+        if (!string.IsNullOrEmpty(userModel.PhoneNumber))
+        {
+            var userExist = await _userRepository.GetUserByPhone(userModel.PhoneNumber);
+            if (isAddNewUser && userExist.PhoneNumber.Trim() == userModel.PhoneNumber.Trim())
+            {
+                return StatusEnum.InvalidPhoneNumber;
+            }
+            if (!isAddNewUser && userExist.UserId != userModel.UserId)
+            {
+                return StatusEnum.InvalidPhoneNumber;
+            }
+        }
+        if (!string.IsNullOrEmpty(userModel.CitizenIdentificationNumber))
+        {
+            var userExist = await _userRepository.GetUserByCitizenIdentificationNumber(userModel.CitizenIdentificationNumber);
+            if (isAddNewUser && userExist.CitizenIdentificationNumber.Trim() == userModel.CitizenIdentificationNumber.Trim())
+            {
+                return StatusEnum.InvalidCitizenIdentificationNumber;
+            }
+            if (!isAddNewUser && userExist.UserId != userModel.UserId)
+            {
+                return StatusEnum.InvalidCitizenIdentificationNumber;
+            }
+        }
+        return StatusEnum.Successed;
+    }
+
+    #endregion 
 }

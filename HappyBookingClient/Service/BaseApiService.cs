@@ -120,7 +120,7 @@ public abstract class BaseApiService
         var oldAccessToken = await GetTokenFromLocalStorageAsync();
         if (string.IsNullOrEmpty(oldRefreshToken) || string.IsNullOrEmpty(oldAccessToken))
         {
-            throw new ApplicationException(MessageConstant.RefreshTokenIsNotExist);
+            return new LoginResponse(string.Empty, string.Empty, StatusEnum.RefreshTokenIsNotExist);
         }
 
         try

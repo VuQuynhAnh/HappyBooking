@@ -1,5 +1,6 @@
 ﻿using HappyBookingServer.DBContext;
 using HappyBookingServer.Interface;
+using HappyBookingShare.Entities;
 using HappyBookingShare.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,8 +17,10 @@ public class UserRepository : IUserRepository
 
     public async Task<List<UserModel>> GetAllData(string keyword, int pageIndex, int pageSize)
     {
-        var result = await _context.UserRepository.Where(item => (item.UserName.Contains(keyword)
-                                                                  || item.Description.Contains(keyword))
+        var result = await _context.UserRepository.Where(item => (item.FullName.Contains(keyword)
+                                                                  || item.Address.Contains(keyword)
+                                                                  || item.PhoneNumber.Contains(keyword)
+                                                                  || item.CitizenIdentificationNumber.Contains(keyword))
                                                                  && item.IsDeleted == 0)
                                                   .Skip((pageIndex - 1) * pageSize)
                                                   .Take(pageSize)
@@ -32,21 +35,96 @@ public class UserRepository : IUserRepository
                                                                                  && item.IsDeleted == 0);
         if (userItem == null)
         {
-            return new UserModel();
+            return new();
+        }
+        return new UserModel(userItem);
+    }
+
+    public async Task<UserModel> GetUserByEmail(string email)
+    {
+        var userItem = await _context.UserRepository.FirstOrDefaultAsync(item => item.Email == email
+                                                                                 && item.IsDeleted == 0);
+        if (userItem == null)
+        {
+            return new();
+        }
+        return new UserModel(userItem);
+    }
+
+    public async Task<UserModel> GetUserByPhone(string phoneNumber)
+    {
+        var userItem = await _context.UserRepository.FirstOrDefaultAsync(item => item.PhoneNumber == phoneNumber
+                                                                                 && item.IsDeleted == 0);
+        if (userItem == null)
+        {
+            return new();
+        }
+        return new UserModel(userItem);
+    }
+
+    public async Task<UserModel> GetUserByCitizenIdentificationNumber(string citizenIdentificationNumber)
+    {
+        var userItem = await _context.UserRepository.FirstOrDefaultAsync(item => item.CitizenIdentificationNumber == citizenIdentificationNumber
+                                                                                 && item.IsDeleted == 0);
+        if (userItem == null)
+        {
+            return new();
+        }
+        return new UserModel(userItem);
+    }
+
+    public async Task<UserModel> GetUserByUserIdAndPassword(long userId, string password)
+    {
+        var userItem = await _context.UserRepository.FirstOrDefaultAsync(item => item.Password == password
+                                                                                 && item.IsDeleted == 0
+                                                                                 && item.UserId == userId);
+        if (userItem == null)
+        {
+            return new();
         }
         return new UserModel(userItem);
     }
 
     public async Task<UserModel> GetUserByLoginInfor(string userName, string password)
     {
-        var userItem = await _context.UserRepository.FirstOrDefaultAsync(item => item.UserName == userName
-                                                                                 && item.Password == password
-                                                                                 && item.IsDeleted == 0);
+        var userItem = await _context.UserRepository.FirstOrDefaultAsync(item => item.Password == password
+                                                                                 && item.IsDeleted == 0
+                                                                                 && (item.CitizenIdentificationNumber == userName
+                                                                                     || item.PhoneNumber == userName
+                                                                                     || item.Email == userName));
         if (userItem == null)
         {
-            return new UserModel();
+            return new();
         }
         return new UserModel(userItem);
+    }
+
+    public async Task<bool> SaveUser(long userId, UserModel userModel)
+    {
+        var entity = await _context.UserRepository.FirstOrDefaultAsync(item => item.UserId == userModel.UserId
+                                                                               && item.IsDeleted == 0);
+
+        if (entity == null)
+        {
+            entity = new();
+            entity.UserId = 0;
+            entity.CreatedDate = DateTime.Now;
+            entity.CreatedId = userId;
+        }
+        entity.FullName = userModel.FullName;
+        entity.PhoneNumber = userModel.PhoneNumber;
+        entity.Email = userModel.Email;
+        entity.CitizenIdentificationNumber = userModel.CitizenIdentificationNumber;
+        entity.Address = userModel.Address;
+        entity.AvatarImage = userModel.AvatarImage;
+        entity.Password = userModel.Password;
+        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedId = userId;
+        if (entity.UserId == 0)
+        {
+            _context.UserRepository.Add(entity);
+        }
+        return _context.SaveChanges() > 0;
     }
 
     public async Task ReleaseResource()
