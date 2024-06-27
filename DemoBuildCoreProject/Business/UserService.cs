@@ -4,7 +4,7 @@ using HappyBookingShare.Response.User;
 using HappyBookingShare.Request.User;
 using HappyBookingShare.Response.Dtos;
 using HappyBookingShare.Model;
-using HappyBookingShare.Constant;
+using HappyBookingShare.Common;
 
 namespace HappyBookingServer.Business;
 
@@ -30,7 +30,8 @@ public class UserService : IUserService
         StatusEnum status = StatusEnum.Successed;
         try
         {
-            var data = await _userRepository.GetAllData(request.KeyWord, request.PageIndex, request.PageSize);
+            var keyword = request.KeyWord.Equals("_") ? string.Empty : request.KeyWord;
+            var data = await _userRepository.GetAllData(keyword, request.PageIndex, request.PageSize);
             userList = data.Select(item => new UserDto(item)).ToList();
         }
         finally
@@ -163,11 +164,11 @@ public class UserService : IUserService
             var userExist = await _userRepository.GetUserByEmail(userModel.Email);
             if (isAddNewUser && userExist.Email.Trim() == userModel.Email.Trim())
             {
-                return StatusEnum.InvalidEmail;
+                return StatusEnum.ExistEmail;
             }
             if (!isAddNewUser && userExist.UserId != userModel.UserId)
             {
-                return StatusEnum.InvalidEmail;
+                return StatusEnum.ExistEmail;
             }
         }
         if (!string.IsNullOrEmpty(userModel.PhoneNumber))
@@ -175,11 +176,11 @@ public class UserService : IUserService
             var userExist = await _userRepository.GetUserByPhone(userModel.PhoneNumber);
             if (isAddNewUser && userExist.PhoneNumber.Trim() == userModel.PhoneNumber.Trim())
             {
-                return StatusEnum.InvalidPhoneNumber;
+                return StatusEnum.ExistPhoneNumber;
             }
             if (!isAddNewUser && userExist.UserId != userModel.UserId)
             {
-                return StatusEnum.InvalidPhoneNumber;
+                return StatusEnum.ExistPhoneNumber;
             }
         }
         if (!string.IsNullOrEmpty(userModel.CitizenIdentificationNumber))
@@ -187,11 +188,11 @@ public class UserService : IUserService
             var userExist = await _userRepository.GetUserByCitizenIdentificationNumber(userModel.CitizenIdentificationNumber);
             if (isAddNewUser && userExist.CitizenIdentificationNumber.Trim() == userModel.CitizenIdentificationNumber.Trim())
             {
-                return StatusEnum.InvalidCitizenIdentificationNumber;
+                return StatusEnum.ExistCitizenIdentificationNumber;
             }
             if (!isAddNewUser && userExist.UserId != userModel.UserId)
             {
-                return StatusEnum.InvalidCitizenIdentificationNumber;
+                return StatusEnum.ExistCitizenIdentificationNumber;
             }
         }
         return StatusEnum.Successed;

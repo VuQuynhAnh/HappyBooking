@@ -1,4 +1,4 @@
-﻿using HappyBookingShare.Constant;
+﻿using HappyBookingShare.Common;
 
 namespace HappyBookingShare.Response.User;
 

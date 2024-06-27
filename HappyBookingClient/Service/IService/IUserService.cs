@@ -10,4 +10,8 @@ public interface IUserService : IBaseApiService
     Task<LoginResponse?> Login(LoginRequest request);
 
     Task RemoveTokensFromLocalStorageAsync();
+
+    Task<SaveUserResponse?> RegisterUser(RegisterUserRequest request);
+
+    Task<SaveUserResponse?> UpdateUser(UpdateUserRequest request);
 }

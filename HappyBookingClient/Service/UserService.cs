@@ -1,6 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using HappyBookingClient.Service.IService;
-using HappyBookingShare.Constant;
+using HappyBookingShare.Common;
 using HappyBookingShare.Request.User;
 using HappyBookingShare.Response.User;
 using Microsoft.AspNetCore.Components;
@@ -23,7 +23,8 @@ public class UserService : BaseApiService, IUserService
     {
         try
         {
-            var queryUrl = $"User/{APIName.GetAllData}?PageIndex={request.PageIndex}&PageSize={request.PageSize}";
+            string keyword = string.IsNullOrEmpty(request.KeyWord) ? "_" : request.KeyWord;
+            var queryUrl = $"User/{APIName.GetAllData}?PageIndex={request.PageIndex}&PageSize={request.PageSize}&KeyWord={keyword}";
             var result = await SendAuthorizedRequestAsync<GetListUserResponse>(HttpMethod.Get, queryUrl);
             return result;
         }
@@ -56,6 +57,44 @@ public class UserService : BaseApiService, IUserService
                 return result;
             }
             return null;
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// register new user
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public async Task<SaveUserResponse?> RegisterUser(RegisterUserRequest request)
+    {
+        try
+        {
+            var queryUrl = $"User/{APIName.RegisterUser}";
+            var result = await SendAuthorizedRequestAsync<SaveUserResponse>(HttpMethod.Post, queryUrl, request);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// update user
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public async Task<SaveUserResponse?> UpdateUser(UpdateUserRequest request)
+    {
+        try
+        {
+            var queryUrl = $"User/{APIName.UpdateUser}";
+            var result = await SendAuthorizedRequestAsync<SaveUserResponse>(HttpMethod.Put, queryUrl, request);
+            return result;
         }
         catch (Exception ex)
         {

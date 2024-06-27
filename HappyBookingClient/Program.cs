@@ -1,12 +1,14 @@
 ﻿using Blazored.LocalStorage;
 using HappyBookingClient.Components;
 using HappyBookingClient.Middleware;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddServices();
+builder.Services.AddMudServices();
 
 string baseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value ?? string.Empty;
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseUrl) });

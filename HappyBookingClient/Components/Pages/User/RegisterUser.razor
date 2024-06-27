@@ -1,91 +1,152 @@
 ﻿@page "/register-user"
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
-@using MudBlazor
+@using HappyBookingClient.Service.IService
+@using HappyBookingShare.Common
+@using HappyBookingShare.Request.User
+@inject IUserService _userService
+@inject NavigationManager _navigation
 
-<MudCard>
-    <MudForm Model="@model" @ref="@form" ValidationDelay="0">
-        <MudCardContent>
-            <MudTextField @bind-Value="model.Name"
-                          For="@(() => model.Name)"
-                          Immediate="true"
-                          Label="Name" />
+<MudBreadcrumbs Items="mudBreadcrumbs" Class="p-0 mb-3 mt-0"></MudBreadcrumbs>
+<MudGrid Justify="Justify.Center">
+    <MudItem md="6" sm="12" xs="12">
+        <MudText Typo="Typo.h6">Register user</MudText>
+        <MudCard>
+            @if (isShowAlert)
+            {
+                <MudAlert Severity="@severity" Variant="Variant.Filled" Dense="true" ShowCloseIcon="true" CloseIconClicked="@(() => isShowAlert = false)">@message</MudAlert>
+            }
+            <MudForm Model="@requestModel" @ref="@form" ValidationDelay="0">
+                <MudCardContent>
+                    <MudTextField @bind-Value="requestModel.FullName"
+                                  Immediate="true"
+                                  placeholder="Full name"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.DriveFileRenameOutline"
+                                  Variant="Variant.Outlined"
+                                  Required="true"
+                                  Class="pt-0" />
 
-            <MudTextField @bind-Value="model.Email"
-                          For="@(() => model.Email)"
-                          Immediate="true"
-                          Label="Email" />
+                    <MudTextField @bind-Value="requestModel.Email"
+                                  Immediate="true"
+                                  placeholder="Email"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Email"
+                                  Variant="Variant.Outlined"
+                                  Required="true"
+                                  InputType="InputType.Email" />
 
-            <MudTextField @bind-Value="model.CCNumber"
-                          For="@(() => model.CCNumber)"
-                          Immediate="true"
-                          Label="Credit card nr" />
+                    <MudTextField @bind-Value="requestModel.PhoneNumber"
+                                  Immediate="true"
+                                  placeholder="Phone number"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.PhonelinkRing"
+                                  Variant="Variant.Outlined"
+                                  Required="true"
+                                  InputType="InputType.Telephone" />
 
-            <MudTextField @bind-Value="model.Address.Address"
-                          For="@(() => model.Address.Address)"
-                          Immediate="true"
-                          Label="Address" />
+                    <MudTextField @bind-Value="requestModel.CitizenIdentificationNumber"
+                                  Immediate="true"
+                                  Required="true"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.RememberMe"
+                                  Variant="Variant.Outlined"
+                                  placeholder="Citizen identification number" />
 
-            <MudTextField @bind-Value="model.Address.City"
-                          For="@(() => model.Address.City)"
-                          Immediate="true"
-                          Label="City" />
+                    <MudTextField @bind-Value="requestModel.Address"
+                                  Immediate="true"
+                                  Required="true"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.AddLocationAlt"
+                                  Variant="Variant.Outlined"
+                                  placeholder="Address" />
 
-            <MudTextField @bind-Value="model.Address.Country"
-                          For="@(() => model.Address.Country)"
-                          Immediate="true"
-                          Label="Country" />
-        </MudCardContent>
-    </MudForm>
-    <MudCardActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Order</MudButton>
-    </MudCardActions>
-</MudCard>
+                    <MudTextField @bind-Value="requestModel.Password"
+                                  Immediate="true"
+                                  placeholder="Password"
+                                  Variant="Variant.Outlined"
+                                  Required="true"
+                                  InputType="InputType.Password"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Password" />
+
+                    <MudTextField @bind-Value="confirmPassword"
+                                  Immediate="true"
+                                  placeholder="Confirm password"
+                                  Variant="Variant.Outlined"
+                                  Required="true"
+                                  InputType="InputType.Password"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Password" />
+                </MudCardContent>
+            </MudForm>
+            <MudCardActions Class="pt-0">
+                <MudButton Variant="Variant.Filled" Class="mr-2" Size="Size.Small" Color="Color.Success" OnClick="@(async () => await SaveClick())">Save</MudButton>
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Default" OnClick="@(() => _navigation.NavigateTo("/"))">Cancel</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+</MudGrid>
 
 @code {
-    [Inject] ISnackbar Snackbar { get; set; }
-
-    MudForm form;
-
-    OrderModel model = new OrderModel();
-
-    public class OrderModel
+    private List<BreadcrumbItem> mudBreadcrumbs = new()
     {
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string CCNumber { get; set; } = "4012 8888 8888 1881";
-        public AddressModel Address { get; set; } = new AddressModel();
-        public List<OrderDetailsModel> OrderDetails = new List<OrderDetailsModel>()
-        {
-            new OrderDetailsModel()
-                {
-                    Description = "Perform Work order 1",
-                    Offer = 100
-                },
-            new OrderDetailsModel()
-        };
-    }
+        new BreadcrumbItem("Home", href: "/", icon: Icons.Material.Filled.Home),
+        new BreadcrumbItem("User", href: "user-list", icon: Icons.Material.Filled.People),
+        new BreadcrumbItem("Register user", href: "register-user", icon: Icons.Material.Filled.PersonAddAlt1),
+    };
+    private MudForm form;
+    private RegisterUserRequest requestModel = new();
+    private string confirmPassword = string.Empty;
+    private bool isShowAlert = false;
+    private Severity severity = Severity.Normal;
+    private string message = string.Empty;
 
-    public class AddressModel
+    private async Task SaveClick()
     {
-        public string Address { get; set; }
-        public string City { get; set; }
-        public string Country { get; set; }
-    }
-
-    public class OrderDetailsModel
-    {
-        public string Description { get; set; }
-        public decimal Offer { get; set; }
-    }
-
-    private async Task Submit()
-    {
+        isShowAlert = false;
         await form.Validate();
-
+        if (!form.IsValid)
+        {
+            return;
+        }
+        if (string.IsNullOrEmpty(requestModel.Password) || confirmPassword != requestModel.Password)
+        {
+            ShowAlert("Invalid confirm password!", Severity.Warning);
+            return;
+        }
         if (form.IsValid)
         {
-            Snackbar.Add("Submited!");
+            if (!Validator.IsValidEmail(requestModel.Email))
+            {
+                ShowAlert("Invalid email, please try again!", Severity.Warning);
+                return;
+            }
+            if (!Validator.IsValidPhoneNumber(requestModel.PhoneNumber))
+            {
+                ShowAlert("Invalid phone number, please try again!", Severity.Warning);
+                return;
+            }
+            var result = await _userService.RegisterUser(requestModel);
+            if (result == null || !result.Data)
+            {
+                ShowAlert(result?.Message ?? string.Empty, Severity.Warning);
+                return;
+            }
+            ShowAlert("Register user successed!", Severity.Success);
+            var loginResponse = await _userService.Login(new LoginRequest() { UserName = requestModel.PhoneNumber, Password = requestModel.Password });
+            if (loginResponse != null)
+            {
+                _navigation.NavigateTo("/");
+                requestModel = new();
+            }
         }
+    }
+
+    private void ShowAlert(string message, Severity severity)
+    {
+        this.isShowAlert = true;
+        this.severity = severity;
+        this.message = message;
     }
 
 }

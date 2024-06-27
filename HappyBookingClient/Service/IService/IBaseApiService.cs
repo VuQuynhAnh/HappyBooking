@@ -1,4 +1,4 @@
-﻿namespace HappyBookingClient.Service;
+﻿namespace HappyBookingClient.Service.IService;
 
 public interface IBaseApiService
 {

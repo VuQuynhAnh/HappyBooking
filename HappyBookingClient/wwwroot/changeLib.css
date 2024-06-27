@@ -1,0 +1,46 @@
+﻿.content {
+    padding-top: 0.1rem;
+}
+
+.mud-card-content {
+    padding: 8px;
+}
+
+.mud-breadcrumb-separator {
+    padding: 0 2px;
+}
+
+.mud-typography-body1 {
+    font-size: 14px;
+}
+
+.mud-input > input.mud-input-root-outlined {
+    padding: 5px;
+}
+
+.mud-input.mud-input-outlined.mud-input-adorned-start {
+    padding: 5px;
+}
+
+.mud-input {
+    font-size: 14px;
+}
+
+.mud-button-filled-success {
+    background-color: rgb(31, 136, 61) !important;
+}
+
+.mud-button-outlined-default {
+    background-color: rgb(246, 248, 250);
+    border-color: rgb(208, 215, 222);
+}
+
+.mud-button-filled-size-small {
+    padding: 3px 8px;
+    font-size: 14px;
+}
+
+.mud-button-outlined-size-small {
+    padding: 3px 8px;
+    font-size: 14px;
+}

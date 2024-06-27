@@ -1,4 +1,4 @@
-﻿namespace HappyBookingShare.Constant;
+﻿namespace HappyBookingShare.Common;
 
 public static class KeyConstant
 {

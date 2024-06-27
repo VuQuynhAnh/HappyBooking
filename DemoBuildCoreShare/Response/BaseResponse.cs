@@ -1,4 +1,4 @@
-﻿using HappyBookingShare.Constant;
+﻿using HappyBookingShare.Common;
 using System.Text.Json.Serialization;
 
 namespace HappyBookingShare.Response;

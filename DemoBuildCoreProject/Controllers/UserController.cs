@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using HappyBookingShare.Response.User;
-using HappyBookingShare.Constant;
+using HappyBookingShare.Common;
 using HappyBookingShare.Request.User;
 using DemoBuildCoreProject.Controllers;
 
@@ -49,7 +49,7 @@ public class UserController : BaseController
         return Ok(response);
     }
 
-    [HttpPost(APIName.UpdateUser)]
+    [HttpPut(APIName.UpdateUser)]
     public async Task<ActionResult<SaveUserResponse>> UpdateUser([FromBody] UpdateUserRequest request)
     {
         var response = await _userService.UpdateUser(UserId, request);

@@ -1,13 +1,13 @@
-﻿namespace HappyBookingShare.Constant;
+﻿namespace HappyBookingShare.Common;
 
 public enum StatusEnum : byte
 {
     Successed = 0,
     Failed = 1,
     InvalidParam = 2,
-    InvalidEmail = 3,
-    InvalidPhoneNumber = 4,
-    InvalidCitizenIdentificationNumber = 5,
+    ExistEmail = 3,
+    ExistPhoneNumber = 4,
+    ExistCitizenIdentificationNumber = 5,
     InvalidPassword = 6,
     RefreshTokenIsNotExist = 7,
 }
