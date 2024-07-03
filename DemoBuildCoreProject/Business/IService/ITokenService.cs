@@ -1,7 +1,7 @@
 ﻿using HappyBookingShare.Model;
 using HappyBookingShare.Response.User;
 
-namespace HappyBookingServer.Business.IService;
+namespace DemoBuildCoreProject.Business.IService;
 
 public interface ITokenService
 {

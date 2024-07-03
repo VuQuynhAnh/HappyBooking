@@ -1,10 +1,9 @@
-﻿using HappyBookingServer.DBContext;
-using HappyBookingServer.Interface;
-using HappyBookingShare.Entities;
+﻿using DemoBuildCoreProject.DBContext;
+using DemoBuildCoreProject.Interface;
 using HappyBookingShare.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace HappyBookingServer.Repository;
+namespace DemoBuildCoreProject.Repository;
 
 public class UserRepository : IUserRepository
 {
@@ -108,7 +107,7 @@ public class UserRepository : IUserRepository
         {
             entity = new();
             entity.UserId = 0;
-            entity.CreatedDate = DateTime.Now;
+            entity.CreatedDate = DateTime.UtcNow;
             entity.CreatedId = userId;
         }
         entity.FullName = userModel.FullName;
@@ -118,13 +117,13 @@ public class UserRepository : IUserRepository
         entity.Address = userModel.Address;
         entity.AvatarImage = userModel.AvatarImage;
         entity.Password = userModel.Password;
-        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedId = userId;
         if (entity.UserId == 0)
         {
             _context.UserRepository.Add(entity);
         }
-        return _context.SaveChanges() > 0;
+        return await _context.SaveChangesAsync() > 0;
     }
 
     public async Task ReleaseResource()

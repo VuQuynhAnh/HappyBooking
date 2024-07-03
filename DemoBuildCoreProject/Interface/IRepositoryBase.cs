@@ -1,4 +1,4 @@
-﻿namespace HappyBookingServer.Interface;
+﻿namespace DemoBuildCoreProject.Interface;
 
 public interface IRepositoryBase
 {

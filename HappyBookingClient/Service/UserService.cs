@@ -4,6 +4,7 @@ using HappyBookingShare.Common;
 using HappyBookingShare.Request.User;
 using HappyBookingShare.Response.User;
 using Microsoft.AspNetCore.Components;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace HappyBookingClient.Service;
 
@@ -118,6 +119,32 @@ public class UserService : BaseApiService, IUserService
     /// <returns></returns>
     async Task<string> IBaseApiService.GetTokenFromLocalStorageAsync()
     {
-        return await base.GetTokenFromLocalStorageAsync();
+        return await GetTokenFromLocalStorageAsync();
+    }
+
+    /// <summary>
+    /// IsTokenExpired
+    /// </summary>
+    /// <returns></returns>
+    public async Task<bool> IsTokenExpired()
+    {
+        var token = await GetTokenFromLocalStorageAsync();
+        if (string.IsNullOrEmpty(token))
+        {
+            return true; // Token không tồn tại hoặc rỗng, coi như đã hết hạn
+        }
+        var jwtHandler = new JwtSecurityTokenHandler();
+        var jwtToken = jwtHandler.ReadJwtToken(token);
+        var expClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "exp");
+
+        if (expClaim != null)
+        {
+            var exp = long.Parse(expClaim.Value);
+            var expirationTime = DateTimeOffset.FromUnixTimeSeconds(exp);
+            var utcNow = DateTime.UtcNow;
+            return expirationTime < utcNow;
+        }
+
+        return true; // Nếu không tìm thấy claim "exp", coi như đã hết hạn
     }
 }

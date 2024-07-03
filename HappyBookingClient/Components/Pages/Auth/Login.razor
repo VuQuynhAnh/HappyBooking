@@ -2,52 +2,63 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @using Blazored.LocalStorage
 @using HappyBookingClient.Service.IService
+@using HappyBookingShare.Common
 @using HappyBookingShare.Request.User
-@inject NavigationManager Navigation
+@inject NavigationManager _navigation
 @inject ILocalStorageService localStorage
 @inject IUserService _userService
 
-<h3>Login</h3>
+<MudGrid Justify="Justify.Center">
+    <MudItem md="6" sm="12" xs="12">
+        <MudText Typo="Typo.h6">Login</MudText>
+        <MudCard>
+            @if (isShowAlert)
+            {
+                <MudAlert Severity="@severity" Variant="Variant.Filled" Dense="true" ShowCloseIcon="true" CloseIconClicked="@(() => isShowAlert = false)">@message</MudAlert>
+            }
+            <MudForm Model="@request" @ref="@form" ValidationDelay="0">
+                <MudCardContent>
+                    <MudTextField @bind-Value="request.UserName"
+                                  Immediate="true"
+                                  Label="User name"
+                                  placeholder="Input email, phone or citizen identification number"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.DriveFileRenameOutline"
+                                  Variant="Variant.Outlined"
+                                  Required="true"
+                                  Class="pt-0" />
 
-
-@if (isConnected)
-{
-    <EditForm Model="@request" OnSubmit="HandleValidSubmit" FormName="loginForm">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
-        <div>
-            <label for="userName">UserName:</label>
-            <InputText id="userName" @bind-Value="request.UserName" />
-        </div>
-        <div>
-            <label for="password">Password:</label>
-            <InputText id="password" @bind-Value="request.Password" type="password" />
-        </div>
-        <button type="submit">Login</button>
-    </EditForm>
-
-    @if (!string.IsNullOrEmpty(message))
-    {
-        <div>@message</div>
-    }
-}
-else
-{
-    <p>Loading...</p>
-}
-
+                    <MudTextField @bind-Value="request.Password"
+                                  Immediate="true"
+                                  Class="mt-5"
+                                  Label="Password"
+                                  placeholder="Password"
+                                  Variant="Variant.Outlined"
+                                  Required="true"
+                                  InputType="InputType.Password"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Password" />
+                </MudCardContent>
+            </MudForm>
+            <MudCardActions Class="pt-0">
+                <MudButton Variant="Variant.Filled" Class="mr-2" Size="Size.Small" Color="Color.Success" OnClick="@(async () => await LoginClick())">Login</MudButton>
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Default" OnClick="@(() => _navigation.NavigateTo("/"))">Cancel</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+</MudGrid>
 
 @code {
-    [SupplyParameterFromForm(FormName = "loginForm")]
     public LoginRequest request { get; set; } = new();
+    private MudForm form;
+    private bool isShowAlert = false;
+    private Severity severity = Severity.Normal;
     private string message = string.Empty;
-    private bool isConnected = false;
     private string returnUrl = string.Empty;
 
     protected override void OnInitialized()
     {
-        var uri = new Uri(Navigation.Uri);
+        var uri = new Uri(_navigation.Uri);
         if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var value))
         {
             returnUrl = value.ToString();
@@ -58,14 +69,16 @@ else
     {
         if (firstRender)
         {
-            isConnected = true;
-            var result = await _userService.GetTokenFromLocalStorageAsync();
+            var token = await _userService.GetTokenFromLocalStorageAsync();
+            if (!await _userService.IsTokenExpired())
+            {
+                _navigation.NavigateTo("/");
+            }
             StateHasChanged();
         }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task HandleValidSubmit()
+    private async Task LoginClick()
     {
         message = string.Empty;
         try
@@ -73,16 +86,30 @@ else
             var response = await _userService.Login(request);
             if (response != null)
             {
-                Navigation.NavigateTo("/");
+                if (!string.IsNullOrEmpty(returnUrl))
+                {
+                    _navigation.NavigateTo(returnUrl);
+                }
+                else
+                {
+                    _navigation.NavigateTo("/");
+                }
             }
             else
             {
-                message = "Invalid username or password.";
+                ShowAlert("Invalid username or password.", Severity.Warning);
             }
         }
         catch (Exception ex)
         {
             message = ex.Message;
         }
+    }
+
+    private void ShowAlert(string message, Severity severity)
+    {
+        this.isShowAlert = true;
+        this.severity = severity;
+        this.message = message;
     }
 }

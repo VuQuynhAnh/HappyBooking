@@ -4,7 +4,6 @@ using System.Web.Http;
 namespace DemoBuildCoreProject.Controllers;
 
 [Authorize]
-[ApiController]
 public abstract class BaseController : ControllerBase
 {
     protected long UserId { get; }

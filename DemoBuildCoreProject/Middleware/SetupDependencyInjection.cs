@@ -1,9 +1,9 @@
-﻿using HappyBookingServer.Business.IService;
-using HappyBookingServer.Business;
-using HappyBookingServer.Interface;
-using HappyBookingServer.Repository;
+﻿using DemoBuildCoreProject.Business.IService;
+using DemoBuildCoreProject.Business;
+using DemoBuildCoreProject.Interface;
+using DemoBuildCoreProject.Repository;
 
-namespace HappyBookingServer.Middleware;
+namespace DemoBuildCoreProject.Middleware;
 
 public static class SetupDependencyInjection
 {
@@ -11,10 +11,12 @@ public static class SetupDependencyInjection
     {
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddHttpClient<IUploadImageService, UploadImageService>();
     }
 
     public static void AddRepositoryServices(this IServiceCollection services)
     {
         services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IImageRepository, ImageRepository>();
     }
 }

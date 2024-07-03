@@ -14,4 +14,6 @@ public interface IUserService : IBaseApiService
     Task<SaveUserResponse?> RegisterUser(RegisterUserRequest request);
 
     Task<SaveUserResponse?> UpdateUser(UpdateUserRequest request);
+
+    Task<bool> IsTokenExpired();
 }

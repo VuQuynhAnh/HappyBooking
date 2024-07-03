@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace HappyBookingServer.Migrations
+namespace DemoBuildCoreProject.Migrations
 {
     /// <inheritdoc />
     public partial class update_table_user : Migration

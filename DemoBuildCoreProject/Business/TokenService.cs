@@ -1,6 +1,6 @@
-﻿using HappyBookingServer.Business.IService;
-using HappyBookingServer.DBContext;
-using HappyBookingServer.Interface;
+﻿using DemoBuildCoreProject.Business.IService;
+using DemoBuildCoreProject.DBContext;
+using DemoBuildCoreProject.Interface;
 using HappyBookingShare.Entities;
 using HappyBookingShare.Model;
 using HappyBookingShare.Response.User;
@@ -10,7 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace HappyBookingServer.Business;
+namespace DemoBuildCoreProject.Business;
 
 public class TokenService : ITokenService
 {
@@ -83,7 +83,7 @@ public class TokenService : ITokenService
         {
             Token = Guid.NewGuid().ToString(),
             UserId = user.UserId,
-            ExpiryDate = DateTime.UtcNow.AddDays(2),
+            ExpiryDate = DateTime.UtcNow.AddDays(1),
             IsRevoked = false
         };
 
