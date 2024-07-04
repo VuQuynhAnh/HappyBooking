@@ -5,22 +5,24 @@ using HappyBookingShare.Response.ImageUpload;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 
-namespace DemoBuildCoreProject.Business
+namespace DemoBuildCoreProject.Business;
+
+public class UploadImageService : IUploadImageService
 {
-    public class UploadImageService : IUploadImageService
+    private readonly HttpClient _httpClient;
+    private readonly string _clientId;
+    private readonly IImageRepository _imageRepository;
+
+    public UploadImageService(HttpClient httpClient, IConfiguration configuration, IImageRepository imageRepository)
     {
-        private readonly HttpClient _httpClient;
-        private readonly string _clientId;
-        private readonly IImageRepository _imageRepository;
+        _httpClient = httpClient;
+        _clientId = configuration["Imgur:ClientId"] ?? throw new ArgumentNullException(nameof(configuration), "Imgur ClientId is not configured");
+        _imageRepository = imageRepository;
+    }
 
-        public UploadImageService(HttpClient httpClient, IConfiguration configuration, IImageRepository imageRepository)
-        {
-            _httpClient = httpClient;
-            _clientId = configuration["Imgur:ClientId"] ?? throw new ArgumentNullException(nameof(configuration), "Imgur ClientId is not configured");
-            _imageRepository = imageRepository;
-        }
-
-        public async Task<UploadImageResponse> UploadImageAsync(IFormFile image, long userId)
+    public async Task<UploadImageResponse> UploadImageAsync(IFormFile image, long userId)
+    {
+        try
         {
             StatusEnum status = StatusEnum.Successed;
             if (image == null || image.Length == 0)
@@ -62,31 +64,57 @@ namespace DemoBuildCoreProject.Business
                 }
             }
         }
-
-        public async Task<DeleteImageResponse> DeleteImageAsync(string deleteHash, long userId)
+        finally
         {
-            try
-            {
-                StatusEnum status = StatusEnum.Successed;
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", _clientId);
+            await _imageRepository.ReleaseResource();
+        }
+    }
 
-                var response = await _httpClient.DeleteAsync($"https://api.imgur.com/3/image/{deleteHash}");
+    public async Task<DeleteImageResponse> DeleteImageAsync(string deleteHash, long userId)
+    {
+        try
+        {
+            StatusEnum status = StatusEnum.Successed;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", _clientId);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    await _imageRepository.DeleteImage(deleteHash, userId);
-                    return new DeleteImageResponse(true, status); // Xóa thành công
-                }
-                else
-                {
-                    var responseBody = await response.Content.ReadAsStringAsync();
-                    throw new HttpRequestException($"Failed to delete image from Imgur. Status code: {response.StatusCode}. Response: {responseBody}");
-                }
-            }
-            catch (Exception ex)
+            var response = await _httpClient.DeleteAsync($"https://api.imgur.com/3/image/{deleteHash}");
+
+            if (response.IsSuccessStatusCode)
             {
-                throw new ApplicationException("Error deleting image from Imgur", ex);
+                await _imageRepository.DeleteImage(deleteHash, userId);
+                return new DeleteImageResponse(true, status); // Xóa thành công
             }
+            else
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Failed to delete image from Imgur. Status code: {response.StatusCode}. Response: {responseBody}");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("Error deleting image from Imgur", ex);
+        }
+        finally
+        {
+            await _imageRepository.ReleaseResource();
+        }
+    }
+
+    public async Task<DeleteImageResponse> ClearImageNotUsed()
+    {
+        try
+        {
+            var deletedList = await _imageRepository.GetClearImageList();
+            StatusEnum status = StatusEnum.Successed;
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", _clientId);
+            var tasks = deletedList.Select(image => _httpClient.DeleteAsync($"https://api.imgur.com/3/image/{image}"));
+            await Task.WhenAll(tasks);
+            return new DeleteImageResponse(true, status);
+        }
+        finally
+        {
+            await _imageRepository.ReleaseResource();
         }
     }
 }

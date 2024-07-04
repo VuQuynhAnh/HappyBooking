@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddServices();
 builder.Services.AddMudServices();
+builder.Services.AddBlazoredLocalStorage();
 
 string baseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value ?? string.Empty;
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseUrl) });

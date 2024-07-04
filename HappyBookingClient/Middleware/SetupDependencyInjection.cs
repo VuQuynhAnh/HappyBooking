@@ -7,6 +7,7 @@ public static class SetupDependencyInjection
 {
     public static void AddServices(this IServiceCollection services)
     {
+        services.AddSingleton<ILanguageService, LanguageService>();
         services.AddScoped<IUserService, UserService>();
     }
 }

@@ -5,6 +5,7 @@ using HappyBookingShare.Request.User;
 using HappyBookingShare.Response.Dtos;
 using HappyBookingShare.Model;
 using HappyBookingShare.Common;
+using DemoBuildCoreProject.Repository;
 
 namespace DemoBuildCoreProject.Business;
 
@@ -97,7 +98,9 @@ public class UserService : IUserService
     /// <returns></returns>
     public async Task<SaveUserResponse> RegisterUser(long userId, RegisterUserRequest request)
     {
-        var userModel = new UserModel(
+        try
+        {
+            var userModel = new UserModel(
                             0,
                             request.FullName,
                             request.Email,
@@ -106,13 +109,18 @@ public class UserService : IUserService
                             request.Address,
                             request.AvatarImage,
                             request.Password);
-        StatusEnum status = await ValidateUserInformation(userModel);
-        if (status != StatusEnum.Successed)
-        {
-            return new SaveUserResponse(false, status);
+            StatusEnum status = await ValidateUserInformation(userModel);
+            if (status != StatusEnum.Successed)
+            {
+                return new SaveUserResponse(false, status);
+            }
+            var result = await _userRepository.SaveUser(userId, userModel);
+            return new SaveUserResponse(result, status);
         }
-        var result = await _userRepository.SaveUser(userId, userModel);
-        return new SaveUserResponse(result, status);
+        finally
+        {
+            await _userRepository.ReleaseResource();
+        }
     }
 
     /// <summary>
@@ -123,22 +131,29 @@ public class UserService : IUserService
     /// <returns></returns>
     public async Task<SaveUserResponse> UpdateUser(long userId, UpdateUserRequest request)
     {
-        var userModel = new UserModel(
-                            request.UserId,
-                            request.FullName,
-                            request.Email,
-                            request.PhoneNumber,
-                            request.CitizenIdentificationNumber,
-                            request.Address,
-                            request.AvatarImage,
-                            request.Password);
-        StatusEnum status = await ValidateUserInformation(userModel);
-        if (status != StatusEnum.Successed)
+        try
         {
-            return new SaveUserResponse(false, status);
+            var userModel = new UserModel(
+                           request.UserId,
+                           request.FullName,
+                           request.Email,
+                           request.PhoneNumber,
+                           request.CitizenIdentificationNumber,
+                           request.Address,
+                           request.AvatarImage,
+                           request.Password);
+            StatusEnum status = await ValidateUserInformation(userModel);
+            if (status != StatusEnum.Successed)
+            {
+                return new SaveUserResponse(false, status);
+            }
+            var result = await _userRepository.SaveUser(userId, userModel);
+            return new SaveUserResponse(result, status);
         }
-        var result = await _userRepository.SaveUser(userId, userModel);
-        return new SaveUserResponse(result, status);
+        finally
+        {
+            await _userRepository.ReleaseResource();
+        }
     }
 
     #region private function

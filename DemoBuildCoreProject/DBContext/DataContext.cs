@@ -14,4 +14,6 @@ public class DataContext : DbContext
     public DbSet<RefreshToken> RefreshTokenRepository { get; set; }
 
     public DbSet<ImageManagement> ImageManagementRepository { get; set; }
+
+    public DbSet<Setting> SettingRepository { get; set; }
 }

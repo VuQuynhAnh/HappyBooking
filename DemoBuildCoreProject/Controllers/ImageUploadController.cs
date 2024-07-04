@@ -29,15 +29,14 @@ public class ImageUploadController : BaseController
     [HttpDelete("{deleteHash}")]
     public async Task<IActionResult> DeleteImage(string deleteHash)
     {
-        try
-        {
-            var response = await _uploadImageService.DeleteImageAsync(deleteHash, UserId);
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest($"Failed to delete image: {ex.Message}");
-        }
+        var response = await _uploadImageService.DeleteImageAsync(deleteHash, UserId);
+        return Ok(response);
     }
 
+    [HttpDelete]
+    public async Task<IActionResult> DeleteImages()
+    {
+        var response = await _uploadImageService.ClearImageNotUsed();
+        return Ok(response);
+    }
 }
