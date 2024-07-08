@@ -1,20 +1,21 @@
-# Stage 1: Build the application
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+# Use the official .NET image as a build stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+# Set the working directory
 WORKDIR /app
 
-# Copy solution and restore as distinct layers
-COPY *.sln .
-COPY HappyBookingClient/*.csproj ./HappyBookingClient/
+# Copy the csproj and restore as distinct layers
 COPY HappyBookingServer/*.csproj ./HappyBookingServer/
-COPY HappyBookingShare/*.csproj ./HappyBookingShare/
-RUN dotnet restore
+RUN dotnet restore ./HappyBookingServer/HappyBookingServer.csproj
 
-# Copy everything else and build
-COPY . ./
+# Copy everything else and build the project
+COPY . .
 RUN dotnet publish ./HappyBookingServer/HappyBookingServer.csproj -c Release -o out
 
-# Stage 2: Serve the application
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Use the official .NET runtime image as a runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build-env /app/out .
+COPY --from=build /app/out .
+
+# Set the entry point for the application
 ENTRYPOINT ["dotnet", "HappyBookingServer.dll"]
