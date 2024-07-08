@@ -9,6 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HappyBookingShare", "DemoBu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HappyBookingClient", "HappyBookingClient\HappyBookingClient.csproj", "{6755AFAA-8848-4CB5-8756-04494949468E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{BC551D7E-A377-4DC3-A09B-182D90E58146}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{B8BC6DEF-3357-46B9-814C-4260E85A1F3E}"
+	ProjectSection(SolutionItems) = preProject
+		ci-cd-docker.yml = ci-cd-docker.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +37,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B8BC6DEF-3357-46B9-814C-4260E85A1F3E} = {BC551D7E-A377-4DC3-A09B-182D90E58146}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5F918DD-28B7-43D1-B8BE-6C258B885D3F}

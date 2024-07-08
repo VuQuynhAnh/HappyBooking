@@ -9,5 +9,6 @@ public static class SetupDependencyInjection
     {
         services.AddHttpClient<ILanguageService, LanguageService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ISettingService, SettingService>();
     }
 }

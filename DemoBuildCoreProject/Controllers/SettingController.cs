@@ -24,7 +24,7 @@ public class SettingController : BaseController
     }
 
     [HttpPost(APIName.SaveSetting)]
-    public async Task<ActionResult<GetSettingResponse>> SaveSetting([FromBody] SaveSettingRequest request)
+    public async Task<ActionResult<SaveSettingResponse>> SaveSetting([FromBody] SaveSettingRequest request)
     {
         var response = await _settingService.SaveSetting(request, UserId);
         return Ok(response);
