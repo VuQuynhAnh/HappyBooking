@@ -13,7 +13,6 @@ builder.Services.AddBlazoredLocalStorage();
 
 string baseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value ?? string.Empty;
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseUrl) });
-builder.Services.AddBlazoredLocalStorage();
 
 var app = builder.Build();
 
