@@ -6,7 +6,7 @@ public static class Validator
 {
     public static bool IsValidPhoneNumber(string phoneNumber)
     {
-        var phoneNumberPattern = @"^\+?[1-9]\d{1,14}$";
+        var phoneNumberPattern = @"^(0|\+84)(3[2-9]|5[2-9]|7[0-9]|8[1-9]|9[0-9])[0-9]{7}$";
         return Regex.IsMatch(phoneNumber, phoneNumberPattern);
     }
 

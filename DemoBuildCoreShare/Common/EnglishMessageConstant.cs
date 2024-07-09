@@ -1,9 +1,9 @@
 ﻿namespace HappyBookingShare.Common;
 
-public static class MessageConstant
+public static class EnglishMessageConstant
 {
     /// <summary>
-    /// get message from status enum
+    /// get English message from status enum
     /// </summary>
     /// <param name="statusEnum"></param>
     /// <returns></returns>

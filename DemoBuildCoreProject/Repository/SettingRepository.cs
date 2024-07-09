@@ -1,18 +1,21 @@
 ﻿using DemoBuildCoreProject.DBContext;
 using DemoBuildCoreProject.Interface;
+using HappyBookingShare.Common;
 using HappyBookingShare.Entities;
 using HappyBookingShare.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DemoBuildCoreProject.Repository;
 
 public class SettingRepository : ISettingRepository
 {
     private readonly DataContext _context;
-
-    public SettingRepository(DataContext context)
+    private readonly IMemoryCache _cache;
+    public SettingRepository(DataContext context, IMemoryCache cache)
     {
         _context = context;
+        _cache = cache;
     }
 
     /// <summary>
@@ -34,6 +37,7 @@ public class SettingRepository : ISettingRepository
         setting.LanguageCode = model.LanguageCode;
         setting.UpdatedDate = DateTime.UtcNow;
         setting.CreatedId = model.UserId;
+        _cache.Set($"{KeyConstant.LanguageCode}_{model.UserId}", model.LanguageCode);
         return await _context.SaveChangesAsync() > 0;
     }
 
@@ -46,6 +50,10 @@ public class SettingRepository : ISettingRepository
     {
         var setting = await _context.SettingRepository.FirstOrDefaultAsync(item => item.UserId == userId
                                                                                    && item.IsDeleted == 0);
+        if (setting != null)
+        {
+            _cache.Set($"{KeyConstant.LanguageCode}_{setting.UserId}", setting.LanguageCode);
+        }
         return new SettingModel(setting ?? new());
     }
 

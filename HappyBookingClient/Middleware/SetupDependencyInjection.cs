@@ -7,7 +7,7 @@ public static class SetupDependencyInjection
 {
     public static void AddServices(this IServiceCollection services)
     {
-        services.AddHttpClient<ILanguageService, LanguageService>();
+        services.AddScoped<ILanguageService, LanguageService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ISettingService, SettingService>();
     }

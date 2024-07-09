@@ -5,7 +5,7 @@ using HappyBookingShare.Request.User;
 using HappyBookingShare.Response.Dtos;
 using HappyBookingShare.Model;
 using HappyBookingShare.Common;
-using DemoBuildCoreProject.Repository;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DemoBuildCoreProject.Business;
 
@@ -13,11 +13,14 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService;
+    private readonly IMemoryCache _cache;
 
-    public UserService(IUserRepository userRepository, ITokenService tokenService)
+
+    public UserService(IUserRepository userRepository, ITokenService tokenService, IMemoryCache cache)
     {
         _userRepository = userRepository;
         _tokenService = tokenService;
+        _cache = cache;
     }
 
     /// <summary>
@@ -25,7 +28,7 @@ public class UserService : IUserService
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    public async Task<GetListUserResponse> GetAllUserData(GetListUserRequest request)
+    public async Task<GetListUserResponse> GetAllUserData(long userId, GetListUserRequest request)
     {
         List<UserDto> userList = new();
         StatusEnum status = StatusEnum.Successed;
@@ -39,7 +42,7 @@ public class UserService : IUserService
         {
             await _userRepository.ReleaseResource();
         }
-        return new GetListUserResponse(userList, status);
+        return new GetListUserResponse(userId, userList, status, _cache);
     }
 
     /// <summary>
@@ -112,10 +115,10 @@ public class UserService : IUserService
             StatusEnum status = await ValidateUserInformation(userModel);
             if (status != StatusEnum.Successed)
             {
-                return new SaveUserResponse(false, status);
+                return new SaveUserResponse(0, false, status, _cache);
             }
             var result = await _userRepository.SaveUser(userId, userModel);
-            return new SaveUserResponse(result, status);
+            return new SaveUserResponse(userId, result, status, _cache);
         }
         finally
         {
@@ -145,10 +148,10 @@ public class UserService : IUserService
             StatusEnum status = await ValidateUserInformation(userModel);
             if (status != StatusEnum.Successed)
             {
-                return new SaveUserResponse(false, status);
+                return new SaveUserResponse(userId, false, status, _cache);
             }
             var result = await _userRepository.SaveUser(userId, userModel);
-            return new SaveUserResponse(result, status);
+            return new SaveUserResponse(userId, result, status, _cache);
         }
         finally
         {

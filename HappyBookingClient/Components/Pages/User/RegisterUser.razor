@@ -1,15 +1,15 @@
 ﻿@page "/register-user"
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Common
 @using HappyBookingShare.Request.User
 @inject IUserService _userService
 @inject NavigationManager _navigation
+@inject ILanguageService _languageService
 
 <MudBreadcrumbs Items="mudBreadcrumbs" Class="p-0 mb-3 mt-0"></MudBreadcrumbs>
 <MudGrid Justify="Justify.Center">
     <MudItem md="6" sm="12" xs="12">
-        <MudText Typo="Typo.h6">Register user</MudText>
+        <MudText Typo="Typo.h6">@_languageService["Register"]</MudText>
         <MudCard>
             @if (isShowAlert)
             {
@@ -19,29 +19,32 @@
                 <MudCardContent>
                     <MudTextField @bind-Value="requestModel.FullName"
                                   Immediate="true"
-                                  placeholder="Full name"
+                                  placeholder="@_languageService["FullName"]"
                                   Adornment="Adornment.Start"
                                   AdornmentIcon="@Icons.Material.Filled.DriveFileRenameOutline"
                                   Variant="Variant.Outlined"
                                   Required="true"
+                                  RequiredError="@_languageService["RequiredError"]"
                                   Class="pt-0" />
 
                     <MudTextField @bind-Value="requestModel.Email"
                                   Immediate="true"
-                                  placeholder="Email"
+                                  placeholder="@_languageService["Email"]"
                                   Adornment="Adornment.Start"
                                   AdornmentIcon="@Icons.Material.Filled.Email"
                                   Variant="Variant.Outlined"
                                   Required="true"
+                                  RequiredError="@_languageService["RequiredError"]"
                                   InputType="InputType.Email" />
 
                     <MudTextField @bind-Value="requestModel.PhoneNumber"
                                   Immediate="true"
-                                  placeholder="Phone number"
+                                  placeholder="@_languageService["PhoneNumber"]"
                                   Adornment="Adornment.Start"
                                   AdornmentIcon="@Icons.Material.Filled.PhonelinkRing"
                                   Variant="Variant.Outlined"
                                   Required="true"
+                                  RequiredError="@_languageService["RequiredError"]"
                                   InputType="InputType.Telephone" />
 
                     <MudTextField @bind-Value="requestModel.CitizenIdentificationNumber"
@@ -50,7 +53,8 @@
                                   Adornment="Adornment.Start"
                                   AdornmentIcon="@Icons.Material.Filled.RememberMe"
                                   Variant="Variant.Outlined"
-                                  placeholder="Citizen identification number" />
+                                  RequiredError="@_languageService["RequiredError"]"
+                                  placeholder="@_languageService["CitizenIdentificationNumber"]" />
 
                     <MudTextField @bind-Value="requestModel.Address"
                                   Immediate="true"
@@ -58,48 +62,66 @@
                                   Adornment="Adornment.Start"
                                   AdornmentIcon="@Icons.Material.Filled.AddLocationAlt"
                                   Variant="Variant.Outlined"
-                                  placeholder="Address" />
+                                  RequiredError="@_languageService["RequiredError"]"
+                                  placeholder="@_languageService["Address"]" />
 
                     <MudTextField @bind-Value="requestModel.Password"
                                   Immediate="true"
-                                  placeholder="Password"
+                                  placeholder="@_languageService["Password"]"
                                   Variant="Variant.Outlined"
                                   Required="true"
                                   InputType="InputType.Password"
                                   Adornment="Adornment.Start"
+                                  RequiredError="@_languageService["RequiredError"]"
                                   AdornmentIcon="@Icons.Material.Filled.Password" />
 
                     <MudTextField @bind-Value="confirmPassword"
                                   Immediate="true"
-                                  placeholder="Confirm password"
+                                  placeholder="@_languageService["ConfirmPassword"]"
                                   Variant="Variant.Outlined"
                                   Required="true"
                                   InputType="InputType.Password"
                                   Adornment="Adornment.Start"
+                                  RequiredError="@_languageService["RequiredError"]"
                                   AdornmentIcon="@Icons.Material.Filled.Password" />
                 </MudCardContent>
             </MudForm>
             <MudCardActions Class="pt-0">
-                <MudButton Variant="Variant.Filled" Class="mr-2" Size="Size.Small" Color="Color.Success" OnClick="@(async () => await SaveClick())">Save</MudButton>
-                <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Default" OnClick="@(() => _navigation.NavigateTo("/"))">Cancel</MudButton>
+                <MudButton Variant="Variant.Filled" Class="mr-2" Size="Size.Small" Color="Color.Success" OnClick="@(async () => await SaveClick())">@_languageService["Save"]</MudButton>
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Default" OnClick="@(() => _navigation.NavigateTo("/"))">@_languageService["Cancel"]</MudButton>
             </MudCardActions>
         </MudCard>
     </MudItem>
 </MudGrid>
 
 @code {
-    private List<BreadcrumbItem> mudBreadcrumbs = new()
-    {
-        new BreadcrumbItem("Home", href: "/", icon: Icons.Material.Filled.Home),
-        new BreadcrumbItem("User", href: "user-list", icon: Icons.Material.Filled.People),
-        new BreadcrumbItem("Register user", href: "register-user", icon: Icons.Material.Filled.PersonAddAlt1),
-    };
+    private List<BreadcrumbItem> mudBreadcrumbs;
     private MudForm form;
     private RegisterUserRequest requestModel = new();
     private string confirmPassword = string.Empty;
     private bool isShowAlert = false;
     private Severity severity = Severity.Normal;
     private string message = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _languageService.LoadLanguage();
+            InitializeBreadcrumbs();
+            StateHasChanged();
+        }
+    }
+
+    private void InitializeBreadcrumbs()
+    {
+        mudBreadcrumbs = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem(_languageService["Home"], href: "/", icon: Icons.Material.Filled.Home),
+            new BreadcrumbItem(_languageService["User"], href: "user-list", icon: Icons.Material.Filled.People),
+            new BreadcrumbItem(_languageService["Register"], href: "register-user", icon: Icons.Material.Filled.PersonAddAlt1)
+        };
+    }
 
     private async Task SaveClick()
     {
@@ -111,19 +133,23 @@
         }
         if (string.IsNullOrEmpty(requestModel.Password) || confirmPassword != requestModel.Password)
         {
-            ShowAlert("Invalid confirm password!", Severity.Warning);
+            ShowAlert(_languageService["InvalidConfirmPassword"], Severity.Warning);
             return;
         }
         if (form.IsValid)
         {
             if (!Validator.IsValidEmail(requestModel.Email))
             {
-                ShowAlert("Invalid email, please try again!", Severity.Warning);
+                ShowAlert(_languageService["InvalidEmail"], Severity.Warning);
+                requestModel.Email = string.Empty;
+                await form.Validate();
                 return;
             }
             if (!Validator.IsValidPhoneNumber(requestModel.PhoneNumber))
             {
-                ShowAlert("Invalid phone number, please try again!", Severity.Warning);
+                ShowAlert(_languageService["InvalidPhoneNumber"], Severity.Warning);
+                requestModel.PhoneNumber = string.Empty;
+                await form.Validate();
                 return;
             }
             var result = await _userService.RegisterUser(requestModel);
@@ -132,7 +158,6 @@
                 ShowAlert(result?.Message ?? string.Empty, Severity.Warning);
                 return;
             }
-            ShowAlert("Register user successed!", Severity.Success);
             var loginResponse = await _userService.Login(new LoginRequest() { UserName = requestModel.PhoneNumber, Password = requestModel.Password });
             if (loginResponse != null)
             {

@@ -19,6 +19,6 @@ public class LoginResponse
 
     public string Message
     {
-        get => MessageConstant.GetMessage(Status);
+        get => EnglishMessageConstant.GetMessage(Status);
     }
 }

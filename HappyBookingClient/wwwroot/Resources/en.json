@@ -1,0 +1,19 @@
+﻿{
+  "Welcome": "Welcome",
+  "Home": "Home",
+  "User": "User",
+  "Register": "Register",
+  "Save": "Save",
+  "Cancel": "Cancel",
+  "FullName": "Full name",
+  "Email": "Email",
+  "PhoneNumber": "Phone number",
+  "CitizenIdentificationNumber": "Citizen identification number",
+  "Address": "Address",
+  "Password": "Password",
+  "ConfirmPassword": "Confirm password",
+  "InvalidConfirmPassword": "Invalid confirm password!",
+  "InvalidEmail": "Invalid email, please try again!",
+  "InvalidPhoneNumber": "Invalid phone number, please try again!",
+  "RequiredError": "This field is required!"
+}

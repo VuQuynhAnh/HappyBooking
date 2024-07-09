@@ -1,9 +1,9 @@
 ﻿@page "/user-list"
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Request.User
 @using HappyBookingShare.Response.Dtos
 @inject IUserService _userService
+@inject ILanguageService _languageService
 
 <h3>Product List</h3>
 
@@ -35,6 +35,8 @@ else
             request.PageSize = 20;
             var response = await _userService.GetAllUserData(request);
             userList = response?.Data ?? new();
+
+            await _languageService.LoadLanguage();
             StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);

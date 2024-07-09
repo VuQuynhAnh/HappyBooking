@@ -5,10 +5,10 @@ public static class LanguageCode
     /// <summary>
     /// Vietnamese
     /// </summary>
-    public static string VN = "vn";
+    public const string VN = "vn";
 
     /// <summary>
     /// English
     /// </summary>
-    public static string EN = "en";
+    public const string EN = "en";
 }

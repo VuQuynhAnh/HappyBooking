@@ -1,0 +1,19 @@
+﻿{
+  "Welcome": "Xin chào",
+  "Home": "Trang chủ",
+  "User": "Người dùng",
+  "Register": "Đăng ký",
+  "Save": "Lưu",
+  "Cancel": "Hủy",
+  "FullName": "Họ và tên",
+  "Email": "Email",
+  "PhoneNumber": "Số điện thoại",
+  "CitizenIdentificationNumber": "Mã căn cước công dân",
+  "Address": "Dịa chỉ",
+  "Password": "Mật khẩu",
+  "ConfirmPassword": "Nhập lại mật khẩu",
+  "InvalidConfirmPassword": "Nhập lại mật khẩu không đúng, hãy nhập lại!",
+  "InvalidEmail": "Email không đúng định dạng, hãy nhập lại!",
+  "InvalidPhoneNumber": "Số điện thoại không đúng định dạng, hãy nhập lại!",
+  "RequiredError": "Bạn hãy nhập trường này!"
+}

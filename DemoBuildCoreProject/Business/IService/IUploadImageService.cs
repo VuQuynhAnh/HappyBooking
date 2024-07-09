@@ -8,5 +8,5 @@ public interface IUploadImageService
 
     Task<DeleteImageResponse> DeleteImageAsync(string deleteHash, long userId);
 
-    Task<DeleteImageResponse> ClearImageNotUsed();
+    Task<DeleteImageResponse> ClearImageNotUsed(long userId);
 }

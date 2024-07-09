@@ -1,5 +1,4 @@
 ﻿@page "/login"
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @using Blazored.LocalStorage
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Common
@@ -7,6 +6,7 @@
 @inject NavigationManager _navigation
 @inject ILocalStorageService localStorage
 @inject IUserService _userService
+@inject ILanguageService _languageService
 
 <MudGrid Justify="Justify.Center">
     <MudItem md="6" sm="12" xs="12">
@@ -69,6 +69,7 @@
     {
         if (firstRender)
         {
+            await _languageService.LoadLanguage();
             var token = await _userService.GetTokenFromLocalStorageAsync();
             if (!await _userService.IsTokenExpired())
             {

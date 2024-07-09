@@ -2,6 +2,7 @@
 using DemoBuildCoreProject.Interface;
 using HappyBookingShare.Common;
 using HappyBookingShare.Response.ImageUpload;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 
@@ -12,12 +13,14 @@ public class UploadImageService : IUploadImageService
     private readonly HttpClient _httpClient;
     private readonly string _clientId;
     private readonly IImageRepository _imageRepository;
+    private readonly IMemoryCache _cache;
 
-    public UploadImageService(HttpClient httpClient, IConfiguration configuration, IImageRepository imageRepository)
+    public UploadImageService(HttpClient httpClient, IConfiguration configuration, IImageRepository imageRepository, IMemoryCache cache)
     {
         _httpClient = httpClient;
         _clientId = configuration["Imgur:ClientId"] ?? throw new ArgumentNullException(nameof(configuration), "Imgur ClientId is not configured");
         _imageRepository = imageRepository;
+        _cache = cache;
     }
 
     public async Task<UploadImageResponse> UploadImageAsync(IFormFile image, long userId)
@@ -60,7 +63,7 @@ public class UploadImageService : IUploadImageService
                         throw new HttpRequestException("Failed to retrieve image link from Imgur response.");
                     }
                     await _imageRepository.UploadImage(imageLink, userId);
-                    return new UploadImageResponse(imageLink, status);
+                    return new UploadImageResponse(userId, imageLink, status, _cache);
                 }
             }
         }
@@ -82,7 +85,7 @@ public class UploadImageService : IUploadImageService
             if (response.IsSuccessStatusCode)
             {
                 await _imageRepository.DeleteImage(deleteHash, userId);
-                return new DeleteImageResponse(true, status); // Xóa thành công
+                return new DeleteImageResponse(userId, true, status, _cache); // Xóa thành công
             }
             else
             {
@@ -100,7 +103,7 @@ public class UploadImageService : IUploadImageService
         }
     }
 
-    public async Task<DeleteImageResponse> ClearImageNotUsed()
+    public async Task<DeleteImageResponse> ClearImageNotUsed(long userId)
     {
         try
         {
@@ -110,7 +113,7 @@ public class UploadImageService : IUploadImageService
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", _clientId);
             var tasks = deletedList.Select(image => _httpClient.DeleteAsync($"https://api.imgur.com/3/image/{image}"));
             await Task.WhenAll(tasks);
-            return new DeleteImageResponse(true, status);
+            return new DeleteImageResponse(userId, true, status, _cache);
         }
         finally
         {

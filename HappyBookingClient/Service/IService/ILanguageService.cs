@@ -6,8 +6,6 @@ public interface ILanguageService
 {
     CultureInfo CurrentCulture { get; }
 
-    Task SetLanguage(string languageCode);
-
     Task LoadLanguage();
 
     string this[string key] { get; }

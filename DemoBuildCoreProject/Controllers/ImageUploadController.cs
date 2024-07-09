@@ -36,7 +36,7 @@ public class ImageUploadController : BaseController
     [HttpDelete]
     public async Task<IActionResult> DeleteImages()
     {
-        var response = await _uploadImageService.ClearImageNotUsed();
+        var response = await _uploadImageService.ClearImageNotUsed(UserId);
         return Ok(response);
     }
 }

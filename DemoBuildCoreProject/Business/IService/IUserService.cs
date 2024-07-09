@@ -5,7 +5,7 @@ namespace DemoBuildCoreProject.Business.IService;
 
 public interface IUserService
 {
-    Task<GetListUserResponse> GetAllUserData(GetListUserRequest request);
+    Task<GetListUserResponse> GetAllUserData(long userId, GetListUserRequest request);
 
     Task<LoginResponse> Login(LoginRequest request);
 

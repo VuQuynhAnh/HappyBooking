@@ -22,7 +22,7 @@ public class UserController : BaseController
     [HttpGet(APIName.GetAllData)]
     public async Task<ActionResult<GetListUserResponse>> GetData([FromQuery] GetListUserRequest request)
     {
-        var response = await _userService.GetAllUserData(request);
+        var response = await _userService.GetAllUserData(UserId, request);
         return Ok(response);
     }
 
