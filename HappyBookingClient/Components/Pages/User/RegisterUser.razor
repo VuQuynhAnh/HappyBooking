@@ -5,9 +5,32 @@
 @inject IUserService _userService
 @inject NavigationManager _navigation
 @inject ILanguageService _languageService
+@inject IUploadImageService _uploadImageService
+@inject IJSRuntime JSRuntime
 
 <MudBreadcrumbs Items="mudBreadcrumbs" Class="p-0 mb-3 mt-0"></MudBreadcrumbs>
 <MudGrid Justify="Justify.Center">
+    <MudItem md="4" sm="12" xs="12">
+        <div class="avatar-upload">
+            <span>@_languageService["ProfilePicture"]</span>
+
+            <div class="avatar-edit">
+                <InputFile id="imageUpload" OnChange="LoadFiles" />
+                <label for="imageUpload"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> @_languageService["Edit"]</label>
+            </div>
+            <div class="avatar-preview">
+                @if (!isLoading)
+                {
+                    <div id="imagePreview" style="background-image: url('@imagePreviewUrl');"></div>
+                }
+                else
+                {
+                    <div class="loader loader-position"></div>
+                }
+            </div>
+
+        </div>
+    </MudItem>
     <MudItem md="6" sm="12" xs="12">
         <MudText Typo="Typo.h6">@_languageService["Register"]</MudText>
         <MudCard>
@@ -123,6 +146,60 @@
         };
     }
 
+    private List<IBrowserFile> loadedFiles = new();
+    private int maxAllowedFiles = 1;
+    private string imagePreviewUrl = "https://st.depositphotos.com/1006018/3108/v/450/depositphotos_31081475-stock-illustration-bus-truck-driver-side-shield.jpg";
+    private long maxFileSize = 3 * 1024 * 1024; // 3 MB
+    private bool isLoading = false;
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        loadedFiles.Clear();
+        isLoading = true;
+
+        var file = e.File;
+        try
+        {
+            if (file.Size > maxFileSize)
+            {
+                ShowAlert(_languageService["MaxImageSizeIs3MB"], Severity.Warning);
+            }
+
+            loadedFiles.Add(file);
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.OpenReadStream(maxFileSize).CopyToAsync(memoryStream);
+                memoryStream.Seek(0, SeekOrigin.Begin); // Reset stream position
+                var formFile = new FormFile(memoryStream, 0, memoryStream.Length, file.Name, file.Name)
+                    {
+                        Headers = new HeaderDictionary(),
+                        ContentType = file.ContentType
+                    };
+
+                var response = await _uploadImageService.UploadImageAsync(formFile);
+                if (response == null)
+                {
+                    var fileBytes = memoryStream.ToArray();
+
+                    // Create Blob URL for the file
+                    var fileUrl = await JSRuntime.InvokeAsync<string>("createObjectURLFromArray", fileBytes);
+                    imagePreviewUrl = fileUrl;
+                    return;
+                }
+                imagePreviewUrl = response!.Data;
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
     private async Task SaveClick()
     {
         isShowAlert = false;
@@ -152,6 +229,7 @@
                 await form.Validate();
                 return;
             }
+            requestModel.AvatarImage = imagePreviewUrl;
             var result = await _userService.RegisterUser(requestModel);
             if (result == null || !result.Data)
             {

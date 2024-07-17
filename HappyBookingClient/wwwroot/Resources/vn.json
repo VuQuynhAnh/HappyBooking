@@ -15,5 +15,8 @@
   "InvalidConfirmPassword": "Nhập lại mật khẩu không đúng, hãy nhập lại!",
   "InvalidEmail": "Email không đúng định dạng, hãy nhập lại!",
   "InvalidPhoneNumber": "Số điện thoại không đúng định dạng, hãy nhập lại!",
-  "RequiredError": "Bạn hãy nhập trường này!"
+  "RequiredError": "Bạn hãy nhập trường này!",
+  "MaxImageSizeIs3MB": "Ảnh có kích thước quá lớn, hãy nhập ảnh có kích thước nhỏ hơn 3MB!",
+  "ProfilePicture": "Ảnh đại diện",
+  "Edit": "Sửa"
 }

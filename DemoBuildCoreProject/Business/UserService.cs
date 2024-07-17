@@ -13,14 +13,16 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService;
+    private readonly IImageRepository _imageRepository;
     private readonly IMemoryCache _cache;
 
 
-    public UserService(IUserRepository userRepository, ITokenService tokenService, IMemoryCache cache)
+    public UserService(IUserRepository userRepository, ITokenService tokenService, IMemoryCache cache, IImageRepository imageRepository)
     {
         _userRepository = userRepository;
         _tokenService = tokenService;
         _cache = cache;
+        _imageRepository = imageRepository;
     }
 
     /// <summary>
@@ -118,6 +120,7 @@ public class UserService : IUserService
                 return new SaveUserResponse(0, false, status, _cache);
             }
             var result = await _userRepository.SaveUser(userId, userModel);
+            await _imageRepository.UsedImage(userModel.AvatarImage, userId);
             return new SaveUserResponse(userId, result, status, _cache);
         }
         finally

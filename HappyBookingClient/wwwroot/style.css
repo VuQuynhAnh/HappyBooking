@@ -1,0 +1,103 @@
+﻿.avatar-upload {
+    position: relative;
+    max-width: 205px;
+    margin: 50px auto;
+    margin-bottom: 0;
+}
+
+    .avatar-upload .avatar-edit {
+        position: absolute;
+        right: 12px;
+        z-index: 1;
+        bottom: -10px;
+        left: 20px;
+    }
+
+        .avatar-upload .avatar-edit input {
+            display: none;
+        }
+
+            .avatar-upload .avatar-edit input + label {
+                display: inline-block;
+                font-size: 14px;
+                padding: 3px 5px;
+                margin-bottom: 0;
+                border-radius: 5px;
+                background: #FFFFFF;
+                border: 1px solid transparent;
+                box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+                cursor: pointer;
+                font-weight: normal;
+                transition: all .2s ease-in-out;
+            }
+
+                .avatar-upload .avatar-edit input + label:hover {
+                    background: #f1f1f1;
+                    border-color: #d6d6d6;
+                }
+
+                .avatar-upload .avatar-edit input + label:after {
+                    color: #757575;
+                    position: absolute;
+                    top: 8px;
+                    left: 11px;
+                    text-align: center;
+                    margin: auto;
+                }
+
+    .avatar-upload .avatar-preview {
+        width: 192px;
+        height: 192px;
+        position: relative;
+        border-radius: 100%;
+        border: 6px solid #F8F8F8;
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+    }
+
+        .avatar-upload .avatar-preview #imagePreview {
+            width: 100%;
+            height: 100%;
+            border-radius: 100%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+    .avatar-upload span {
+        font: inherit;
+        color: currentColor;
+        width: 100%;
+        border: 0;
+        height: 1.1876em;
+        margin: 0;
+        display: block;
+        padding: 0px;
+        min-width: 0;
+        background: none;
+        position: relative;
+        box-sizing: content-box;
+        letter-spacing: inherit;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+/* HTML: <div class="loader"></div> */
+.loader {
+    width: 50px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(farthest-side,#ffa516 94%,#0000) top/8px 8px no-repeat, conic-gradient(#0000 30%,#ffa516);
+    -webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 8px),#000 0);
+    animation: l13 1s infinite linear;
+}
+
+.loader-position {
+    position: absolute;
+    top: 35%;
+    left: 35%;
+}
+
+@keyframes l13 {
+    100% {
+        transform: rotate(1turn)
+    }
+}

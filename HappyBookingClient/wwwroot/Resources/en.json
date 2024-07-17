@@ -15,5 +15,8 @@
   "InvalidConfirmPassword": "Invalid confirm password!",
   "InvalidEmail": "Invalid email, please try again!",
   "InvalidPhoneNumber": "Invalid phone number, please try again!",
-  "RequiredError": "This field is required!"
+  "RequiredError": "This field is required!",
+  "MaxImageSizeIs3MB": "Image size is too large, please enter image smaller than 3MB!",
+  "ProfilePicture": "Profile picture",
+  "Edit": "Edit"
 }

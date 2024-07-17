@@ -1,7 +1,8 @@
 ﻿using Blazored.LocalStorage;
 using HappyBookingClient.Components;
 using HappyBookingClient.Middleware;
-using HappyBookingClient.Service.IService;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);

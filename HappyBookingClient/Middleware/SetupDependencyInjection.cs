@@ -10,5 +10,6 @@ public static class SetupDependencyInjection
         services.AddScoped<ILanguageService, LanguageService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ISettingService, SettingService>();
+        services.AddScoped<IUploadImageService, UploadImageService>();
     }
 }

@@ -87,6 +87,52 @@ public abstract class BaseApiService
     }
 
     /// <summary>
+    /// SendMultipartFormDataRequestAsync
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="method"></param>
+    /// <param name="requestUri"></param>
+    /// <param name="content"></param>
+    /// <returns></returns>
+    protected async Task<T?> SendMultipartFormDataRequestAsync<T>(HttpMethod method, string requestUri, MultipartFormDataContent content)
+    {
+        async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
+        {
+            var response = await _httpClient.SendAsync(request);
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                await RefreshToken();
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", await GetTokenFromLocalStorageAsync());
+                response = await _httpClient.SendAsync(request);
+            }
+            return response;
+        }
+
+        var accessToken = await GetTokenFromLocalStorageAsync();
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            var returnUrl = _navigationManager.Uri;
+            _navigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(returnUrl)}");
+            return default;
+        }
+
+        var request = new HttpRequestMessage(method, requestUri)
+        {
+            Headers = { Authorization = new AuthenticationHeaderValue("Bearer", accessToken) },
+            Content = content
+        };
+
+        var finalResponse = await SendRequestAsync(request);
+
+        if (finalResponse.IsSuccessStatusCode)
+        {
+            var responseBody = await finalResponse.Content.ReadAsStringAsync();
+            return !string.IsNullOrEmpty(responseBody) ? JsonSerializer.Deserialize<T>(responseBody) : default;
+        }
+        return default;
+    }
+
+    /// <summary>
     /// Set Token in local storage
     /// </summary>
     /// <param name="token"></param>
