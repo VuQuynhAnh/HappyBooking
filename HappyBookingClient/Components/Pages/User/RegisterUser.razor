@@ -9,6 +9,7 @@
 @inject IJSRuntime JSRuntime
 
 <MudBreadcrumbs Items="mudBreadcrumbs" Class="p-0 mb-3 mt-0"></MudBreadcrumbs>
+
 <MudGrid Justify="Justify.Center">
     <MudItem md="4" sm="12" xs="12">
         <div class="avatar-upload">
@@ -19,14 +20,7 @@
                 <label for="imageUpload"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> @_languageService["Edit"]</label>
             </div>
             <div class="avatar-preview">
-                @if (!isLoading)
-                {
-                    <div id="imagePreview" style="background-image: url('@imagePreviewUrl');"></div>
-                }
-                else
-                {
-                    <div class="loader loader-position"></div>
-                }
+                <div id="imagePreview" style="background-image: url('@imagePreviewUrl');"></div>
             </div>
 
         </div>
@@ -115,7 +109,17 @@
             </MudCardActions>
         </MudCard>
     </MudItem>
+    <div class="content-loading-overlay">
+        <div class="spinner"></div>
+    </div>
 </MudGrid>
+
+@if (isLoading)
+{
+    <div class="content-loading-overlay">
+        <div class="spinner"></div>
+    </div>
+}
 
 @code {
     private List<BreadcrumbItem> mudBreadcrumbs;
@@ -146,102 +150,102 @@
         };
     }
 
-    private List<IBrowserFile> loadedFiles = new();
+    private MemoryStream? memoryStream = null;
+    private IBrowserFile? file = null;
     private int maxAllowedFiles = 1;
     private string imagePreviewUrl = "https://st.depositphotos.com/1006018/3108/v/450/depositphotos_31081475-stock-illustration-bus-truck-driver-side-shield.jpg";
     private long maxFileSize = 3 * 1024 * 1024; // 3 MB
     private bool isLoading = false;
 
-    private async Task LoadFiles(InputFileChangeEventArgs e)
+    private async Task LoadFiles(InputFileChangeEventArgs eventArg)
     {
-        loadedFiles.Clear();
-        isLoading = true;
+        file = eventArg.File;
 
-        var file = e.File;
-        try
+        if (file.Size > maxFileSize)
         {
-            if (file.Size > maxFileSize)
-            {
-                ShowAlert(_languageService["MaxImageSizeIs3MB"], Severity.Warning);
-            }
+            ShowAlert(_languageService["MaxImageSizeIs3MB"], Severity.Warning);
+        }
 
-            loadedFiles.Add(file);
+        memoryStream = new MemoryStream();
+        await file.OpenReadStream(maxFileSize).CopyToAsync(memoryStream);
+        memoryStream.Seek(0, SeekOrigin.Begin); // Reset stream position
 
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.OpenReadStream(maxFileSize).CopyToAsync(memoryStream);
-                memoryStream.Seek(0, SeekOrigin.Begin); // Reset stream position
-                var formFile = new FormFile(memoryStream, 0, memoryStream.Length, file.Name, file.Name)
-                    {
-                        Headers = new HeaderDictionary(),
-                        ContentType = file.ContentType
-                    };
+        var fileBytes = memoryStream.ToArray();
 
-                var response = await _uploadImageService.UploadImageAsync(formFile);
-                if (response == null)
+        // Create Blob URL for the file
+        var fileUrl = await JSRuntime.InvokeAsync<string>("createObjectURLFromArray", fileBytes);
+        imagePreviewUrl = fileUrl;
+    }
+
+    private async Task UploadImageToServer()
+    {
+        if (file != null && memoryStream != null)
+        {
+            var formFile = new FormFile(memoryStream, 0, memoryStream.Length, file.Name, file.Name)
                 {
-                    var fileBytes = memoryStream.ToArray();
+                    Headers = new HeaderDictionary(),
+                    ContentType = file.ContentType
+                };
 
-                    // Create Blob URL for the file
-                    var fileUrl = await JSRuntime.InvokeAsync<string>("createObjectURLFromArray", fileBytes);
-                    imagePreviewUrl = fileUrl;
-                    return;
-                }
-                imagePreviewUrl = response!.Data;
+            var response = await _uploadImageService.UploadImageAsync(formFile);
+            if (response != null)
+            {
+                imagePreviewUrl = response.Data;
             }
-        }
-        catch (Exception ex)
-        {
-
-        }
-        finally
-        {
-            isLoading = false;
         }
     }
 
     private async Task SaveClick()
     {
-        isShowAlert = false;
-        await form.Validate();
-        if (!form.IsValid)
+        isLoading = true;
+        try
         {
-            return;
+            isShowAlert = false;
+            await form.Validate();
+            if (!form.IsValid)
+            {
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.Password) || confirmPassword != requestModel.Password)
+            {
+                ShowAlert(_languageService["InvalidConfirmPassword"], Severity.Warning);
+                return;
+            }
+            if (form.IsValid)
+            {
+                if (!Validator.IsValidEmail(requestModel.Email))
+                {
+                    ShowAlert(_languageService["InvalidEmail"], Severity.Warning);
+                    requestModel.Email = string.Empty;
+                    await form.Validate();
+                    return;
+                }
+                if (!Validator.IsValidPhoneNumber(requestModel.PhoneNumber))
+                {
+                    ShowAlert(_languageService["InvalidPhoneNumber"], Severity.Warning);
+                    requestModel.PhoneNumber = string.Empty;
+                    await form.Validate();
+                    return;
+                }
+                await UploadImageToServer();
+                requestModel.AvatarImage = imagePreviewUrl;
+                var result = await _userService.RegisterUser(requestModel);
+                if (result == null || !result.Data)
+                {
+                    ShowAlert(result?.Message ?? string.Empty, Severity.Warning);
+                    return;
+                }
+                var loginResponse = await _userService.Login(new LoginRequest() { UserName = requestModel.PhoneNumber, Password = requestModel.Password });
+                if (loginResponse != null)
+                {
+                    _navigation.NavigateTo("/");
+                    requestModel = new();
+                }
+            }
         }
-        if (string.IsNullOrEmpty(requestModel.Password) || confirmPassword != requestModel.Password)
+        finally
         {
-            ShowAlert(_languageService["InvalidConfirmPassword"], Severity.Warning);
-            return;
-        }
-        if (form.IsValid)
-        {
-            if (!Validator.IsValidEmail(requestModel.Email))
-            {
-                ShowAlert(_languageService["InvalidEmail"], Severity.Warning);
-                requestModel.Email = string.Empty;
-                await form.Validate();
-                return;
-            }
-            if (!Validator.IsValidPhoneNumber(requestModel.PhoneNumber))
-            {
-                ShowAlert(_languageService["InvalidPhoneNumber"], Severity.Warning);
-                requestModel.PhoneNumber = string.Empty;
-                await form.Validate();
-                return;
-            }
-            requestModel.AvatarImage = imagePreviewUrl;
-            var result = await _userService.RegisterUser(requestModel);
-            if (result == null || !result.Data)
-            {
-                ShowAlert(result?.Message ?? string.Empty, Severity.Warning);
-                return;
-            }
-            var loginResponse = await _userService.Login(new LoginRequest() { UserName = requestModel.PhoneNumber, Password = requestModel.Password });
-            if (loginResponse != null)
-            {
-                _navigation.NavigateTo("/");
-                requestModel = new();
-            }
+            isLoading = false;
         }
     }
 
@@ -251,5 +255,4 @@
         this.severity = severity;
         this.message = message;
     }
-
 }
