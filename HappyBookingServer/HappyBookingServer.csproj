@@ -29,6 +29,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\DemoBuildCoreShare\HappyBookingShare.csproj" />
+	  <ProjectReference Include="..\HappyBookingShare\HappyBookingShare.csproj" />
 	</ItemGroup>
 
 </Project>
