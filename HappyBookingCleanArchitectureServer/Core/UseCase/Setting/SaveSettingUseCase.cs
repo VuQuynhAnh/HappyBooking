@@ -8,7 +8,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace HappyBookingCleanArchitectureServer.Core.UseCase.Setting;
 
-public class SaveSettingUseCase: ISaveSettingUseCase
+public class SaveSettingUseCase : ISaveSettingUseCase
 {
     private readonly ISettingRepository _settingRepository;
     private readonly IMemoryCache _cache;

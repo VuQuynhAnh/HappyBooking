@@ -23,14 +23,14 @@ public class DeleteImageUseCase: IDeleteImageUseCase
     }
 
     /// <summary>
-    /// DeleteImageAsync
+    /// DeleteImage
     /// </summary>
     /// <param name="deleteHash"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
     /// <exception cref="HttpRequestException"></exception>
     /// <exception cref="ApplicationException"></exception>
-    public async Task<DeleteImageResponse> DeleteImageAsync(string deleteHash, long userId)
+    public async Task<DeleteImageResponse> DeleteImage(string deleteHash, long userId)
     {
         try
         {

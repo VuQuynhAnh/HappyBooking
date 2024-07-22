@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
 using HappyBookingCleanArchitectureServer.Middleware;
 using HappyBookingCleanArchitectureServer.Database;
 
