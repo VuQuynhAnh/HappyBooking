@@ -48,7 +48,7 @@ public class UserService : BaseApiService, IUserService
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("User/Login", request);
+            var response = await _httpClient.PostAsJsonAsync($"Auth/{APIName.Login}", request);
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadFromJsonAsync<LoginResponse>();

@@ -173,7 +173,7 @@ public abstract class BaseApiService
         try
         {
             var request = new RefreshTokenRequest(oldAccessToken, oldRefreshToken);
-            var response = await _httpClient.PostAsJsonAsync("User/RefreshToken", request);
+            var response = await _httpClient.PostAsJsonAsync($"Auth/{APIName.RefreshToken}", request);
             response.EnsureSuccessStatusCode();
             var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
             var newAccessToken = result?.Token ?? string.Empty;

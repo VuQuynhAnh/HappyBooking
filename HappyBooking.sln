@@ -12,11 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		ci-cd-docker.yml = ci-cd-docker.yml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HappyBookingServer", "HappyBookingServer\HappyBookingServer.csproj", "{9758A2A7-9A76-41F6-B1C4-9AB87F248569}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HappyBookingShare", "HappyBookingShare\HappyBookingShare.csproj", "{65A6533E-A9A2-4A20-9561-0FEFD6423B5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HappyBookingCleanArchitectureServer", "HappyBookingCleanArchitectureServer\HappyBookingCleanArchitectureServer.csproj", "{3599C94E-289B-4152-A270-689DDD3F6368}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HappyBookingCleanArchitectureServer", "HappyBookingCleanArchitectureServer\HappyBookingCleanArchitectureServer.csproj", "{3599C94E-289B-4152-A270-689DDD3F6368}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,10 +26,6 @@ Global
 		{6755AFAA-8848-4CB5-8756-04494949468E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6755AFAA-8848-4CB5-8756-04494949468E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6755AFAA-8848-4CB5-8756-04494949468E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9758A2A7-9A76-41F6-B1C4-9AB87F248569}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9758A2A7-9A76-41F6-B1C4-9AB87F248569}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9758A2A7-9A76-41F6-B1C4-9AB87F248569}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9758A2A7-9A76-41F6-B1C4-9AB87F248569}.Release|Any CPU.Build.0 = Release|Any CPU
 		{65A6533E-A9A2-4A20-9561-0FEFD6423B5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{65A6533E-A9A2-4A20-9561-0FEFD6423B5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65A6533E-A9A2-4A20-9561-0FEFD6423B5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
