@@ -1,16 +1,15 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HappyBookingShare.Entities;
 
+[Table("Setting")]
 public class Setting : BaseEntity
 {
-    [BsonId]
-    [BsonElement("Id")]
+    [Key]
     public long Id { get; set; }
 
-    [BsonElement("UserId")]
     public long UserId { get; set; }
 
-    [BsonElement("LanguageCode")]
     public string LanguageCode { get; set; } = string.Empty;
 }

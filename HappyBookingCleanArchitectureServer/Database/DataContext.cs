@@ -1,37 +1,19 @@
 ﻿using HappyBookingShare.Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using MongoDB.Driver;
-using System.Threading.Tasks;
-using Sequence = HappyBookingShare.Entities.Sequence;
+using Microsoft.EntityFrameworkCore;
 
 namespace HappyBookingCleanArchitectureServer.Database;
 
-public class DataContext
+public class DataContext : DbContext
 {
-    private readonly IMongoDatabase _database;
-
-    public DataContext(IMongoClient client)
+    public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
-        _database = client.GetDatabase("happy-booking"); // Tên cơ sở dữ liệu của bạn
     }
 
-    public IMongoCollection<User> UserRepository => _database.GetCollection<User>("Users");
-    public IMongoCollection<RefreshToken> RefreshTokenRepository => _database.GetCollection<RefreshToken>("RefreshTokens");
-    public IMongoCollection<ImageManagement> ImageManagementRepository => _database.GetCollection<ImageManagement>("ImageManagements");
-    public IMongoCollection<Setting> SettingRepository => _database.GetCollection<Setting>("Settings");
-    public IMongoCollection<Sequence> SequenceRepository => _database.GetCollection<Sequence>("Sequences");
+    public DbSet<User> UserRepository { get; set; }
 
-    public async Task<long> GetNextSequenceValue(string collectionName)
-    {
-        var filter = Builders<Sequence>.Filter.Eq(s => s.CollectionName, collectionName);
-        var update = Builders<Sequence>.Update.Inc(s => s.Value, 1);
-        var options = new FindOneAndUpdateOptions<Sequence>
-        {
-            IsUpsert = true,
-            ReturnDocument = ReturnDocument.After
-        };
+    public DbSet<RefreshToken> RefreshTokenRepository { get; set; }
 
-        var sequence = await SequenceRepository.FindOneAndUpdateAsync(filter, update, options);
-        return sequence.Value;
-    }
+    public DbSet<ImageManagement> ImageManagementRepository { get; set; }
+
+    public DbSet<Setting> SettingRepository { get; set; }
 }

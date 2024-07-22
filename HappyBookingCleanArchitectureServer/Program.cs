@@ -5,7 +5,6 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using HappyBookingCleanArchitectureServer.Middleware;
 using HappyBookingCleanArchitectureServer.Database;
-using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,9 +18,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
 
-// Add services to the container.
-builder.Services.AddSingleton<IMongoClient, MongoClient>(sp =>
-    new MongoClient(builder.Configuration.GetConnectionString("DefaultConnection"))
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
