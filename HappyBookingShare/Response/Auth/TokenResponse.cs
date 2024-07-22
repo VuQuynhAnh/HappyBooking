@@ -1,4 +1,4 @@
-﻿namespace HappyBookingShare.Response.User;
+﻿namespace HappyBookingShare.Response.Auth;
 
 public class TokenResponse
 {

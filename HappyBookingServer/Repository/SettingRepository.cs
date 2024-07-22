@@ -1,12 +1,12 @@
-﻿using DemoBuildCoreProject.DBContext;
-using DemoBuildCoreProject.Interface;
+﻿using HappyBookingServer.DBContext;
+using HappyBookingServer.Interface;
 using HappyBookingShare.Common;
 using HappyBookingShare.Entities;
 using HappyBookingShare.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace DemoBuildCoreProject.Repository;
+namespace HappyBookingServer.Repository;
 
 public class SettingRepository : ISettingRepository
 {

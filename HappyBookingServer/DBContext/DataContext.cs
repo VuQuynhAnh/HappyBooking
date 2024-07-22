@@ -1,7 +1,7 @@
 ﻿using HappyBookingShare.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace DemoBuildCoreProject.DBContext;
+namespace HappyBookingServer.DBContext;
 
 public class DataContext : DbContext
 {

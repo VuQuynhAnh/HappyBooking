@@ -1,10 +1,10 @@
-﻿using DemoBuildCoreProject.DBContext;
+﻿using HappyBookingServer.DBContext;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using DemoBuildCoreProject.Middleware;
+using HappyBookingServer.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 

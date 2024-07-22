@@ -1,6 +1,6 @@
 ﻿using HappyBookingShare.Model;
 
-namespace DemoBuildCoreProject.Interface;
+namespace HappyBookingServer.Interface;
 
 public interface IUserRepository : IRepositoryBase
 {

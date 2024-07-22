@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DemoBuildCoreProject.Migrations
+namespace HappyBookingServer.Migrations
 {
     /// <inheritdoc />
     public partial class init_Database : Migration

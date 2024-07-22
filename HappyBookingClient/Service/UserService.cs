@@ -1,7 +1,9 @@
 ﻿using Blazored.LocalStorage;
 using HappyBookingClient.Service.IService;
 using HappyBookingShare.Common;
+using HappyBookingShare.Request.Auth;
 using HappyBookingShare.Request.User;
+using HappyBookingShare.Response.Auth;
 using HappyBookingShare.Response.User;
 using Microsoft.AspNetCore.Components;
 using System.IdentityModel.Tokens.Jwt;

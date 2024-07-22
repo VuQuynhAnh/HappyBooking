@@ -1,7 +1,7 @@
 ﻿using HappyBookingShare.Request.Setting;
 using HappyBookingShare.Response.Setting;
 
-namespace DemoBuildCoreProject.Business.IService;
+namespace HappyBookingServer.Business.IService;
 
 public interface ISettingService
 {

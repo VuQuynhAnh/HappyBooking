@@ -1,6 +1,6 @@
 ﻿using HappyBookingShare.Response.ImageUpload;
 
-namespace DemoBuildCoreProject.Business.IService;
+namespace HappyBookingServer.Business.IService;
 
 public interface IUploadImageService
 {

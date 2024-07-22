@@ -1,6 +1,6 @@
 ﻿using HappyBookingShare.Common;
 
-namespace HappyBookingShare.Response.User;
+namespace HappyBookingShare.Response.Auth;
 
 public class LoginResponse
 {

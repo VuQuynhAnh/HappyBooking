@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Web.Http;
 
-namespace DemoBuildCoreProject.Controllers;
+namespace HappyBookingServer.Controllers;
 
 [Authorize]
 public abstract class BaseController : ControllerBase

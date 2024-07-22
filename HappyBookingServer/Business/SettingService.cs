@@ -1,5 +1,5 @@
-﻿using DemoBuildCoreProject.Business.IService;
-using DemoBuildCoreProject.Interface;
+﻿using HappyBookingServer.Business.IService;
+using HappyBookingServer.Interface;
 using HappyBookingShare.Common;
 using HappyBookingShare.Model;
 using HappyBookingShare.Request.Setting;
@@ -7,7 +7,7 @@ using HappyBookingShare.Response.Dtos;
 using HappyBookingShare.Response.Setting;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace DemoBuildCoreProject.Business;
+namespace HappyBookingServer.Business;
 
 public class SettingService : ISettingService
 {

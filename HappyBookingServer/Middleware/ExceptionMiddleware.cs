@@ -1,4 +1,4 @@
-﻿namespace DemoBuildCoreProject.Middleware;
+﻿namespace HappyBookingServer.Middleware;
 
 public class ExceptionMiddleware
 {

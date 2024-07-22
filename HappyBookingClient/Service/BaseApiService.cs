@@ -5,8 +5,9 @@ using System.Text.Json;
 using System.Text;
 using HappyBookingShare.Common;
 using HappyBookingShare.Request.User;
-using HappyBookingShare.Response.User;
 using Microsoft.AspNetCore.Components;
+using HappyBookingShare.Response.Auth;
+using HappyBookingShare.Request.Auth;
 
 namespace HappyBookingClient.Service;
 

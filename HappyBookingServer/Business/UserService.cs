@@ -1,13 +1,15 @@
-﻿using DemoBuildCoreProject.Interface;
-using DemoBuildCoreProject.Business.IService;
+﻿using HappyBookingServer.Interface;
+using HappyBookingServer.Business.IService;
 using HappyBookingShare.Response.User;
 using HappyBookingShare.Request.User;
 using HappyBookingShare.Response.Dtos;
 using HappyBookingShare.Model;
 using HappyBookingShare.Common;
 using Microsoft.Extensions.Caching.Memory;
+using HappyBookingShare.Request.Auth;
+using HappyBookingShare.Response.Auth;
 
-namespace DemoBuildCoreProject.Business;
+namespace HappyBookingServer.Business;
 
 public class UserService : IUserService
 {

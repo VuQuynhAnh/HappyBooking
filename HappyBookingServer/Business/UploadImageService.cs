@@ -1,12 +1,12 @@
-﻿using DemoBuildCoreProject.Business.IService;
-using DemoBuildCoreProject.Interface;
+﻿using HappyBookingServer.Business.IService;
+using HappyBookingServer.Interface;
 using HappyBookingShare.Common;
 using HappyBookingShare.Response.ImageUpload;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 
-namespace DemoBuildCoreProject.Business;
+namespace HappyBookingServer.Business;
 
 public class UploadImageService : IUploadImageService
 {

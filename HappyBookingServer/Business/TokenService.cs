@@ -1,16 +1,16 @@
-﻿using DemoBuildCoreProject.Business.IService;
-using DemoBuildCoreProject.DBContext;
-using DemoBuildCoreProject.Interface;
+﻿using HappyBookingServer.Business.IService;
+using HappyBookingServer.DBContext;
+using HappyBookingServer.Interface;
 using HappyBookingShare.Entities;
 using HappyBookingShare.Model;
-using HappyBookingShare.Response.User;
+using HappyBookingShare.Response.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace DemoBuildCoreProject.Business;
+namespace HappyBookingServer.Business;
 
 public class TokenService : ITokenService
 {

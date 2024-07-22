@@ -1,7 +1,9 @@
-﻿using HappyBookingShare.Request.User;
+﻿using HappyBookingShare.Request.Auth;
+using HappyBookingShare.Request.User;
+using HappyBookingShare.Response.Auth;
 using HappyBookingShare.Response.User;
 
-namespace DemoBuildCoreProject.Business.IService;
+namespace HappyBookingServer.Business.IService;
 
 public interface IUserService
 {

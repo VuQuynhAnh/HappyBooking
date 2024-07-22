@@ -1,10 +1,10 @@
-﻿using DemoBuildCoreProject.Business.IService;
+﻿using HappyBookingServer.Business.IService;
 using HappyBookingShare.Common;
 using HappyBookingShare.Request.Setting;
 using HappyBookingShare.Response.Setting;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DemoBuildCoreProject.Controllers;
+namespace HappyBookingServer.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

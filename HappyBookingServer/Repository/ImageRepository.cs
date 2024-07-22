@@ -1,8 +1,8 @@
-﻿using DemoBuildCoreProject.DBContext;
-using DemoBuildCoreProject.Interface;
+﻿using HappyBookingServer.DBContext;
+using HappyBookingServer.Interface;
 using Microsoft.EntityFrameworkCore;
 
-namespace DemoBuildCoreProject.Repository;
+namespace HappyBookingServer.Repository;
 
 public class ImageRepository : IImageRepository
 {

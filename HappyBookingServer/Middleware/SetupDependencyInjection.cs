@@ -1,9 +1,9 @@
-﻿using DemoBuildCoreProject.Business.IService;
-using DemoBuildCoreProject.Business;
-using DemoBuildCoreProject.Interface;
-using DemoBuildCoreProject.Repository;
+﻿using HappyBookingServer.Business.IService;
+using HappyBookingServer.Business;
+using HappyBookingServer.Interface;
+using HappyBookingServer.Repository;
 
-namespace DemoBuildCoreProject.Middleware;
+namespace HappyBookingServer.Middleware;
 
 public static class SetupDependencyInjection
 {

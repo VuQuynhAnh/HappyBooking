@@ -1,4 +1,4 @@
-﻿namespace HappyBookingShare.Request.User;
+﻿namespace HappyBookingShare.Request.Auth;
 
 public class LoginRequest
 {

@@ -1,4 +1,6 @@
-﻿using HappyBookingShare.Request.User;
+﻿using HappyBookingShare.Request.Auth;
+using HappyBookingShare.Request.User;
+using HappyBookingShare.Response.Auth;
 using HappyBookingShare.Response.User;
 
 namespace HappyBookingClient.Service.IService;
