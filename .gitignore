@@ -25,3 +25,4 @@ node_modules/
 *.iml
 
 HappyBookingCleanArchitectureServer/appsettings.json
+/HappyBookingCleanArchitectureServer/appsettings.json
