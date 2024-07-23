@@ -110,3 +110,7 @@
         transform: rotate(360deg);
     }
 }
+
+.cursorPointer {
+    cursor: pointer;
+}
