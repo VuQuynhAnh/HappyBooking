@@ -4,7 +4,6 @@ using System.Net;
 using System.Text.Json;
 using System.Text;
 using HappyBookingShare.Common;
-using HappyBookingShare.Request.User;
 using Microsoft.AspNetCore.Components;
 using HappyBookingShare.Response.Auth;
 using HappyBookingShare.Request.Auth;
@@ -167,7 +166,7 @@ public abstract class BaseApiService
         var oldAccessToken = await GetTokenFromLocalStorageAsync();
         if (string.IsNullOrEmpty(oldRefreshToken) || string.IsNullOrEmpty(oldAccessToken))
         {
-            return new LoginResponse(string.Empty, string.Empty, StatusEnum.RefreshTokenIsNotExist);
+            return new LoginResponse(StatusEnum.RefreshTokenIsNotExist);
         }
 
         try

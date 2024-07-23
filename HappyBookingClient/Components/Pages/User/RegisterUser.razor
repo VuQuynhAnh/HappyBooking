@@ -7,7 +7,7 @@
 @inject NavigationManager _navigation
 @inject ILanguageService _languageService
 @inject IUploadImageService _uploadImageService
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime _jsRuntime
 
 <MudBreadcrumbs Items="mudBreadcrumbs" Class="p-0 mb-3 mt-0"></MudBreadcrumbs>
 
@@ -151,7 +151,7 @@
     private MemoryStream? memoryStream = null;
     private IBrowserFile? file = null;
     private int maxAllowedFiles = 1;
-    private string imagePreviewUrl = "https://st.depositphotos.com/1006018/3108/v/450/depositphotos_31081475-stock-illustration-bus-truck-driver-side-shield.jpg";
+    private string imagePreviewUrl = KeyConstant.DefaultAvata;
     private long maxFileSize = 3 * 1024 * 1024; // 3 MB
     private bool isLoading = false;
 
@@ -171,7 +171,7 @@
         var fileBytes = memoryStream.ToArray();
 
         // Create Blob URL for the file
-        var fileUrl = await JSRuntime.InvokeAsync<string>("createObjectURLFromArray", fileBytes);
+        var fileUrl = await _jsRuntime.InvokeAsync<string>("createObjectURLFromArray", fileBytes);
         imagePreviewUrl = fileUrl;
     }
 

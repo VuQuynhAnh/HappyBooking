@@ -27,6 +27,7 @@ public class LoginUseCase : ILoginUseCase
     {
         string token = string.Empty;
         string refeshToken = string.Empty;
+        long userId = 0;
         StatusEnum status = StatusEnum.Successed;
         try
         {
@@ -36,6 +37,7 @@ public class LoginUseCase : ILoginUseCase
                 var tokenResponse = await _tokenService.GenerateToken(user);
                 token = tokenResponse.JwtToken;
                 refeshToken = tokenResponse.RefreshToken;
+                userId = user.UserId;
             }
         }
         finally
@@ -43,6 +45,6 @@ public class LoginUseCase : ILoginUseCase
             await _userRepository.ReleaseResource();
         }
 
-        return new LoginResponse(token, refeshToken, status);
+        return new LoginResponse(userId, token, refeshToken, status);
     }
 }

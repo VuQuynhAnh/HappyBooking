@@ -24,14 +24,16 @@ public class RefreshTokenUseCase : IRefreshTokenUseCase
     {
         string token = string.Empty;
         string refeshToken = string.Empty;
+        long userId = 0;
         StatusEnum status = StatusEnum.Successed;
         var result = await _tokenService.RefreshTokenAsync(request.JwtToken, request.RefreshToken);
         if (result != null)
         {
+            userId = result.UserId;
             token = result.JwtToken;
             refeshToken = result.RefreshToken;
         }
 
-        return new LoginResponse(token, refeshToken, status);
+        return new LoginResponse(userId, token, refeshToken, status);
     }
 }

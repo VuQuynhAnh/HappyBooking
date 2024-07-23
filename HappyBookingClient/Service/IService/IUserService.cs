@@ -9,9 +9,11 @@ public interface IUserService : IBaseApiService
 {
     Task<GetListUserResponse?> GetAllUserData(GetListUserRequest request);
 
+    Task<GetUserByUserIdResponse?> GetUserByUserId(long userId);
+
     Task<LoginResponse?> Login(LoginRequest request);
 
-    Task RemoveTokensFromLocalStorageAsync();
+    Task ClearAllLocalStorage();
 
     Task<SaveUserResponse?> RegisterUser(RegisterUserRequest request);
 

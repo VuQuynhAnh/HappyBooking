@@ -29,7 +29,7 @@ public class TokenService : ITokenService
         var jwtToken = GenerateJwtToken(user);
         var refreshToken = await _userRepository.GenerateRefreshToken(user);
 
-        return new TokenResponse(jwtToken, refreshToken);
+        return new TokenResponse(user.UserId, jwtToken, refreshToken);
     }
 
     public async Task<TokenResponse?> RefreshTokenAsync(string jwtToken, string refreshToken)

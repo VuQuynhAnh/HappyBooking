@@ -106,13 +106,12 @@ public class UserService : BaseApiService, IUserService
     }
 
     /// <summary>
-    /// remove tokens from local storage
+    /// ClearAllLocalStorage
     /// </summary>
     /// <returns></returns>
-    public async Task RemoveTokensFromLocalStorageAsync()
+    public async Task ClearAllLocalStorage()
     {
-        await _localStorage.RemoveItemAsync(KeyConstant.AuthToken);
-        await _localStorage.RemoveItemAsync(KeyConstant.RefreshToken);
+        await _localStorage.ClearAsync();
     }
 
     /// <summary>
@@ -148,5 +147,27 @@ public class UserService : BaseApiService, IUserService
         }
 
         return true; // Nếu không tìm thấy claim "exp", coi như đã hết hạn
+    }
+
+    /// <summary>
+    /// GetUserByUserId
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<GetUserByUserIdResponse?> GetUserByUserId(long userId)
+    {
+        try
+        {
+            var queryUrl = $"User/{APIName.GetUserByUserId}?UserId={userId}";
+            var result = await SendAuthorizedRequestAsync<GetUserByUserIdResponse>(HttpMethod.Get, queryUrl);
+            await _localStorage.SetItemAsync(KeyConstant.AvatarUrl, result?.Data.AvatarImage ?? string.Empty);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            // Log the exception if necessary
+            throw new ApplicationException(ex.Message);
+        }
     }
 }

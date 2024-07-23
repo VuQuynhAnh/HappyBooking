@@ -5,7 +5,7 @@
 @using HappyBookingShare.Request.Auth
 @using HappyBookingShare.Request.User
 @inject NavigationManager _navigation
-@inject ILocalStorageService localStorage
+@inject ILocalStorageService _localStorage
 @inject IUserService _userService
 @inject ILanguageService _languageService
 
@@ -88,6 +88,7 @@
             var response = await _userService.Login(request);
             if (response != null)
             {
+                var userResponse = await _userService.GetUserByUserId(response.UserId);
                 if (!string.IsNullOrEmpty(returnUrl))
                 {
                     _navigation.NavigateTo(returnUrl);
@@ -96,6 +97,7 @@
                 {
                     _navigation.NavigateTo("/");
                 }
+                StateHasChanged();
             }
             else
             {

@@ -12,20 +12,29 @@ namespace HappyBookingCleanArchitectureServer.Api.Controller;
 public class UserController : BaseController
 {
     private readonly IGetAllUserDataUseCase _getAllUserDataUseCase;
+    private readonly IGetUserByUserIdUseCase _getUserByUserIdUseCase;
     private readonly IRegisterUserUseCase _registerUserUseCase;
     private readonly IUpdateUserUseCase _updateUserUseCase;
 
-    public UserController(IGetAllUserDataUseCase getAllUserDataUseCase, IRegisterUserUseCase registerUserUseCase, IUpdateUserUseCase updateUserUseCase, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+    public UserController(IGetAllUserDataUseCase getAllUserDataUseCase, IRegisterUserUseCase registerUserUseCase, IUpdateUserUseCase updateUserUseCase, IGetUserByUserIdUseCase getUserByUserIdUseCase, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
     {
         _getAllUserDataUseCase = getAllUserDataUseCase;
         _registerUserUseCase = registerUserUseCase;
         _updateUserUseCase = updateUserUseCase;
+        _getUserByUserIdUseCase = getUserByUserIdUseCase;
     }
 
     [HttpGet(APIName.GetAllData)]
     public async Task<ActionResult<GetListUserResponse>> GetData([FromQuery] GetListUserRequest request)
     {
         var response = await _getAllUserDataUseCase.GetAllUserData(UserId, request);
+        return Ok(response);
+    }
+
+    [HttpGet(APIName.GetUserByUserId)]
+    public async Task<ActionResult<GetListUserResponse>> GetUserByUserId([FromQuery] GetUserByUserIdRequest request)
+    {
+        var response = await _getUserByUserIdUseCase.GetUserByUserId(UserId, request);
         return Ok(response);
     }
 

@@ -2,11 +2,14 @@
 
 public class TokenResponse
 {
-    public TokenResponse(string jwtToken, string refreshToken)
+    public TokenResponse(long userId, string jwtToken, string refreshToken)
     {
+        UserId = userId;
         JwtToken = jwtToken;
         RefreshToken = refreshToken;
     }
+
+    public long UserId { get; private set; }
 
     public string JwtToken { get; private set; }
 

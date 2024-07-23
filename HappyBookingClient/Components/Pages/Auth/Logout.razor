@@ -6,7 +6,7 @@
 @code {
     protected override async void OnInitialized()
     {
-        await _userService.RemoveTokensFromLocalStorageAsync();
+        await _userService.ClearAllLocalStorage();
         Navigation.NavigateTo("/login");
     }
 }

@@ -80,11 +80,6 @@
         -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     }
 
-/* wwwroot/css/site.css */
-.content {
-    position: relative;
-}
-
 .content-loading-overlay {
     position: absolute;
     top: 0;
