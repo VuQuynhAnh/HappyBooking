@@ -17,6 +17,7 @@ public class ExceptionMiddleware
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             // Xử lý exception ở đây
             // Ví dụ: Ghi log, trả về một trang lỗi, gửi email thông báo, vv.
             // Sau đó, bạn có thể chuyển exception cho middleware tiếp theo nếu cần

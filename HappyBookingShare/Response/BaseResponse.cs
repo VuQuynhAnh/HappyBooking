@@ -7,7 +7,7 @@ namespace HappyBookingShare.Response;
 public abstract class BaseResponse<T>
 {
     [JsonIgnore]
-    public IMemoryCache Cache { get; set; }
+    public IMemoryCache? Cache { get; set; }
 
     [JsonPropertyName("userId")]
     public long UserId { get; set; }
