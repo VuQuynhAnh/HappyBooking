@@ -1,8 +1,28 @@
 ﻿@using Blazored.LocalStorage
 @using HappyBookingShare.Common
+@using HappyBookingShare.Response.Dtos
 @inherits LayoutComponentBase
 @inject ILocalStorageService LocalStorage
 
+<style>
+    .styleMudPaper {
+        width: 230px;
+        position: absolute;
+        top: 55px;
+        right: 10px;
+        background: #d9ffea;
+        border: 1px solid #05fa73;
+    }
+
+        .styleMudPaper a {
+            text-decoration: none;
+        }
+
+    a:hover, a:visited, a:link, a:active {
+        color: #000;
+        text-decoration: none !important;
+    }
+</style>
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -13,16 +33,18 @@
             <MudAvatar onclick="@(() => HandleClick())" Class="cursorPointer">
                 <MudImage Src="@avatarUrl"></MudImage>
             </MudAvatar>
-            <MudPaper Width="250px" Class="d-inline-flex py-3" Elevation="0">
-                <MudNavMenu Class="mud-width-full">
-                    <MudText Typo="Typo.h6" Class="px-4">Material</MudText>
-                    <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Icons</MudText>
-                    <MudDivider Class="my-2" />
-                    <MudNavLink Href="/dashboard" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
-                    <MudNavLink Href="/servers" Icon="@Icons.Material.Filled.Storage">Servers</MudNavLink>
-                    <MudNavLink Href="/billing" Icon="@Icons.Material.Filled.Receipt" Disabled="true">Billing</MudNavLink>
-                </MudNavMenu>
-            </MudPaper>
+            @if (showMudPaper)
+            {
+                <MudPaper Class="d-inline-flex styleMudPaper" Elevation="0">
+                    <MudNavMenu Class="mud-width-full" Rounded="true" Margin="Margin.Dense" Color="Color.Primary">
+                        <MudText Typo="Typo.h6" Class="px-4">@userLogin.FullName</MudText>
+                        <MudDivider Class="my-2" />
+                        <MudNavLink Href="/dashboard" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
+                        <MudNavLink Href="/servers" Icon="@Icons.Material.Filled.Storage">Servers</MudNavLink>
+                        <MudNavLink Href="/billing" Icon="@Icons.Material.Filled.Receipt">Billing</MudNavLink>
+                    </MudNavMenu>
+                </MudPaper>
+            }
         </div>
 
         <article class="content px-4">
@@ -42,17 +64,18 @@
 
 @code {
     private string avatarUrl = string.Empty;
+    private UserDto userLogin = new();
+    private bool showMudPaper = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var url = await LocalStorage.GetItemAsync<string>(KeyConstant.AvatarUrl);
-        avatarUrl = !string.IsNullOrEmpty(url) ? url : KeyConstant.DefaultAvata;
+        userLogin = await LocalStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
+        avatarUrl = !string.IsNullOrEmpty(userLogin.AvatarImage) ? userLogin.AvatarImage : KeyConstant.DefaultAvata;
         StateHasChanged();
     }
 
     public void HandleClick()
     {
-
-        // call ToggleMenu or any other method
+        showMudPaper = !showMudPaper;
     }
 }

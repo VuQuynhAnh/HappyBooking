@@ -89,6 +89,7 @@
             if (response != null)
             {
                 var userResponse = await _userService.GetUserByUserId(response.UserId);
+                await _localStorage.SetItemAsync(KeyConstant.UserLogin, userResponse?.Data);
                 if (!string.IsNullOrEmpty(returnUrl))
                 {
                     _navigation.NavigateTo(returnUrl);

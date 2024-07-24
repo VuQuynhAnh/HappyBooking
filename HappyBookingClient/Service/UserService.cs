@@ -161,7 +161,6 @@ public class UserService : BaseApiService, IUserService
         {
             var queryUrl = $"User/{APIName.GetUserByUserId}?UserId={userId}";
             var result = await SendAuthorizedRequestAsync<GetUserByUserIdResponse>(HttpMethod.Get, queryUrl);
-            await _localStorage.SetItemAsync(KeyConstant.AvatarUrl, result?.Data.AvatarImage ?? string.Empty);
             return result;
         }
         catch (Exception ex)
