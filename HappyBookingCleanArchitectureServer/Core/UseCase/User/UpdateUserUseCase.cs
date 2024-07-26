@@ -62,14 +62,6 @@ public class UpdateUserUseCase : IUpdateUserUseCase
     /// <returns></returns>
     private async Task<StatusEnum> ValidateUserInformation(UserModel userModel)
     {
-        if (userModel.UserId > 0)
-        {
-            var userExist = await _userRepository.GetUserByUserIdAndPassword(userModel.UserId, userModel.Password);
-            if (userExist.UserId != userModel.UserId)
-            {
-                return StatusEnum.InvalidPassword;
-            }
-        }
         if (!string.IsNullOrEmpty(userModel.Email))
         {
             var userExist = await _userRepository.GetUserByEmail(userModel.Email);

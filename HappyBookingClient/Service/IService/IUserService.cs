@@ -19,5 +19,7 @@ public interface IUserService : IBaseApiService
 
     Task<SaveUserResponse?> UpdateUser(UpdateUserRequest request);
 
+    Task<SaveUserResponse?> ChangePassword(ChangePasswordRequest request);
+
     Task<bool> IsTokenExpired();
 }

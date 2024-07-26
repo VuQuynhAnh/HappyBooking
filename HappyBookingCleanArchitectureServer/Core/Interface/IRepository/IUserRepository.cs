@@ -21,5 +21,7 @@ public interface IUserRepository : IRepositoryBase
 
     Task<bool> SaveUser(long userId, UserModel userModel);
 
+    Task<bool> ChangePassword(long userId, string oldPassword, string newPassword);
+
     Task<string> GenerateRefreshToken(UserModel user);
 }

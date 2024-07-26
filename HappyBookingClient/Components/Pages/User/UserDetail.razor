@@ -1,12 +1,15 @@
-﻿@page "/register-user"
+﻿@page "/user-detail"
+@using Blazored.LocalStorage
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Common
 @using HappyBookingShare.Request.Auth
 @using HappyBookingShare.Request.User
+@using HappyBookingShare.Response.Dtos
 @inject IUserService _userService
 @inject NavigationManager _navigation
 @inject ILanguageService _languageService
 @inject IUploadImageService _uploadImageService
+@inject ILocalStorageService _localStorage
 @inject IJSRuntime _jsRuntime
 
 <MudBreadcrumbs Items="mudBreadcrumbs" Class="p-0 mb-3 mt-0"></MudBreadcrumbs>
@@ -21,13 +24,13 @@
                 <label for="imageUpload"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> @_languageService["Edit"]</label>
             </div>
             <div class="avatar-preview">
-                <div id="imagePreview" style="background-image: url('@imagePreviewUrl');"></div>
+                <div id="imagePreview" style="background-image: url('@requestModel.AvatarImage');"></div>
             </div>
 
         </div>
     </MudItem>
     <MudItem md="6" sm="12" xs="12">
-        <MudText Typo="Typo.h6">@_languageService["Register"]</MudText>
+        <MudText Typo="Typo.h6">@_languageService["YourProfile"]</MudText>
         <MudCard>
             @if (isShowAlert)
             {
@@ -82,26 +85,6 @@
                                   Variant="Variant.Outlined"
                                   RequiredError="@_languageService["RequiredError"]"
                                   placeholder="@_languageService["Address"]" />
-
-                    <MudTextField @bind-Value="requestModel.Password"
-                                  Immediate="true"
-                                  placeholder="@_languageService["Password"]"
-                                  Variant="Variant.Outlined"
-                                  Required="true"
-                                  InputType="InputType.Password"
-                                  Adornment="Adornment.Start"
-                                  RequiredError="@_languageService["RequiredError"]"
-                                  AdornmentIcon="@Icons.Material.Filled.Password" />
-
-                    <MudTextField @bind-Value="confirmPassword"
-                                  Immediate="true"
-                                  placeholder="@_languageService["ConfirmPassword"]"
-                                  Variant="Variant.Outlined"
-                                  Required="true"
-                                  InputType="InputType.Password"
-                                  Adornment="Adornment.Start"
-                                  RequiredError="@_languageService["RequiredError"]"
-                                  AdornmentIcon="@Icons.Material.Filled.Password" />
                 </MudCardContent>
             </MudForm>
             <MudCardActions Class="pt-0">
@@ -122,23 +105,43 @@
 @code {
     private List<BreadcrumbItem>? mudBreadcrumbs;
     private MudForm? form;
-    private RegisterUserRequest requestModel = new();
-    private string confirmPassword = string.Empty;
+    private UpdateUserRequest requestModel = new();
     private bool isShowAlert = false;
     private Severity severity = Severity.Normal;
     private string message = string.Empty;
     private MemoryStream? memoryStream = null;
     private IBrowserFile? file = null;
-    private string imagePreviewUrl = KeyConstant.DefaultAvata;
     private long maxFileSize = 3 * 1024 * 1024; // 3 MB
+    private long userId = 0;
     private bool isLoading = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            isLoading = true;
             await _languageService.LoadLanguage();
+            var userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
+            userId = userLogin.UserId;
+            if (userId > 0)
+            {
+                var userResponse = await _userService.GetUserByUserId(userId);
+                if (userResponse == null || userResponse.Data.UserId == 0)
+                {
+                    _navigation.NavigateTo("/");
+                    return;
+                }
+                var userDto = userResponse.Data;
+                requestModel.UserId = userDto.UserId;
+                requestModel.FullName = userDto.FullName;
+                requestModel.Email = userDto.Email;
+                requestModel.PhoneNumber = userDto.PhoneNumber;
+                requestModel.CitizenIdentificationNumber = userDto.CitizenIdentificationNumber;
+                requestModel.Address = userDto.Address;
+                requestModel.AvatarImage = userDto.AvatarImage;
+            }
             InitializeBreadcrumbs();
+            isLoading = false;
             StateHasChanged();
         }
     }
@@ -149,7 +152,7 @@
         {
             new BreadcrumbItem(_languageService["Home"], href: "/", icon: Icons.Material.Filled.Home),
             new BreadcrumbItem(_languageService["User"], href: "user-list", icon: Icons.Material.Filled.People),
-            new BreadcrumbItem(_languageService["Register"], href: "register-user", icon: Icons.Material.Filled.PersonAddAlt1)
+            new BreadcrumbItem(_languageService["YourProfile"], href: "user-detail", icon: Icons.Material.Filled.PersonAddAlt1)
         };
     }
 
@@ -170,7 +173,7 @@
 
         // Create Blob URL for the file
         var fileUrl = await _jsRuntime.InvokeAsync<string>("createObjectURLFromArray", fileBytes);
-        imagePreviewUrl = fileUrl;
+        requestModel.AvatarImage = fileUrl;
     }
 
     private async Task UploadImageToServer()
@@ -186,7 +189,7 @@
             var response = await _uploadImageService.UploadImageAsync(formFile);
             if (response != null)
             {
-                imagePreviewUrl = response.Data;
+                requestModel.AvatarImage = response.Data;
             }
         }
     }
@@ -200,11 +203,6 @@
             await form!.Validate();
             if (!form.IsValid)
             {
-                return;
-            }
-            if (string.IsNullOrEmpty(requestModel.Password) || confirmPassword != requestModel.Password)
-            {
-                ShowAlert(_languageService["InvalidConfirmPassword"], Severity.Warning);
                 return;
             }
             if (form.IsValid)
@@ -224,19 +222,13 @@
                     return;
                 }
                 await UploadImageToServer();
-                requestModel.AvatarImage = imagePreviewUrl;
-                var result = await _userService.RegisterUser(requestModel);
+                var result = await _userService.UpdateUser(requestModel);
                 if (result == null || !result.Data)
                 {
                     ShowAlert(result?.Message ?? string.Empty, Severity.Warning);
                     return;
                 }
-                var loginResponse = await _userService.Login(new LoginRequest() { UserName = requestModel.PhoneNumber, Password = requestModel.Password });
-                if (loginResponse != null)
-                {
-                    _navigation.NavigateTo("/");
-                    requestModel = new();
-                }
+                ShowAlert(result?.Message ?? string.Empty, Severity.Success);
             }
         }
         finally

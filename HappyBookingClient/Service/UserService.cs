@@ -106,6 +106,25 @@ public class UserService : BaseApiService, IUserService
     }
 
     /// <summary>
+    /// ChangePassword
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public async Task<SaveUserResponse?> ChangePassword(ChangePasswordRequest request)
+    {
+        try
+        {
+            var queryUrl = $"User/{APIName.ChangePassword}";
+            var result = await SendAuthorizedRequestAsync<SaveUserResponse>(HttpMethod.Put, queryUrl, request);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException(ex.Message);
+        }
+    }
+
+    /// <summary>
     /// ClearAllLocalStorage
     /// </summary>
     /// <returns></returns>

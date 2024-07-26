@@ -35,6 +35,7 @@ public static class SetupDependencyInjection
         services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
         services.AddScoped<IUpdateUserUseCase, UpdateUserUseCase>();
         services.AddScoped<IGetUserByUserIdUseCase, GetUserByUserIdUseCase>();
+        services.AddScoped<IChangePasswordUseCase, ChangePasswordUseCase>();
     }
 
     public static void AddRepositoryServices(this IServiceCollection services)

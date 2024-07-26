@@ -155,6 +155,7 @@ public class UserRepository : IUserRepository
             entity.UserId = 0;
             entity.CreatedDate = DateTime.UtcNow;
             entity.CreatedId = userId;
+            entity.Password = userModel.Password;
         }
         entity.FullName = userModel.FullName;
         entity.PhoneNumber = userModel.PhoneNumber;
@@ -162,13 +163,35 @@ public class UserRepository : IUserRepository
         entity.CitizenIdentificationNumber = userModel.CitizenIdentificationNumber;
         entity.Address = userModel.Address;
         entity.AvatarImage = userModel.AvatarImage;
-        entity.Password = userModel.Password;
         entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedId = userId;
         if (entity.UserId == 0)
         {
             _context.UserRepository.Add(entity);
         }
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    /// <summary>
+    /// UpdatePassword
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="oldPassword"></param>
+    /// <param name="newPassword"></param>
+    /// <returns></returns>
+    public async Task<bool> ChangePassword(long userId, string oldPassword, string newPassword)
+    {
+        var entity = await _context.UserRepository.FirstOrDefaultAsync(item => item.UserId == userId
+                                                                               && item.Password == oldPassword
+                                                                               && item.IsDeleted == 0);
+
+        if (entity == null)
+        {
+            return false;
+        }
+        entity.Password = newPassword;
+        entity.UpdatedDate = DateTime.UtcNow;
+        entity.UpdatedId = userId;
         return await _context.SaveChangesAsync() > 0;
     }
 

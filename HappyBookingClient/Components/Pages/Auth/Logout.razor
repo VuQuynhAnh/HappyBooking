@@ -1,12 +1,12 @@
 ﻿@page "/logout"
 @using HappyBookingClient.Service.IService
-@inject NavigationManager Navigation
+@inject NavigationManager _navigation
 @inject IUserService _userService
 
 @code {
     protected override async void OnInitialized()
     {
         await _userService.ClearAllLocalStorage();
-        Navigation.NavigateTo("/login");
+        _navigation.NavigateTo("/login");
     }
 }

@@ -18,5 +18,12 @@
   "RequiredError": "This field is required!",
   "MaxImageSizeIs3MB": "Image size is too large, please enter image smaller than 3MB!",
   "ProfilePicture": "Profile picture",
-  "Edit": "Edit"
+  "Edit": "Edit",
+  "Logout": "Logout",
+  "ManageAccount": "Manage Account",
+  "Setting": "Setting",
+  "YourProfile": "Your Profile",
+  "ChangePassword": "Change Password",
+  "OldPassword": "Old Password",
+  "NewPassword": "New Password"
 }

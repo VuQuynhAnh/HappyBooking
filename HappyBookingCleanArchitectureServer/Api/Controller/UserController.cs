@@ -15,13 +15,15 @@ public class UserController : BaseController
     private readonly IGetUserByUserIdUseCase _getUserByUserIdUseCase;
     private readonly IRegisterUserUseCase _registerUserUseCase;
     private readonly IUpdateUserUseCase _updateUserUseCase;
+    private readonly IChangePasswordUseCase _changePasswordUseCase;
 
-    public UserController(IGetAllUserDataUseCase getAllUserDataUseCase, IRegisterUserUseCase registerUserUseCase, IUpdateUserUseCase updateUserUseCase, IGetUserByUserIdUseCase getUserByUserIdUseCase, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+    public UserController(IGetAllUserDataUseCase getAllUserDataUseCase, IRegisterUserUseCase registerUserUseCase, IUpdateUserUseCase updateUserUseCase, IGetUserByUserIdUseCase getUserByUserIdUseCase, IHttpContextAccessor httpContextAccessor, IChangePasswordUseCase changePasswordUseCase) : base(httpContextAccessor)
     {
         _getAllUserDataUseCase = getAllUserDataUseCase;
         _registerUserUseCase = registerUserUseCase;
         _updateUserUseCase = updateUserUseCase;
         _getUserByUserIdUseCase = getUserByUserIdUseCase;
+        _changePasswordUseCase = changePasswordUseCase;
     }
 
     [HttpGet(APIName.GetAllData)]
@@ -50,6 +52,13 @@ public class UserController : BaseController
     public async Task<ActionResult<SaveUserResponse>> UpdateUser([FromBody] UpdateUserRequest request)
     {
         var response = await _updateUserUseCase.UpdateUser(UserId, request);
+        return Ok(response);
+    }
+
+    [HttpPut(APIName.ChangePassword)]
+    public async Task<ActionResult<SaveUserResponse>> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var response = await _changePasswordUseCase.ChangePassword(UserId, request);
         return Ok(response);
     }
 }

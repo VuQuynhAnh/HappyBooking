@@ -1,8 +1,10 @@
 ﻿@using Blazored.LocalStorage
+@using HappyBookingClient.Service.IService
 @using HappyBookingShare.Common
 @using HappyBookingShare.Response.Dtos
 @inherits LayoutComponentBase
-@inject ILocalStorageService LocalStorage
+@inject ILocalStorageService _localStorage
+@inject ILanguageService _languageService
 
 <style>
     .styleMudPaper {
@@ -30,18 +32,30 @@
 
     <main>
         <div class="top-row px-4">
-            <MudAvatar onclick="@(() => HandleClick())" Class="cursorPointer">
+            <MudAvatar onclick="@(() => MudPaperClick())" Class="cursorPointer">
                 <MudImage Src="@avatarUrl"></MudImage>
             </MudAvatar>
-            @if (showMudPaper)
+            @if (showMudPaper && userLogin.UserId > 0)
             {
                 <MudPaper Class="d-inline-flex styleMudPaper" Elevation="0">
                     <MudNavMenu Class="mud-width-full" Rounded="true" Margin="Margin.Dense" Color="Color.Primary">
                         <MudText Typo="Typo.h6" Class="px-4">@userLogin.FullName</MudText>
-                        <MudDivider Class="my-2" />
-                        <MudNavLink Href="/dashboard" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
-                        <MudNavLink Href="/servers" Icon="@Icons.Material.Filled.Storage">Servers</MudNavLink>
-                        <MudNavLink Href="/billing" Icon="@Icons.Material.Filled.Receipt">Billing</MudNavLink>
+                        <MudText Class="px-4">@userLogin.Email</MudText>
+                        <MudText Class="px-4">@userLogin.PhoneNumber</MudText>
+                        <MudDivider Class="my-1" />
+                        <MudNavLink Href="user-detail" Icon="@Icons.Material.Filled.ManageAccounts">
+                            <MudText onclick="@(() => CloseNavBar())">@_languageService["YourProfile"]</MudText>
+                        </MudNavLink>
+                        <MudNavLink Href="change-password" Icon="@Icons.Material.Filled.Password">
+                            <MudText onclick="@(() => CloseNavBar())">@_languageService["ChangePassword"]</MudText>
+                        </MudNavLink>
+                        <MudNavLink Href="/setting" Icon="@Icons.Material.Filled.Settings">
+                            <MudText onclick="@(() => CloseNavBar())">@_languageService["Setting"]</MudText>
+                        </MudNavLink>
+                        <MudDivider Class="my-1" />
+                        <MudNavLink Href="/logout" Icon="@Icons.Material.Filled.Logout">
+                            <MudText onclick="@(() => CloseNavBar())">@_languageService["Logout"]</MudText>
+                        </MudNavLink>
                     </MudNavMenu>
                 </MudPaper>
             }
@@ -65,17 +79,27 @@
 @code {
     private string avatarUrl = string.Empty;
     private UserDto userLogin = new();
-    private bool showMudPaper = true;
+    private bool showMudPaper = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        userLogin = await LocalStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
+        if (firstRender)
+        {
+            await _languageService.LoadLanguage();
+        }
+        userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
         avatarUrl = !string.IsNullOrEmpty(userLogin.AvatarImage) ? userLogin.AvatarImage : KeyConstant.DefaultAvata;
         StateHasChanged();
     }
 
-    public void HandleClick()
+    public void MudPaperClick()
     {
         showMudPaper = !showMudPaper;
+    }
+
+    private void CloseNavBar()
+    {
+        // Ensure MudPaper is hidden when any NavLink is clicked
+        showMudPaper = false;
     }
 }

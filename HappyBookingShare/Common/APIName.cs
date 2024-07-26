@@ -10,4 +10,5 @@ public static class APIName
     public const string GetSetting = "GetSetting";
     public const string SaveSetting = "SaveSetting";
     public const string GetUserByUserId = "GetUserByUserId";
+    public const string ChangePassword = "ChangePassword";
 }

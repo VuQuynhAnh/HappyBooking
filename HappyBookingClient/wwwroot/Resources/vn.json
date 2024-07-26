@@ -18,5 +18,12 @@
   "RequiredError": "Bạn hãy nhập trường này!",
   "MaxImageSizeIs3MB": "Ảnh có kích thước quá lớn, hãy nhập ảnh có kích thước nhỏ hơn 3MB!",
   "ProfilePicture": "Ảnh đại diện",
-  "Edit": "Sửa"
+  "Edit": "Sửa",
+  "Logout": "Đăng xuất",
+  "ManageAccount": "Quản lý người dùng",
+  "Setting": "Cài đặt",
+  "YourProfile": "Hồ sơ của bạn",
+  "ChangePassword": "Thay đổi mật khẩu",
+  "OldPassword": "Mật khẩu cũ",
+  "NewPassword": "Mật khẩu mới"
 }
