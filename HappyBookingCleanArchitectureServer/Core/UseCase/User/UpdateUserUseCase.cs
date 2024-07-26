@@ -65,7 +65,7 @@ public class UpdateUserUseCase : IUpdateUserUseCase
         if (!string.IsNullOrEmpty(userModel.Email))
         {
             var userExist = await _userRepository.GetUserByEmail(userModel.Email);
-            if (userExist.UserId != userModel.UserId)
+            if (userExist.UserId != 0 && userExist.UserId != userModel.UserId)
             {
                 return StatusEnum.ExistEmail;
             }
@@ -73,7 +73,7 @@ public class UpdateUserUseCase : IUpdateUserUseCase
         if (!string.IsNullOrEmpty(userModel.PhoneNumber))
         {
             var userExist = await _userRepository.GetUserByPhone(userModel.PhoneNumber);
-            if (userExist.UserId != userModel.UserId)
+            if (userExist.UserId != 0 && userExist.UserId != userModel.UserId)
             {
                 return StatusEnum.ExistPhoneNumber;
             }
@@ -81,7 +81,7 @@ public class UpdateUserUseCase : IUpdateUserUseCase
         if (!string.IsNullOrEmpty(userModel.CitizenIdentificationNumber))
         {
             var userExist = await _userRepository.GetUserByCitizenIdentificationNumber(userModel.CitizenIdentificationNumber);
-            if (userExist.UserId != userModel.UserId)
+            if (userExist.UserId != 0 && userExist.UserId != userModel.UserId)
             {
                 return StatusEnum.ExistCitizenIdentificationNumber;
             }

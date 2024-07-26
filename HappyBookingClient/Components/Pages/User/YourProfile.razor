@@ -1,4 +1,4 @@
-﻿@page "/user-detail"
+﻿@page "/your-profile"
 @using Blazored.LocalStorage
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Common
@@ -15,7 +15,7 @@
 <MudBreadcrumbs Items="mudBreadcrumbs" Class="p-0 mb-3 mt-0"></MudBreadcrumbs>
 
 <MudGrid Justify="Justify.Center">
-    <MudItem md="4" sm="12" xs="12">
+    <MudItem md="3" sm="12" xs="12">
         <div class="avatar-upload">
             <span>@_languageService["ProfilePicture"]</span>
 
@@ -89,6 +89,7 @@
             </MudForm>
             <MudCardActions Class="pt-0">
                 <MudButton Variant="Variant.Filled" Class="mr-2" Size="Size.Small" Color="Color.Success" OnClick="@(async () => await SaveClick())">@_languageService["Save"]</MudButton>
+                <MudButton Variant="Variant.Filled" Class="mr-2" Size="Size.Small" Color="Color.Tertiary" OnClick="@(async () => await GeneratePdf())">@_languageService["RenderPdf"]</MudButton>
                 <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Default" OnClick="@(() => _navigation.NavigateTo("/"))">@_languageService["Cancel"]</MudButton>
             </MudCardActions>
         </MudCard>
@@ -120,6 +121,8 @@
         if (firstRender)
         {
             isLoading = true;
+            StateHasChanged();
+
             await _languageService.LoadLanguage();
             var userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
             userId = userLogin.UserId;
@@ -141,6 +144,7 @@
                 requestModel.AvatarImage = userDto.AvatarImage;
             }
             InitializeBreadcrumbs();
+
             isLoading = false;
             StateHasChanged();
         }
@@ -228,6 +232,8 @@
                     ShowAlert(result?.Message ?? string.Empty, Severity.Warning);
                     return;
                 }
+                var userResponse = await _userService.GetUserByUserId(userId);
+                await _localStorage.SetItemAsync(KeyConstant.UserLogin, userResponse?.Data);
                 ShowAlert(result?.Message ?? string.Empty, Severity.Success);
             }
         }
@@ -235,6 +241,26 @@
         {
             isLoading = false;
         }
+    }
+
+    private async Task GeneratePdf()
+    {
+        var userResponse = await _userService.GetUserByUserId(userId);
+        var userDto = userResponse?.Data;
+        if (userDto == null)
+        {
+            return;
+        }
+        var data = new
+        {
+            userName = userDto.FullName,
+            userEmail = userDto.Email,
+            userPhone = userDto.PhoneNumber,
+            citizenId = userDto.CitizenIdentificationNumber,
+            address = userDto.Address,
+            avatarUrl = userDto.AvatarImage
+        };
+        await _jsRuntime.InvokeVoidAsync("jsPDFHelper.generatePDF", data, "UserInfo.pdf");
     }
 
     private void ShowAlert(string message, Severity severity)

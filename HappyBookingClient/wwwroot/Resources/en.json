@@ -25,5 +25,6 @@
   "YourProfile": "Your Profile",
   "ChangePassword": "Change Password",
   "OldPassword": "Old Password",
-  "NewPassword": "New Password"
+  "NewPassword": "New Password",
+  "RenderPdf": "Render Pdf"
 }

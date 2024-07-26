@@ -25,5 +25,6 @@
   "YourProfile": "Hồ sơ của bạn",
   "ChangePassword": "Thay đổi mật khẩu",
   "OldPassword": "Mật khẩu cũ",
-  "NewPassword": "Mật khẩu mới"
+  "NewPassword": "Mật khẩu mới",
+  "RenderPdf": "Xuất file pdf"
 }
