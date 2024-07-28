@@ -260,7 +260,7 @@
             address = userDto.Address,
             avatarUrl = userDto.AvatarImage
         };
-        await _jsRuntime.InvokeVoidAsync("jsPDFHelper.generatePDF", data, "UserInfo.pdf");
+        await _jsRuntime.InvokeVoidAsync("jsPDFHelper.previewPDF", data, "UserInfo.pdf");
     }
 
     private void ShowAlert(string message, Severity severity)
