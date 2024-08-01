@@ -1,4 +1,5 @@
 ﻿@page "/register-user"
+@using HappyBookingClient.Components.Layout
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Common
 @using HappyBookingShare.Request.Auth
@@ -112,12 +113,7 @@
     </MudItem>
 </MudGrid>
 
-@if (isLoading)
-{
-    <div class="content-loading-overlay">
-        <div class="spinner"></div>
-    </div>
-}
+<LoadingComponent IsLoading="isLoading" />
 
 @code {
     private List<BreadcrumbItem>? mudBreadcrumbs;

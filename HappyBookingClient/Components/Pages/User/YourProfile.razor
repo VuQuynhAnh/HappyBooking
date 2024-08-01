@@ -1,5 +1,6 @@
 ﻿@page "/your-profile"
 @using Blazored.LocalStorage
+@using HappyBookingClient.Components.Layout
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Common
 @using HappyBookingShare.Request.Auth
@@ -96,12 +97,7 @@
     </MudItem>
 </MudGrid>
 
-@if (isLoading)
-{
-    <div class="content-loading-overlay">
-        <div class="spinner"></div>
-    </div>
-}
+<LoadingComponent IsLoading="isLoading" />
 
 @code {
     private List<BreadcrumbItem>? mudBreadcrumbs;
@@ -131,7 +127,6 @@
                 var userResponse = await _userService.GetUserByUserId(userId);
                 if (userResponse == null || userResponse.Data.UserId == 0)
                 {
-                    _navigation.NavigateTo("/");
                     return;
                 }
                 var userDto = userResponse.Data;

@@ -1,5 +1,6 @@
 ﻿@page "/login"
 @using Blazored.LocalStorage
+@using HappyBookingClient.Components.Layout
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Common
 @using HappyBookingShare.Request.Auth
@@ -49,6 +50,8 @@
     </MudItem>
 </MudGrid>
 
+<LoadingComponent IsLoading="isLoading" />
+
 @code {
     public LoginRequest request { get; set; } = new();
     private MudForm form;
@@ -56,6 +59,7 @@
     private Severity severity = Severity.Normal;
     private string message = string.Empty;
     private string returnUrl = string.Empty;
+    private bool isLoading = false;
 
     protected override void OnInitialized()
     {
@@ -82,6 +86,7 @@
 
     private async Task LoginClick()
     {
+        isLoading = true;
         message = string.Empty;
         try
         {
@@ -108,6 +113,10 @@
         catch (Exception ex)
         {
             message = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿@page "/user-list"
+@using HappyBookingClient.Components.Layout
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Request.User
 @using HappyBookingShare.Response.Dtos
@@ -7,28 +8,25 @@
 
 <h3>Product List</h3>
 
-@if (userList.Any())
-{
-    <ul>
-        @foreach (var user in userList)
-        {
-            <li>@user.UserId - @user.FullName</li>
-        }
-    </ul>
-}
-else
-{
-    <p><em>Loading...</em></p>
-}
+<ul>
+    @foreach (var user in userList)
+    {
+        <li>@user.UserId - @user.FullName</li>
+    }
+</ul>
+
+<LoadingComponent IsLoading="isLoading" />
 
 @code {
     private List<UserDto> userList = new();
     private string accessToken = string.Empty;
+    private bool isLoading = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            isLoading = true;
             accessToken = await _userService.GetTokenFromLocalStorageAsync();
             GetListUserRequest request = new();
             request.PageIndex = 1;
@@ -38,6 +36,7 @@ else
 
             await _languageService.LoadLanguage();
             StateHasChanged();
+            isLoading = false;
         }
         await base.OnAfterRenderAsync(firstRender);
     }

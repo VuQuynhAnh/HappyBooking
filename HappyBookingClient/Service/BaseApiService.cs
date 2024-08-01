@@ -182,7 +182,9 @@ public abstract class BaseApiService
                 await SetTokenInLocalStorageAsync(newAccessToken, newRefreshToken);
                 return result;
             }
-            return null;
+            var returnUrl = _navigationManager.Uri;
+            _navigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(returnUrl)}");
+            return default;
         }
         catch (Exception ex)
         {
