@@ -7,9 +7,9 @@ namespace HappyBookingShare.Entities;
 public class ChatParticipant : BaseEntity
 {
     [Key]
-    public int Id { get; set; }
+    public long Id { get; set; }
 
-    public int ChatId { get; set; }
+    public long ChatId { get; set; }
 
-    public int UserId { get; set; }
+    public long MemberId { get; set; }
 }

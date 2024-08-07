@@ -7,7 +7,7 @@ namespace HappyBookingShare.Entities;
 public class Chat : BaseEntity
 {
     [Key]
-    public int ChatId { get; set; }
+    public long ChatId { get; set; }
 
     public string ChatName { get; set; } = string.Empty;
 

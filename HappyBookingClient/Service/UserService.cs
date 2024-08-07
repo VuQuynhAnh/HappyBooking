@@ -178,7 +178,7 @@ public class UserService : BaseApiService, IUserService
     {
         try
         {
-            var queryUrl = $"User/{APIName.GetUserByUserId}?UserId={userId}";
+            var queryUrl = $"User/{APIName.GetUserByUserId}?MemberId={userId}";
             var result = await SendAuthorizedRequestAsync<GetUserByUserIdResponse>(HttpMethod.Get, queryUrl);
             return result;
         }

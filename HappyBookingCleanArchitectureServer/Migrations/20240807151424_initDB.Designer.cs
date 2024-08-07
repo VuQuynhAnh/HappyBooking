@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HappyBookingCleanArchitectureServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240722155116_initDB")]
+    [Migration("20240807151424_initDB")]
     partial class initDB
     {
         /// <inheritdoc />
@@ -20,18 +20,91 @@ namespace HappyBookingCleanArchitectureServer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("HappyBookingShare.Entities.ImageManagement", b =>
+            modelBuilder.Entity("HappyBookingShare.Entities.Chat", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("ChatId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ChatId"));
+
+                    b.Property<string>("ChatName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("CreatedId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("GroupAvatar")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("IsDeleted")
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<bool>("IsGroupChat")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("UpdatedId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ChatId");
+
+                    b.ToTable("Chat");
+                });
+
+            modelBuilder.Entity("HappyBookingShare.Entities.ChatParticipant", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("ChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("CreatedId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("MemberId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("UpdatedId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChatParticipant");
+                });
+
+            modelBuilder.Entity("HappyBookingShare.Entities.ImageManagement", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -58,6 +131,44 @@ namespace HappyBookingCleanArchitectureServer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ImageManagement");
+                });
+
+            modelBuilder.Entity("HappyBookingShare.Entities.Message", b =>
+                {
+                    b.Property<long>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("MessageId"));
+
+                    b.Property<long>("ChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("CreatedId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("IsDeleted")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TypeMessage")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("UpdatedId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("MessageId");
+
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("HappyBookingShare.Entities.RefreshToken", b =>
@@ -165,6 +276,9 @@ namespace HappyBookingCleanArchitectureServer.Migrations
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone");

@@ -7,11 +7,9 @@ namespace HappyBookingShare.Entities;
 public class Message : BaseEntity
 {
     [Key]
-    public int MessageId { get; set; }
+    public long MessageId { get; set; }
 
-    public int ChatId { get; set; }
-
-    public int UserId { get; set; }
+    public long ChatId { get; set; }
 
     public int TypeMessage { get; set; }
 

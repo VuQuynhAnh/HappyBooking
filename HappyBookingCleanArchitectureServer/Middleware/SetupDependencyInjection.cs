@@ -44,5 +44,6 @@ public static class SetupDependencyInjection
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IImageRepository, ImageRepository>();
         services.AddTransient<ISettingRepository, SettingRepository>();
+        services.AddTransient<IChatRepository, ChatRepository>();
     }
 }

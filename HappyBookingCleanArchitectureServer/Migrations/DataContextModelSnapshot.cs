@@ -24,11 +24,11 @@ namespace HappyBookingCleanArchitectureServer.Migrations
 
             modelBuilder.Entity("HappyBookingShare.Entities.Chat", b =>
                 {
-                    b.Property<int>("ChatId")
+                    b.Property<long>("ChatId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ChatId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ChatId"));
 
                     b.Property<string>("ChatName")
                         .IsRequired()
@@ -63,14 +63,14 @@ namespace HappyBookingCleanArchitectureServer.Migrations
 
             modelBuilder.Entity("HappyBookingShare.Entities.ChatParticipant", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<int>("ChatId")
-                        .HasColumnType("integer");
+                    b.Property<long>("ChatId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -81,14 +81,14 @@ namespace HappyBookingCleanArchitectureServer.Migrations
                     b.Property<int>("IsDeleted")
                         .HasColumnType("integer");
 
+                    b.Property<long>("MemberId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<long>("UpdatedId")
                         .HasColumnType("bigint");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -97,11 +97,11 @@ namespace HappyBookingCleanArchitectureServer.Migrations
 
             modelBuilder.Entity("HappyBookingShare.Entities.ImageManagement", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -132,14 +132,14 @@ namespace HappyBookingCleanArchitectureServer.Migrations
 
             modelBuilder.Entity("HappyBookingShare.Entities.Message", b =>
                 {
-                    b.Property<int>("MessageId")
+                    b.Property<long>("MessageId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MessageId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("MessageId"));
 
-                    b.Property<int>("ChatId")
-                        .HasColumnType("integer");
+                    b.Property<long>("ChatId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -162,9 +162,6 @@ namespace HappyBookingCleanArchitectureServer.Migrations
 
                     b.Property<long>("UpdatedId")
                         .HasColumnType("bigint");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
 
                     b.HasKey("MessageId");
 

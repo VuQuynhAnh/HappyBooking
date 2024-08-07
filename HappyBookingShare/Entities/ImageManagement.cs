@@ -7,7 +7,7 @@ namespace HappyBookingShare.Entities;
 public class ImageManagement : BaseEntity
 {
     [Key]
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     public string ImageLink { get; set; } = string.Empty;
 
