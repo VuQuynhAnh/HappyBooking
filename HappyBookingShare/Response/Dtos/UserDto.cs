@@ -40,4 +40,7 @@ public class UserDto
 
     [JsonPropertyName("avatarImage")]
     public string AvatarImage { get; set; } = string.Empty;
+
+    [JsonPropertyName("role")]
+    public int Role { get; set; }
 }

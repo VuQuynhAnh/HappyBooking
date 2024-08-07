@@ -46,6 +46,18 @@
                                   RequiredError="@_languageService["RequiredError"]"
                                   Class="pt-0" />
 
+                    <MudSelect @bind-Value="requestModel.Role" Label="@_languageService["Role"]" Variant="Variant.Outlined">
+                        <MudSelectItem Value="@(LanguageCode.VN)">
+                            @_languageService["Manager"]
+                        </MudSelectItem>
+                        <MudSelectItem Value="@(LanguageCode.EN)">
+                            @_languageService["Driver"]
+                        </MudSelectItem>
+                        <MudSelectItem Value="@(LanguageCode.EN)">
+                            @_languageService["Staff"]
+                        </MudSelectItem>
+                    </MudSelect>
+
                     <MudTextField @bind-Value="requestModel.Email"
                                   Immediate="true"
                                   placeholder="@_languageService["Email"]"

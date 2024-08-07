@@ -26,5 +26,12 @@
   "ChangePassword": "Change Password",
   "OldPassword": "Old Password",
   "NewPassword": "New Password",
-  "RenderPdf": "Render Pdf"
+  "RenderPdf": "Render Pdf",
+  "Language": "Language",
+  "Vietnamese": "Vietnamese",
+  "English": "English",
+  "Role": "Role",
+  "Manager": "Manager",
+  "Driver": "Driver",
+  "Staff": "Staff"
 }

@@ -39,6 +39,7 @@ public class UpdateUserUseCase : IUpdateUserUseCase
                            request.CitizenIdentificationNumber,
                            request.Address,
                            request.AvatarImage,
+                           request.Role,
                            request.Password);
             StatusEnum status = await ValidateUserInformation(userModel);
             if (status != StatusEnum.Successed)

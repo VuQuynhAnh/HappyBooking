@@ -37,6 +37,10 @@ public class SettingRepository : ISettingRepository
         setting.LanguageCode = model.LanguageCode;
         setting.UpdatedDate = DateTime.UtcNow;
         setting.CreatedId = model.UserId;
+        if (setting.Id == 0)
+        {
+            _context.SettingRepository.Add(setting);
+        }
         _cache.Set($"{KeyConstant.LanguageCode}_{model.UserId}", model.LanguageCode);
         return await _context.SaveChangesAsync() > 0;
     }

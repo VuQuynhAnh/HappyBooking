@@ -12,6 +12,7 @@ public class UserModel
         PhoneNumber = entity.PhoneNumber;
         CitizenIdentificationNumber = entity.CitizenIdentificationNumber;
         Address = entity.Address;
+        Role = entity.Role;
         AvatarImage = entity.AvatarImage;
     }
 
@@ -19,7 +20,7 @@ public class UserModel
     {
     }
 
-    public UserModel(long userId, string fullName, string email, string phoneNumber, string citizenIdentificationNumber, string address, string avatarImage, string password)
+    public UserModel(long userId, string fullName, string email, string phoneNumber, string citizenIdentificationNumber, string address, string avatarImage, int role, string password)
     {
         UserId = userId;
         FullName = fullName;
@@ -28,6 +29,7 @@ public class UserModel
         CitizenIdentificationNumber = citizenIdentificationNumber;
         Address = address;
         AvatarImage = avatarImage;
+        Role = role;
         Password = password;
     }
 
@@ -44,6 +46,8 @@ public class UserModel
     public string Address { get; private set; } = string.Empty;
 
     public string AvatarImage { get; private set; } = string.Empty;
+
+    public int Role { get; private set; }
 
     public string Password { get; private set; } = string.Empty;
 }

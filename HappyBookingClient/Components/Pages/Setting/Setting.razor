@@ -1,6 +1,111 @@
 ﻿@page "/setting"
-<h3>Setting</h3>
+@using Blazored.LocalStorage
+@using HappyBookingClient.Components.Layout
+@using HappyBookingClient.Service.IService
+@using HappyBookingShare.Common
+@using HappyBookingShare.Model
+@using HappyBookingShare.Request.Setting
+@using HappyBookingShare.Response.Dtos
+@inject NavigationManager _navigation
+@inject ILanguageService _languageService
+@inject ISettingService _settingService
+@inject ILocalStorageService _localStorage
+@inject IJSRuntime _jsRuntime
+
+
+<MudBreadcrumbs Items="mudBreadcrumbs" Class="p-0 mb-3 mt-0"></MudBreadcrumbs>
+
+<MudGrid Justify="Justify.Center">
+    <MudItem md="4" sm="8" xs="12">
+        <MudText Typo="Typo.h6">@_languageService["Setting"]</MudText>
+        <MudCard>
+            @if (isShowAlert)
+            {
+                <MudAlert Severity="@severity" Variant="Variant.Filled" Dense="true" ShowCloseIcon="true" CloseIconClicked="@(() => isShowAlert = false)">@message</MudAlert>
+            }
+            <MudForm Model="@settingRequest" @ref="@form" ValidationDelay="0">
+                <MudCardContent>
+                    <MudSelect @bind-Value="settingRequest.LanguageCode" Label="@_languageService["Language"]" Variant="Variant.Outlined">
+                        <MudSelectItem Value="@(LanguageCode.VN)">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg" height="14" class="mr-1" /> @_languageService["Vietnamese"]
+                        </MudSelectItem>
+                        <MudSelectItem Value="@(LanguageCode.EN)">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/b/be/Flag_of_England.svg" height="14" class="mr-1" /> @_languageService["English"]
+                        </MudSelectItem>
+                    </MudSelect>
+                </MudCardContent>
+            </MudForm>
+            <MudCardActions>
+                <MudButton Variant="Variant.Filled" Class="mr-2" Size="Size.Small" Color="Color.Success" OnClick="@(async () => await SaveClick())">@_languageService["Save"]</MudButton>
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Default" OnClick="@(() => _navigation.NavigateTo("/"))">@_languageService["Cancel"]</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+<LoadingComponent IsLoading="isLoading" />
 
 @code {
+    private List<BreadcrumbItem>? mudBreadcrumbs;
+    private MudForm? form;
+    private string message = string.Empty;
+    private bool isShowAlert = false;
+    private Severity severity = Severity.Normal;
+    private SaveSettingRequest settingRequest = new();
+    private bool isLoading = false;
+    private long userId;
 
+    private void InitializeBreadcrumbs()
+    {
+        mudBreadcrumbs = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem(_languageService["Home"], href: "/", icon: Icons.Material.Filled.Home),
+            new BreadcrumbItem(_languageService["Setting"], href: "setting", icon: Icons.Material.Filled.People),
+        };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            await _languageService.LoadLanguage();
+            var userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
+            userId = userLogin.UserId;
+            if (userId > 0)
+            {
+                var settingModel = await _settingService.GetSetting();
+                if (settingModel != null)
+                {
+                    settingRequest.LanguageCode = string.IsNullOrEmpty(settingModel.Data.LanguageCode) ? LanguageCode.VN : settingModel.Data.LanguageCode;
+                }
+            }
+            InitializeBreadcrumbs();
+
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveClick()
+    {
+        var result = await _settingService.SaveSetting(settingRequest);
+        if (result == null || !result.Data)
+        {
+            ShowAlert(result?.Message ?? string.Empty, Severity.Warning);
+            return;
+        }
+
+        // reload page
+        _navigation.NavigateTo(_navigation.Uri, true);
+    }
+
+    private void ShowAlert(string message, Severity severity)
+    {
+        this.isShowAlert = true;
+        this.severity = severity;
+        this.message = message;
+    }
 }

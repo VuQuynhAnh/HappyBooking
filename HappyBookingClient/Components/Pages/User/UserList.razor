@@ -35,8 +35,8 @@
             userList = response?.Data ?? new();
 
             await _languageService.LoadLanguage();
-            StateHasChanged();
             isLoading = false;
+            StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);
     }

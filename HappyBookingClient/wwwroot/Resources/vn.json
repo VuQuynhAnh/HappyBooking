@@ -26,5 +26,12 @@
   "ChangePassword": "Thay đổi mật khẩu",
   "OldPassword": "Mật khẩu cũ",
   "NewPassword": "Mật khẩu mới",
-  "RenderPdf": "Xuất file pdf"
+  "RenderPdf": "Xuất file pdf",
+  "Language": "Ngôn ngữ",
+  "Vietnamese": "Tiếng Việt",
+  "English": "Tiếng Anh",
+  "Role": "Chức danh",
+  "Manager": "Quản lý",
+  "Driver": "Tài xế",
+  "Staff": "Nhân viên"
 }

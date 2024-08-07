@@ -1,7 +1,9 @@
 ﻿using Blazored.LocalStorage;
 using HappyBookingClient.Service.IService;
+using HappyBookingShare.Common;
 using HappyBookingShare.Request.Setting;
 using HappyBookingShare.Response.Setting;
+using HappyBookingShare.Response.User;
 using Microsoft.AspNetCore.Components;
 
 namespace HappyBookingClient.Service;
@@ -21,7 +23,7 @@ public class SettingService : BaseApiService, ISettingService
     {
         try
         {
-            var queryUrl = $"Setting";
+            var queryUrl = $"Setting/{APIName.GetSetting}";
             var result = await SendAuthorizedRequestAsync<GetSettingResponse>(HttpMethod.Get, queryUrl);
             return result;
         }
@@ -34,7 +36,16 @@ public class SettingService : BaseApiService, ISettingService
 
     public async Task<SaveSettingResponse?> SaveSetting(SaveSettingRequest request)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var queryUrl = $"Setting/{APIName.SaveSetting}";
+            var result = await SendAuthorizedRequestAsync<SaveSettingResponse>(HttpMethod.Post, queryUrl, request);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException(ex.Message);
+        }
     }
 
     /// <summary>
