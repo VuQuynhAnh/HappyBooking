@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using HappyBookingCleanArchitectureServer.Middleware;
 using HappyBookingCleanArchitectureServer.Database;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,9 @@ builder.Services.AddMemoryCache();
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+// Configure Redis
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")));
 
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty);
 builder.Services.AddAuthentication(options =>
@@ -90,5 +94,8 @@ app.UseAuthorization();
 app.UseExceptionMiddleware(); // Xử lý exception
 
 app.MapControllers();
+
+// Map SignalR hubs
+app.MapHub<ChatHub>("/chathub");
 
 app.Run();
