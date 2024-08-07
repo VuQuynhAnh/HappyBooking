@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using HappyBookingCleanArchitectureServer.Middleware;
 using HappyBookingCleanArchitectureServer.Database;
 using StackExchange.Redis;
+using HappyBookingShare.Realtime;
 
 var builder = WebApplication.CreateBuilder(args);
 
