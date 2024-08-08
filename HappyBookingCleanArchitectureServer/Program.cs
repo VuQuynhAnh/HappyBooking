@@ -10,7 +10,6 @@ using HappyBookingShare.Realtime;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddUseCaseService();
 builder.Services.AddRepositoryServices();
 builder.Services.AddControllers();
@@ -18,17 +17,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
-// Add SignalR services
 builder.Services.AddSignalR();
 
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-// Configure Redis
-//builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")));
-
-
+// Configure JWT authentication
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty);
 builder.Services.AddAuthentication(options =>
 {

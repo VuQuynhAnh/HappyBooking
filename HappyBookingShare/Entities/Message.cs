@@ -11,7 +11,7 @@ public class Message : BaseEntity
 
     public long ChatId { get; set; }
 
-    public int TypeMessage { get; set; }
+    public int MessageType { get; set; }
 
     public string Content { get; set; } = string.Empty;
 }

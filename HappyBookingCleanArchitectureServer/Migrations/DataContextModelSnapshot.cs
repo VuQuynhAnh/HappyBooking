@@ -61,7 +61,7 @@ namespace HappyBookingCleanArchitectureServer.Migrations
                     b.ToTable("Chat");
                 });
 
-            modelBuilder.Entity("HappyBookingShare.Entities.ChatParticipant", b =>
+            modelBuilder.Entity("HappyBookingShare.Entities.ChatMember", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -71,6 +71,9 @@ namespace HappyBookingCleanArchitectureServer.Migrations
 
                     b.Property<long>("ChatId")
                         .HasColumnType("bigint");
+
+                    b.Property<int>("ChatRole")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -92,7 +95,7 @@ namespace HappyBookingCleanArchitectureServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChatParticipant");
+                    b.ToTable("ChatMember");
                 });
 
             modelBuilder.Entity("HappyBookingShare.Entities.ImageManagement", b =>
@@ -154,7 +157,7 @@ namespace HappyBookingCleanArchitectureServer.Migrations
                     b.Property<int>("IsDeleted")
                         .HasColumnType("integer");
 
-                    b.Property<int>("TypeMessage")
+                    b.Property<int>("MessageType")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedDate")
@@ -166,6 +169,38 @@ namespace HappyBookingCleanArchitectureServer.Migrations
                     b.HasKey("MessageId");
 
                     b.ToTable("Message");
+                });
+
+            modelBuilder.Entity("HappyBookingShare.Entities.MessageHistory", b =>
+                {
+                    b.Property<long>("HistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("HistoryId"));
+
+                    b.Property<long>("ChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("CreatedId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("MessageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("MessageType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("HistoryId");
+
+                    b.ToTable("MessageHistory");
                 });
 
             modelBuilder.Entity("HappyBookingShare.Entities.RefreshToken", b =>

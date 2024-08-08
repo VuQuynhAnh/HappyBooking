@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HappyBookingShare.Entities;
 
-[Table("ChatParticipant")]
-public class ChatParticipant : BaseEntity
+[Table("ChatMember")]
+public class ChatMember : BaseEntity
 {
     [Key]
     public long Id { get; set; }
@@ -12,4 +12,6 @@ public class ChatParticipant : BaseEntity
     public long ChatId { get; set; }
 
     public long MemberId { get; set; }
+
+    public int ChatRole { get; set; }
 }

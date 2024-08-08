@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HappyBookingCleanArchitectureServer.Migrations
 {
     /// <inheritdoc />
-    public partial class initDB : Migration
+    public partial class initDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,13 +33,14 @@ namespace HappyBookingCleanArchitectureServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChatParticipant",
+                name: "ChatMember",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ChatId = table.Column<long>(type: "bigint", nullable: false),
                     MemberId = table.Column<long>(type: "bigint", nullable: false),
+                    ChatRole = table.Column<int>(type: "integer", nullable: false),
                     IsDeleted = table.Column<int>(type: "integer", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedId = table.Column<long>(type: "bigint", nullable: false),
@@ -48,7 +49,7 @@ namespace HappyBookingCleanArchitectureServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChatParticipant", x => x.Id);
+                    table.PrimaryKey("PK_ChatMember", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -77,7 +78,7 @@ namespace HappyBookingCleanArchitectureServer.Migrations
                     MessageId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ChatId = table.Column<long>(type: "bigint", nullable: false),
-                    TypeMessage = table.Column<int>(type: "integer", nullable: false),
+                    MessageType = table.Column<int>(type: "integer", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
                     IsDeleted = table.Column<int>(type: "integer", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -88,6 +89,24 @@ namespace HappyBookingCleanArchitectureServer.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Message", x => x.MessageId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MessageHistory",
+                columns: table => new
+                {
+                    HistoryId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    MessageId = table.Column<long>(type: "bigint", nullable: false),
+                    ChatId = table.Column<long>(type: "bigint", nullable: false),
+                    MessageType = table.Column<int>(type: "integer", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessageHistory", x => x.HistoryId);
                 });
 
             migrationBuilder.CreateTable(
@@ -158,13 +177,16 @@ namespace HappyBookingCleanArchitectureServer.Migrations
                 name: "Chat");
 
             migrationBuilder.DropTable(
-                name: "ChatParticipant");
+                name: "ChatMember");
 
             migrationBuilder.DropTable(
                 name: "ImageManagement");
 
             migrationBuilder.DropTable(
                 name: "Message");
+
+            migrationBuilder.DropTable(
+                name: "MessageHistory");
 
             migrationBuilder.DropTable(
                 name: "RefreshToken");

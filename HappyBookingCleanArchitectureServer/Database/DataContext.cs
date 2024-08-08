@@ -21,5 +21,7 @@ public class DataContext : DbContext
 
     public DbSet<Message> MessageRepository { get; set; }
 
-    public DbSet<ChatParticipant> ChatParticipantRepository { get; set; }
+    public DbSet<ChatMember> ChatMemberRepository { get; set; }
+
+    public DbSet<MessageHistory> MessageHistoryRepository { get; set; }
 }

@@ -8,38 +8,36 @@ public class MessageModel
     {
     }
 
-    public MessageModel(long messageId, long chatId, int typeMessage, string content, DateTime createdDate, long createdId, DateTime updatedDate, long updatedId)
-    {
-        MessageId = messageId;
-        ChatId = chatId;
-        TypeMessage = typeMessage;
-        Content = content;
-        CreatedDate = createdDate;
-        CreatedId = createdId;
-        UpdatedDate = updatedDate;
-        UpdatedId = updatedId;
-    }
-
-    public MessageModel(Message entity, List<User> userList)
+    public MessageModel(Message entity, List<MessageHistory> messageHistoryList)
     {
         MessageId = entity.MessageId;
         ChatId = entity.ChatId;
-        TypeMessage = entity.TypeMessage;
+        MessageType = entity.MessageType;
         Content = entity.Content;
         CreatedDate = entity.CreatedDate;
         CreatedId = entity.CreatedId;
         UpdatedDate = entity.UpdatedDate;
         UpdatedId = entity.UpdatedId;
-        var userModelList = userList.Select(item => new UserModel(item)).ToList();
-        CreatedUser = userModelList.FirstOrDefault(item => item.UserId == CreatedId) ?? new();
-        UpdatedUser = userModelList.FirstOrDefault(item => item.UserId == UpdatedId) ?? new();
+        MessageHistoryList = messageHistoryList.Select(item => new MessageHistoryModel(item)).ToList();
+    }
+
+    public MessageModel(Message entity)
+    {
+        MessageId = entity.MessageId;
+        ChatId = entity.ChatId;
+        MessageType = entity.MessageType;
+        Content = entity.Content;
+        CreatedDate = entity.CreatedDate;
+        CreatedId = entity.CreatedId;
+        UpdatedDate = entity.UpdatedDate;
+        UpdatedId = entity.UpdatedId;
     }
 
     public long MessageId { get; private set; }
 
     public long ChatId { get; private set; }
 
-    public int TypeMessage { get; private set; }
+    public int MessageType { get; private set; }
 
     public string Content { get; private set; } = string.Empty;
 
@@ -51,7 +49,5 @@ public class MessageModel
 
     public long UpdatedId { get; private set; }
 
-    public UserModel CreatedUser { get; private set; } = new();
-
-    public UserModel UpdatedUser { get; private set; } = new();
+    public List<MessageHistoryModel> MessageHistoryList { get; private set; } = new();
 }
