@@ -17,6 +17,12 @@ public class ChatMemberModel
     {
     }
 
+    public ChatMemberModel(long memberId, int chatRole)
+    {
+        MemberId = memberId;
+        ChatRole = chatRole;
+    }
+
     public long ChatId { get; private set; } = new();
 
     public long MemberId { get; private set; } = new();

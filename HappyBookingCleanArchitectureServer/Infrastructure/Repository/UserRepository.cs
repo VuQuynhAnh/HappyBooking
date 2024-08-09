@@ -220,4 +220,16 @@ public class UserRepository : IUserRepository
     {
         await _context.DisposeAsync();
     }
+
+    /// <summary>
+    /// CheckExistUserList
+    /// </summary>
+    /// <param name="userIdList"></param>
+    /// <returns></returns>
+    public async Task<bool> CheckExistUserList(List<long> userIdList)
+    {
+        userIdList = userIdList.Distinct().ToList();
+        var userIdExist = await _context.UserRepository.CountAsync(item => userIdList.Contains(item.UserId) && item.IsDeleted == 0);
+        return userIdList.Count() == userIdExist;
+    }
 }

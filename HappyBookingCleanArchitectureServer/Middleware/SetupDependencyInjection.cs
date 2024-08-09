@@ -1,11 +1,13 @@
 ﻿using HappyBookingCleanArchitectureServer.Core.Interface.IRepository;
 using HappyBookingCleanArchitectureServer.Core.Interface.IService;
 using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.Auth;
+using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.Chat;
 using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.Image;
 using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.Setting;
 using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.User;
 using HappyBookingCleanArchitectureServer.Core.Service;
 using HappyBookingCleanArchitectureServer.Core.UseCase.Auth;
+using HappyBookingCleanArchitectureServer.Core.UseCase.Chat;
 using HappyBookingCleanArchitectureServer.Core.UseCase.Image;
 using HappyBookingCleanArchitectureServer.Core.UseCase.Setting;
 using HappyBookingCleanArchitectureServer.Core.UseCase.User;
@@ -36,6 +38,14 @@ public static class SetupDependencyInjection
         services.AddScoped<IUpdateUserUseCase, UpdateUserUseCase>();
         services.AddScoped<IGetUserByUserIdUseCase, GetUserByUserIdUseCase>();
         services.AddScoped<IChangePasswordUseCase, ChangePasswordUseCase>();
+
+        // Chat
+        services.AddScoped<IAddMemberToGroupUseCase, AddMemberToGroupUseCase>();
+        services.AddScoped<IGetMessageListUseCase, GetMessageListUseCase>();
+        services.AddScoped<IGetMessagesByMessageIdUseCase, GetMessagesByMessageIdUseCase>();
+        services.AddScoped<ILeaveChatGroupUseCase, LeaveChatGroupUseCase>();
+        services.AddScoped<ISaveChatGroupUseCase, SaveChatGroupUseCase>();
+        services.AddScoped<IGetChatGroupUseCase, GetChatGroupUseCase>();
     }
 
     public static void AddRepositoryServices(this IServiceCollection services)

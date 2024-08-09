@@ -10,4 +10,5 @@ public enum StatusEnum : byte
     ExistCitizenIdentificationNumber = 5,
     InvalidPassword = 6,
     RefreshTokenIsNotExist = 7,
+    ValidateSuccessed = 8,
 }

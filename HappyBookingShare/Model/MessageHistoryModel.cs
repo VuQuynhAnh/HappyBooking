@@ -4,7 +4,7 @@ namespace HappyBookingShare.Model;
 
 public class MessageHistoryModel
 {
-    public MessageHistoryModel(long historyId, long messageId, long chatId, int typeMessage, string content, DateTime createdDate, long createdId)
+    public MessageHistoryModel(long historyId, long messageId, long chatId, int typeMessage, string content, DateTime createdDate)
     {
         HistoryId = historyId;
         MessageId = messageId;
@@ -12,7 +12,6 @@ public class MessageHistoryModel
         MessageType = typeMessage;
         Content = content;
         CreatedDate = createdDate;
-        CreatedId = createdId;
     }
 
     public MessageHistoryModel(MessageHistory enity)
@@ -23,7 +22,6 @@ public class MessageHistoryModel
         MessageType = enity.MessageType;
         Content = enity.Content;
         CreatedDate = enity.CreatedDate;
-        CreatedId = enity.CreatedId;
     }
 
     public MessageHistoryModel()
@@ -41,6 +39,4 @@ public class MessageHistoryModel
     public string Content { get; private set; } = string.Empty;
 
     public DateTime CreatedDate { get; private set; }
-
-    public long CreatedId { get; private set; }
 }

@@ -2,9 +2,7 @@
 using HappyBookingCleanArchitectureServer.Database;
 using HappyBookingShare.Entities;
 using HappyBookingShare.Model;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.Replication.PgOutput.Messages;
 
 namespace HappyBookingCleanArchitectureServer.Infrastructure.Repository;
 
@@ -73,7 +71,11 @@ public class ChatRepository : IChatRepository
                                     .Distinct()
                                     .ToList();
 
-        var result = messageList.Select(item => new MessageModel(item))
+        var userList = await _context.UserRepository.Where(item => userIdList.Contains(item.UserId)
+                                                                   && item.IsDeleted == 0)
+                                                    .ToListAsync();
+
+        var result = messageList.Select(item => new MessageModel(item, userList))
                                 .ToList();
         return result;
     }
@@ -83,7 +85,7 @@ public class ChatRepository : IChatRepository
     /// </summary>
     /// <param name="messageId"></param>
     /// <returns></returns>
-    public async Task<MessageModel> GetMessagesbyMessageId(long messageId)
+    public async Task<MessageModel> GetMessagesByMessageId(long messageId)
     {
         var message = await _context.MessageRepository
                                     .FirstOrDefaultAsync(item => item.MessageId == messageId
@@ -98,7 +100,12 @@ public class ChatRepository : IChatRepository
                                                .Where(item => item.MessageId == message.MessageId)
                                                .ToListAsync();
 
-        var result = new MessageModel(message, messageHistoryList);
+        var userList = await _context.UserRepository.Where(item => (item.UserId == message.CreatedId
+                                                                    || item.UserId == message.UpdatedId)
+                                                                   && item.IsDeleted == 0)
+                                                    .ToListAsync();
+
+        var result = new MessageModel(message, messageHistoryList, userList);
         return result;
     }
 
@@ -260,7 +267,12 @@ public class ChatRepository : IChatRepository
         };
         await _context.MessageRepository.AddAsync(message);
         await _context.SaveChangesAsync();
-        return new MessageModel(message);
+
+        var userList = await _context.UserRepository.Where(item => (item.UserId == message.CreatedId
+                                                                    || item.UserId == message.UpdatedId)
+                                                                   && item.IsDeleted == 0)
+                                                    .ToListAsync();
+        return new MessageModel(message, userList);
     }
 
     /// <summary>
@@ -280,7 +292,7 @@ public class ChatRepository : IChatRepository
         }
 
         // add message history
-        var messageHistory = new MessageHistory()
+        MessageHistory messageHistory = new()
         {
             HistoryId = 0,
             MessageId = messageId,
@@ -299,7 +311,26 @@ public class ChatRepository : IChatRepository
         message.UpdatedId = userId;
         await _context.SaveChangesAsync();
 
+        var userList = await _context.UserRepository.Where(item => (item.UserId == message.CreatedId
+                                                                    || item.UserId == message.UpdatedId)
+                                                                   && item.IsDeleted == 0)
+                                                    .ToListAsync();
         var messageHistoryList = await _context.MessageHistoryRepository.Where(item => item.MessageId == messageId).ToListAsync();
-        return new MessageModel(message, messageHistoryList);
+        return new MessageModel(message, messageHistoryList, userList);
+    }
+
+    public async Task ReleaseResource()
+    {
+        await _context.DisposeAsync();
+    }
+
+    /// <summary>
+    /// CheckExistChat
+    /// </summary>
+    /// <param name="chatId"></param>
+    /// <returns></returns>
+    public async Task<bool> CheckExistChat(long chatId)
+    {
+        return await _context.ChatRepository.AnyAsync(item => item.ChatId == chatId && item.IsDeleted == 0);
     }
 }
