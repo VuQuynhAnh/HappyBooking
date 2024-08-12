@@ -38,8 +38,11 @@ public abstract class BaseApiService
         if (string.IsNullOrEmpty(accessToken))
         {
             var returnUrl = _navigationManager.Uri;
-            _navigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(returnUrl)}");
-            return default;
+            if (!returnUrl.Contains("register-user"))
+            {
+                _navigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(returnUrl)}");
+                return default;
+            }
         }
 
         var httpRequest = new HttpRequestMessage(method, requestUri);
@@ -69,8 +72,11 @@ public abstract class BaseApiService
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 var returnUrl = _navigationManager.Uri;
-                _navigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(returnUrl)}");
-                return default;
+                if (!returnUrl.Contains("register-user"))
+                {
+                    _navigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(returnUrl)}");
+                    return default;
+                }
             }
         }
 
@@ -112,8 +118,11 @@ public abstract class BaseApiService
         if (string.IsNullOrEmpty(accessToken))
         {
             var returnUrl = _navigationManager.Uri;
-            _navigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(returnUrl)}");
-            return default;
+            if (!returnUrl.Contains("register-user"))
+            {
+                _navigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(returnUrl)}");
+                return default;
+            }
         }
 
         var request = new HttpRequestMessage(method, requestUri)
@@ -180,11 +189,14 @@ public abstract class BaseApiService
             if (!string.IsNullOrEmpty(newAccessToken) && !string.IsNullOrEmpty(newRefreshToken))
             {
                 await SetTokenInLocalStorageAsync(newAccessToken, newRefreshToken);
-                return result;
             }
             var returnUrl = _navigationManager.Uri;
-            _navigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(returnUrl)}");
-            return default;
+            if (!returnUrl.Contains("register-user"))
+            {
+                _navigationManager.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(returnUrl)}");
+                return default;
+            }
+            return result;
         }
         catch (Exception ex)
         {
