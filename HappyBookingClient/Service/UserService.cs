@@ -54,9 +54,11 @@ public class UserService : BaseApiService, IUserService
             var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
             var token = result?.Token ?? string.Empty;
             var refreshToken = result?.RefeshToken ?? string.Empty;
-            if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(refreshToken))
+            if (result != null && !string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(refreshToken))
             {
                 await SetTokenInLocalStorageAsync(token, refreshToken);
+                var userResponse = await GetUserByUserId(result.UserId);
+                await _localStorage.SetItemAsync(KeyConstant.UserLogin, userResponse?.Data);
                 return result;
             }
             return null;
@@ -151,7 +153,7 @@ public class UserService : BaseApiService, IUserService
         var token = await GetTokenFromLocalStorageAsync();
         if (string.IsNullOrEmpty(token))
         {
-            return true; // Token không tồn tại hoặc rỗng, coi như đã hết hạn
+            return true;
         }
         var jwtHandler = new JwtSecurityTokenHandler();
         var jwtToken = jwtHandler.ReadJwtToken(token);
@@ -178,7 +180,7 @@ public class UserService : BaseApiService, IUserService
     {
         try
         {
-            var queryUrl = $"User/{APIName.GetUserByUserId}?MemberId={userId}";
+            var queryUrl = $"User/{APIName.GetUserByUserId}?UserId={userId}";
             var result = await SendAuthorizedRequestAsync<GetUserByUserIdResponse>(HttpMethod.Get, queryUrl);
             return result;
         }

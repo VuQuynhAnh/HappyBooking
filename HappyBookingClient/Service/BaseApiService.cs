@@ -100,7 +100,7 @@ public abstract class BaseApiService
     /// <param name="requestUri"></param>
     /// <param name="content"></param>
     /// <returns></returns>
-    protected async Task<T?> SendMultipartFormDataRequestAsync<T>(HttpMethod method, string requestUri, MultipartFormDataContent content)
+    protected async Task<T?> SendMultipartFormDataRequestAsync<T>(HttpMethod method, string requestUri, MultipartFormDataContent content, bool isAuthorize = true)
     {
         async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
         {
@@ -108,14 +108,18 @@ public abstract class BaseApiService
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 await RefreshToken();
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", await GetTokenFromLocalStorageAsync());
+                request = new HttpRequestMessage(method, requestUri)
+                {
+                    Headers = { Authorization = new AuthenticationHeaderValue("Bearer", await GetTokenFromLocalStorageAsync()) },
+                    Content = content
+                };
                 response = await _httpClient.SendAsync(request);
             }
             return response;
         }
 
         var accessToken = await GetTokenFromLocalStorageAsync();
-        if (string.IsNullOrEmpty(accessToken))
+        if (string.IsNullOrEmpty(accessToken) && isAuthorize)
         {
             var returnUrl = _navigationManager.Uri;
             if (!returnUrl.Contains("register-user"))

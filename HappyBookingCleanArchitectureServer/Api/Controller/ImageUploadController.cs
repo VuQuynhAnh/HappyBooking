@@ -1,4 +1,6 @@
 ﻿using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.Image;
+using HappyBookingShare.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HappyBookingCleanArchitectureServer.Api.Controller;
@@ -20,6 +22,19 @@ public class ImageUploadController : BaseController
 
     [HttpPost]
     public async Task<IActionResult> UploadImage([FromForm] IFormFile image)
+    {
+        if (image == null || image.Length == 0)
+        {
+            return BadRequest("No image file provided.");
+        }
+
+        var response = await _uploadImageUseCase.UploadImage(image, UserId);
+        return Ok(response);
+    }
+
+    [HttpPost(APIName.ImageUploadWithoutAuthorize)]
+    [AllowAnonymous] 
+    public async Task<IActionResult> ImageUploadWithoutAuthorize([FromForm] IFormFile image)
     {
         if (image == null || image.Length == 0)
         {

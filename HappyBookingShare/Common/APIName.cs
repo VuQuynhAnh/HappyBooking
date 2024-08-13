@@ -20,4 +20,5 @@ public static class APIName
     public const string GetMessagesByMessageId = "GetMessagesByMessageId";
     public const string GetChatGroup = "GetChatGroup";
     public const string GetListChatGroupByMember = "GetListChatGroupByMember";
+    public const string ImageUploadWithoutAuthorize = "ImageUploadWithoutAuthorize";
 }

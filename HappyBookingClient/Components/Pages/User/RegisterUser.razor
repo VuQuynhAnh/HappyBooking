@@ -46,7 +46,7 @@
                                   RequiredError="@_languageService["RequiredError"]"
                                   Class="pt-0" />
 
-                    @* <MudSelect @bind-Value="requestModel.Role" Label="@_languageService["Role"]" Variant="Variant.Outlined">
+                    <MudSelect @bind-Value="requestModel.Role" Label="@_languageService["Role"]" Variant="Variant.Outlined">
                         <MudSelectItem Value="@(UserRoleConstant.Manager)">
                             @_languageService["Manager"]
                         </MudSelectItem>
@@ -56,7 +56,7 @@
                         <MudSelectItem Value="@(UserRoleConstant.Staff)">
                             @_languageService["Staff"]
                         </MudSelectItem>
-                    </MudSelect> *@
+                    </MudSelect>
 
                     <MudTextField @bind-Value="requestModel.Email"
                                   Immediate="true"
@@ -191,7 +191,7 @@
                     ContentType = file.ContentType
                 };
 
-            var response = await _uploadImageService.UploadImageAsync(formFile);
+            var response = await _uploadImageService.UploadImageWithoutAuthorizeAsync(formFile);
             if (response != null)
             {
                 imagePreviewUrl = response.Data;

@@ -50,13 +50,13 @@
                                   Class="pt-0" />
 
                     <MudSelect @bind-Value="requestModel.Role" Label="@_languageService["Role"]" Variant="Variant.Outlined">
-                        <MudSelectItem Value="@(LanguageCode.VN)">
+                        <MudSelectItem Value="@(UserRoleConstant.Manager)">
                             @_languageService["Manager"]
                         </MudSelectItem>
-                        <MudSelectItem Value="@(LanguageCode.EN)">
+                        <MudSelectItem Value="@(UserRoleConstant.Driver)">
                             @_languageService["Driver"]
                         </MudSelectItem>
-                        <MudSelectItem Value="@(LanguageCode.EN)">
+                        <MudSelectItem Value="@(UserRoleConstant.Staff)">
                             @_languageService["Staff"]
                         </MudSelectItem>
                     </MudSelect>

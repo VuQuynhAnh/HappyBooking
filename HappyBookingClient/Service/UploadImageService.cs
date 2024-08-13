@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using HappyBookingClient.Service.IService;
+using HappyBookingShare.Common;
 using HappyBookingShare.Response.ImageUpload;
 using Microsoft.AspNetCore.Components;
 
@@ -49,6 +50,24 @@ public class UploadImageService : BaseApiService, IUploadImageService
             content.Add(fileContent, "image", image.FileName);
 
             var result = await SendMultipartFormDataRequestAsync<UploadImageResponse>(HttpMethod.Post, "ImageUpload", content);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException(ex.Message);
+        }
+    }
+
+    public async Task<UploadImageResponse?> UploadImageWithoutAuthorizeAsync(IFormFile image)
+    {
+        try
+        {
+            using var content = new MultipartFormDataContent();
+            using var fileContent = new StreamContent(image.OpenReadStream());
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(image.ContentType);
+            content.Add(fileContent, "image", image.FileName);
+
+            var result = await SendMultipartFormDataRequestAsync<UploadImageResponse>(HttpMethod.Post, $"ImageUpload/{APIName.ImageUploadWithoutAuthorize}", content, false);
             return result;
         }
         catch (Exception ex)
