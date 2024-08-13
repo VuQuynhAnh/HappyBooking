@@ -46,6 +46,9 @@ public static class SetupDependencyInjection
         services.AddScoped<ILeaveChatGroupUseCase, LeaveChatGroupUseCase>();
         services.AddScoped<ISaveChatGroupUseCase, SaveChatGroupUseCase>();
         services.AddScoped<IGetChatGroupUseCase, GetChatGroupUseCase>();
+        services.AddScoped<IGetListChatGroupByMemberUseCase, GetListChatGroupByMemberUseCase>();
+        services.AddScoped<ISendMessageUseCase, SendMessageUseCase>();
+        services.AddScoped<IUpdateMessageUseCase, UpdateMessageUseCase>();
     }
 
     public static void AddRepositoryServices(this IServiceCollection services)
