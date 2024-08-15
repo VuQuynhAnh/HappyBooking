@@ -8,39 +8,61 @@
 <style>
     .chatUserName {
         font-size: 16px;
+        cursor: pointer;
+    }
+
+    .textLeftButton {
+        justify-content: left;
+    }
+
+        .textLeftButton .mud-card-content {
+            padding: 0 5px;
+        }
+
+    .searchBoxStyle .mud-input > input.mud-input-root-outlined {
+        padding: 18.5px 14px;
     }
 </style>
 
 <MudGrid Justify="Justify.Center">
-    <MudItem md="4" sm="12" xs="12">
-        <MudButton Size="Size.Large" Class="mb-4" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.ChatBubbleOutline" Color="Color.Info">@_languageService["NewChat"]</MudButton>
+    <MudItem md="4" sm="12" xs="12" Class="mt-2">
+        <MudButton Size="Size.Large"
+                   Class="mb-2"
+                   Variant="Variant.Outlined"
+                   EndIcon="@Icons.Material.Filled.ChatBubbleOutline"
+                   Color="Color.Default"
+                   FullWidth>
+            @_languageService["NewChat"]
+        </MudButton>
 
         <MudPaper Class="pa-4">
-            <MudStack Spacing="2">
-                <MudButton OnClick="(() => OnExpandCollapseClick(0))">@_languageService["DirectMessages"]</MudButton>
+            <MudStack Spacing="1">
+                <MudButton Class="textLeftButton" OnClick="(() => OnExpandCollapseClick(0))">@_languageService["DirectMessages"]</MudButton>
                 <MudDivider />
                 <MudCollapse Expanded="expandedDirectMessages">
 
                     <MudCard>
-                        <MudCardContent>
-                            <MudText Class="chatUserName">
-                                <MudBadge Color="@onlineStatusColor" Overlap="true" Bordered="true" Class="mr-2">
-                                    <MudAvatar>
-                                        <MudImage Src="https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp"></MudImage>
-                                    </MudAvatar>
-                                </MudBadge>
-                                Story of the day
-                            </MudText>
-                        </MudCardContent>
+                        <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(1,1))" FullWidth>
+                            <MudCardContent Class=" chatUserName">
+                                <MudText>
+                                    <MudBadge Color="@onlineStatusColor" Overlap="true" Bordered="true" Class="mr-2">
+                                        <MudAvatar>
+                                            <MudImage Src="https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp"></MudImage>
+                                        </MudAvatar>
+                                    </MudBadge>
+                                    <span>Story of the day</span>
+                                </MudText>
+                            </MudCardContent>
+                        </MudButton>
                     </MudCard>
 
                 </MudCollapse>
             </MudStack>
         </MudPaper>
 
-        <MudPaper Class="pa-4">
-            <MudStack Spacing="2">
-                <MudButton OnClick="(() => OnExpandCollapseClick(1))">@_languageService["Spaces"]</MudButton>
+        <MudPaper Class="pa-4 mt-2">
+            <MudStack Spacing="1">
+                <MudButton Class="textLeftButton" OnClick="(() => OnExpandCollapseClick(1))">@_languageService["Spaces"]</MudButton>
                 <MudDivider />
                 <MudCollapse Expanded="expandedSpaces">
                     This content is collapsible.
@@ -50,6 +72,12 @@
     </MudItem>
 
     <MudItem md="8" sm="12" xs="12">
+        <MudTextField @bind-Value="messageSearchKeyWord"
+                      Label="@_languageService["Search"]"
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Class="searchBoxStyle" />
 
     </MudItem>
 
@@ -64,8 +92,10 @@
     bool expandedSpaces = true;
     long userId = 0;
     Color onlineStatusColor = Color.Success;
+    string messageSearchKeyWord = string.Empty;
     List<ChatDto> groupChatList = new();
     List<ChatDto> singleChatList = new();
+    List<MessageDto> messageList = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -117,5 +147,16 @@
         request.MemberId = userId;
         var response = await _chatService.GetListChatGroupByMemberAsync(request);
         singleChatList = response?.Data ?? new();
+    }
+
+    private async Task LoadChatMessage(long chatId, int pageIndex)
+    {
+        GetMessageListRequest request = new();
+        request.PageIndex = pageIndex;
+        request.PageSize = 10;
+        request.ChatId = chatId;
+        request.KeyWord = messageSearchKeyWord;
+        var response = await _chatService.GetMessageListAsync(request);
+        messageList = response?.Data ?? new();
     }
 }
