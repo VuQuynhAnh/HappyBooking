@@ -33,5 +33,8 @@
   "Role": "Chức danh",
   "Manager": "Quản lý",
   "Driver": "Tài xế",
-  "Staff": "Nhân viên"
+  "Staff": "Nhân viên",
+  "NewChat": "Cuộc trò chuyện mới",
+  "DirectMessages": "Tin nhắn trực tiếp",
+  "Spaces": "Nhóm chat"
 }

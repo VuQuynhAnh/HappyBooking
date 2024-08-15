@@ -49,15 +49,21 @@
                                   RequiredError="@_languageService["RequiredError"]"
                                   Class="pt-0" />
 
-                    <MudSelect @bind-Value="requestModel.Role" Label="@_languageService["Role"]" Variant="Variant.Outlined">
+                    <MudSelect Class="mt-2"
+                               @bind-Value="requestModel.Role"
+                               Variant="Variant.Outlined"
+                               AdornmentIcon="@Icons.Material.Filled.ReduceCapacity"
+                               Adornment="Adornment.Start"
+                               AnchorOrigin="Origin.BottomLeft"
+                               TransformOrigin="Origin.CenterCenter">
                         <MudSelectItem Value="@(UserRoleConstant.Manager)">
-                            @_languageService["Manager"]
+                            @_languageService["Role"]: @_languageService["Manager"]
                         </MudSelectItem>
                         <MudSelectItem Value="@(UserRoleConstant.Driver)">
-                            @_languageService["Driver"]
+                            @_languageService["Role"]: @_languageService["Driver"]
                         </MudSelectItem>
                         <MudSelectItem Value="@(UserRoleConstant.Staff)">
-                            @_languageService["Staff"]
+                            @_languageService["Role"]: @_languageService["Staff"]
                         </MudSelectItem>
                     </MudSelect>
 
@@ -69,7 +75,8 @@
                                   Variant="Variant.Outlined"
                                   Required="true"
                                   RequiredError="@_languageService["RequiredError"]"
-                                  InputType="InputType.Email" />
+                                  InputType="InputType.Email"
+                                  Class="mt-2" />
 
                     <MudTextField @bind-Value="requestModel.PhoneNumber"
                                   Immediate="true"
@@ -79,7 +86,8 @@
                                   Variant="Variant.Outlined"
                                   Required="true"
                                   RequiredError="@_languageService["RequiredError"]"
-                                  InputType="InputType.Telephone" />
+                                  InputType="InputType.Telephone"
+                                  Class="mt-2" />
 
                     <MudTextField @bind-Value="requestModel.CitizenIdentificationNumber"
                                   Immediate="true"
@@ -88,7 +96,8 @@
                                   AdornmentIcon="@Icons.Material.Filled.RememberMe"
                                   Variant="Variant.Outlined"
                                   RequiredError="@_languageService["RequiredError"]"
-                                  placeholder="@_languageService["CitizenIdentificationNumber"]" />
+                                  placeholder="@_languageService["CitizenIdentificationNumber"]"
+                                  Class="mt-2" />
 
                     <MudTextField @bind-Value="requestModel.Address"
                                   Immediate="true"
@@ -97,7 +106,8 @@
                                   AdornmentIcon="@Icons.Material.Filled.AddLocationAlt"
                                   Variant="Variant.Outlined"
                                   RequiredError="@_languageService["RequiredError"]"
-                                  placeholder="@_languageService["Address"]" />
+                                  placeholder="@_languageService["Address"]"
+                                  Class="mt-2" />
                 </MudCardContent>
             </MudForm>
             <MudCardActions Class="pt-0">

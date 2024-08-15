@@ -14,7 +14,8 @@
     font-size: 14px;
 }
 
-.mud-input > input.mud-input-root-outlined {
+.mud-input > input.mud-input-root-outlined,
+div.mud-input-slot.mud-input-root-outlined {
     padding: 5px;
 }
 

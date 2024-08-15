@@ -1,0 +1,85 @@
+﻿@page "/chat"
+@using HappyBookingClient.Service.IService
+@using HappyBookingShare.Request.Chat
+@using HappyBookingShare.Response.Chat
+@inject IChatService ChatService
+
+
+@code {
+    private GetListChatGroupByMemberResponse? chatGroups;
+    private GetMessageListResponse? messages;
+    private string newMessage = string.Empty;
+    private bool isLoading = false;
+    private bool hasMoreMessages = true;
+    private long currentChatId;
+    private int pageIndex = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load chat groups for the current member
+        var request = new GetListChatGroupByMemberRequest
+            {
+                MemberId = 123, // Replace with actual member ID
+                IsGroupChat = true,
+                PageIndex = 1,
+                PageSize = 10
+            };
+        chatGroups = await ChatService.GetListChatGroupByMemberAsync(request);
+    }
+
+    private async Task LoadMessages(long chatId)
+    {
+        currentChatId = chatId;
+        pageIndex = 1; // Reset to first page
+        var request = new GetMessageListRequest
+            {
+                ChatId = chatId,
+                PageIndex = pageIndex,
+                PageSize = 20
+            };
+        messages = await ChatService.GetMessageListAsync(request);
+    }
+
+    private async Task SendMessage()
+    {
+        if (!string.IsNullOrEmpty(newMessage))
+        {
+            var request = new SendMessageRequest
+                {
+                    ChatId = currentChatId,
+                    Content = newMessage,
+                };
+            await ChatService.SendMessageAsync(request);
+            newMessage = string.Empty;
+            await LoadMessages(currentChatId); // Refresh messages
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnScroll(double scrollTop, double clientHeight, double scrollHeight)
+    {
+        if (scrollTop == 0 && hasMoreMessages && !isLoading)
+        {
+            isLoading = true;
+            pageIndex++;
+            var request = new GetMessageListRequest
+                {
+                    ChatId = currentChatId,
+                    PageIndex = pageIndex,
+                    PageSize = 20
+                };
+
+            var newMessages = await ChatService.GetMessageListAsync(request);
+            if (newMessages != null && newMessages.Data.Any())
+            {
+                messages.Data.InsertRange(0, newMessages.Data); // Insert new messages at the top
+            }
+            else
+            {
+                hasMoreMessages = false; // No more messages to load
+            }
+            isLoading = false;
+            StateHasChanged(); // Refresh the component after updating the messages
+        }
+    }
+}

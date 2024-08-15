@@ -1,7 +1,121 @@
 ﻿@page "/"
+@using HappyBookingClient.Components.Layout
+@using HappyBookingClient.Service.IService
+@using HappyBookingShare.Request.Chat
+@using HappyBookingShare.Response.Dtos
+@inject ILanguageService _languageService
+@inject IChatService _chatService
+<style>
+    .chatUserName {
+        font-size: 16px;
+    }
+</style>
 
-<PageTitle>Home</PageTitle>
+<MudGrid Justify="Justify.Center">
+    <MudItem md="4" sm="12" xs="12">
+        <MudButton Size="Size.Large" Class="mb-4" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.ChatBubbleOutline" Color="Color.Info">@_languageService["NewChat"]</MudButton>
 
-<h1>Hello, world!</h1>
+        <MudPaper Class="pa-4">
+            <MudStack Spacing="2">
+                <MudButton OnClick="(() => OnExpandCollapseClick(0))">@_languageService["DirectMessages"]</MudButton>
+                <MudDivider />
+                <MudCollapse Expanded="expandedDirectMessages">
 
-Welcome to your new app.
+                    <MudCard>
+                        <MudCardContent>
+                            <MudText Class="chatUserName">
+                                <MudBadge Color="@onlineStatusColor" Overlap="true" Bordered="true" Class="mr-2">
+                                    <MudAvatar>
+                                        <MudImage Src="https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp"></MudImage>
+                                    </MudAvatar>
+                                </MudBadge>
+                                Story of the day
+                            </MudText>
+                        </MudCardContent>
+                    </MudCard>
+
+                </MudCollapse>
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Class="pa-4">
+            <MudStack Spacing="2">
+                <MudButton OnClick="(() => OnExpandCollapseClick(1))">@_languageService["Spaces"]</MudButton>
+                <MudDivider />
+                <MudCollapse Expanded="expandedSpaces">
+                    This content is collapsible.
+                </MudCollapse>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem md="8" sm="12" xs="12">
+
+    </MudItem>
+
+
+</MudGrid>
+
+<LoadingComponent IsLoading="isLoading" />
+
+@code {
+    private bool isLoading = false;
+    bool expandedDirectMessages = true;
+    bool expandedSpaces = true;
+    long userId = 0;
+    Color onlineStatusColor = Color.Success;
+    List<ChatDto> groupChatList = new();
+    List<ChatDto> singleChatList = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            await _languageService.LoadLanguage();
+            await LoadGroupChatList(1);
+            await LoadSingleChatList(1);
+
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+
+    private void OnExpandCollapseClick(int typeCollapse)
+    {
+        switch (typeCollapse)
+        {
+            case 0:
+                expandedDirectMessages = !expandedDirectMessages;
+                break;
+            case 1:
+                expandedSpaces = !expandedSpaces;
+                break;
+        }
+    }
+
+    private async Task LoadGroupChatList(int pageIndex)
+    {
+        GetListChatGroupByMemberRequest request = new();
+        request.PageIndex = pageIndex;
+        request.PageSize = 10;
+        request.IsGroupChat = true;
+        request.MemberId = userId;
+        var response = await _chatService.GetListChatGroupByMemberAsync(request);
+        groupChatList = response?.Data ?? new();
+    }
+
+    private async Task LoadSingleChatList(int pageIndex)
+    {
+        GetListChatGroupByMemberRequest request = new();
+        request.PageIndex = pageIndex;
+        request.PageSize = 10;
+        request.IsGroupChat = false;
+        request.MemberId = userId;
+        var response = await _chatService.GetListChatGroupByMemberAsync(request);
+        singleChatList = response?.Data ?? new();
+    }
+}

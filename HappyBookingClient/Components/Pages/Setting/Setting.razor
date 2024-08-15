@@ -25,7 +25,14 @@
             }
             <MudForm Model="@settingRequest" @ref="@form" ValidationDelay="0">
                 <MudCardContent>
-                    <MudSelect @bind-Value="settingRequest.LanguageCode" Label="@_languageService["Language"]" Variant="Variant.Outlined">
+                    <MudSelect @bind-Value="settingRequest.LanguageCode"
+                               Label=""
+                               Variant="Variant.Outlined"
+                               AnchorOrigin="Origin.BottomLeft"
+                               TransformOrigin="Origin.CenterCenter">
+                        <MudSelectItem Value="@(LanguageCode.VN)">
+                            @_languageService["Language"]
+                        </MudSelectItem>
                         <MudSelectItem Value="@(LanguageCode.VN)">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg" height="14" class="mr-1" /> @_languageService["Vietnamese"]
                         </MudSelectItem>
