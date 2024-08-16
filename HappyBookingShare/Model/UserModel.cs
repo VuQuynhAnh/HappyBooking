@@ -1,4 +1,5 @@
 ﻿using HappyBookingShare.Entities;
+using System.Text.Json.Serialization;
 
 namespace HappyBookingShare.Model;
 
@@ -14,13 +15,15 @@ public class UserModel
         Address = entity.Address;
         Role = entity.Role;
         AvatarImage = entity.AvatarImage;
+        IsOnline = entity.IsOnline;
     }
 
     public UserModel()
     {
     }
 
-    public UserModel(long userId, string fullName, string email, string phoneNumber, string citizenIdentificationNumber, string address, string avatarImage, int role, string password)
+    [JsonConstructor]
+    public UserModel(long userId, string fullName, string email, string phoneNumber, string citizenIdentificationNumber, string address, string avatarImage, int role, string password, bool isOnline)
     {
         UserId = userId;
         FullName = fullName;
@@ -31,6 +34,7 @@ public class UserModel
         AvatarImage = avatarImage;
         Role = role;
         Password = password;
+        IsOnline = isOnline;
     }
 
     public long UserId { get; private set; }
@@ -50,4 +54,6 @@ public class UserModel
     public int Role { get; private set; }
 
     public string Password { get; private set; } = string.Empty;
+
+    public bool IsOnline { get; private set; }
 }

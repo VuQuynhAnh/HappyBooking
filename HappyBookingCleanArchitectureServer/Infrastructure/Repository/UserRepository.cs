@@ -163,6 +163,7 @@ public class UserRepository : IUserRepository
         entity.CitizenIdentificationNumber = userModel.CitizenIdentificationNumber;
         entity.Address = userModel.Address;
         entity.AvatarImage = userModel.AvatarImage;
+        entity.Role = userModel.Role;
         entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedId = userId;
         if (entity.UserId == 0)

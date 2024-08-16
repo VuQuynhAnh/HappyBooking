@@ -1,10 +1,12 @@
 ﻿@page "/"
 @using HappyBookingClient.Components.Layout
+@using HappyBookingClient.Components.Pages.Chat
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Request.Chat
 @using HappyBookingShare.Response.Dtos
 @inject ILanguageService _languageService
 @inject IChatService _chatService
+@inject IDialogService _dialogService
 <style>
     .chatUserName {
         font-size: 16px;
@@ -20,7 +22,7 @@
         }
 
     .searchBoxStyle .mud-input > input.mud-input-root-outlined {
-        padding: 18.5px 14px;
+        padding: 13.5px 14px;
     }
 </style>
 
@@ -31,7 +33,8 @@
                    Variant="Variant.Outlined"
                    EndIcon="@Icons.Material.Filled.ChatBubbleOutline"
                    Color="Color.Default"
-                   FullWidth>
+                   FullWidth
+                   OnClick="OpenAddNewChatDialog">
             @_languageService["NewChat"]
         </MudButton>
 
@@ -45,7 +48,7 @@
                         <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(1,1))" FullWidth>
                             <MudCardContent Class=" chatUserName">
                                 <MudText>
-                                    <MudBadge Color="@onlineStatusColor" Overlap="true" Bordered="true" Class="mr-2">
+                                    <MudBadge Color="onlineStatus ? Color.Success : Color.Error" Overlap="true" Bordered="true" Class="mr-2">
                                         <MudAvatar>
                                             <MudImage Src="https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp"></MudImage>
                                         </MudAvatar>
@@ -73,7 +76,7 @@
 
     <MudItem md="8" sm="12" xs="12">
         <MudTextField @bind-Value="messageSearchKeyWord"
-                      Label="@_languageService["Search"]"
+                      Placeholder="@_languageService["Search"]"
                       Variant="Variant.Outlined"
                       Adornment="Adornment.End"
                       AdornmentIcon="@Icons.Material.Filled.Search"
@@ -91,8 +94,8 @@
     bool expandedDirectMessages = true;
     bool expandedSpaces = true;
     long userId = 0;
-    Color onlineStatusColor = Color.Success;
     string messageSearchKeyWord = string.Empty;
+    bool onlineStatus = false;
     List<ChatDto> groupChatList = new();
     List<ChatDto> singleChatList = new();
     List<MessageDto> messageList = new();
@@ -124,6 +127,18 @@
             case 1:
                 expandedSpaces = !expandedSpaces;
                 break;
+        }
+    }
+
+    private async Task OpenAddNewChatDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Medium };
+        var dialog = await _dialogService.ShowAsync<AddNewChatDialog>(_languageService["NewChat"], options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var _licenseAccepted = (bool)(result.Data ?? false);
         }
     }
 

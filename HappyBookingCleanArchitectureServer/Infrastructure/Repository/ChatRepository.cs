@@ -62,6 +62,7 @@ public class ChatRepository : IChatRepository
                                         .Where(item => item.ChatId == chatId
                                                        && item.Content.Contains(keyword)
                                                        && item.IsDeleted == 0)
+                                        .OrderByDescending(item => item.CreatedDate)
                                         .Skip((pageIndex - 1) * pageSize)
                                         .Take(pageSize)
                                         .ToListAsync();
@@ -218,6 +219,7 @@ public class ChatRepository : IChatRepository
                                                     && item.ChatName.Contains(keyword)
                                                     && item.IsDeleted == 0
                                                     && item.IsGroupChat == isGroupChat)
+                                     .OrderByDescending(item => item.LastChatTime)
                                      .Skip((pageIndex - 1) * pageSize)
                                      .Take(pageSize)
                                      .ToListAsync();
@@ -255,6 +257,14 @@ public class ChatRepository : IChatRepository
     /// <returns></returns>
     public async Task<MessageModel> SendMessage(long chatId, string content, int messageType, long userId)
     {
+        var chat = await _context.ChatRepository.FirstOrDefaultAsync(item => item.ChatId == chatId && item.IsDeleted == 0);
+        if (chat == null)
+        {
+            return new();
+        }
+        // update chat
+        chat.LastChatTime = DateTime.UtcNow;
+
         var message = new Message()
         {
             ChatId = chatId,

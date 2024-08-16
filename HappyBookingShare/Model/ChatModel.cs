@@ -11,6 +11,7 @@ public class ChatModel
         IsGroupChat = entity.IsGroupChat;
         GroupAvatar = entity.GroupAvatar;
         CreatedDate = entity.CreatedDate;
+        LastChatTime = entity.LastChatTime;
         ChatMemberList = chatMemberList;
     }
 
@@ -27,6 +28,8 @@ public class ChatModel
     public string GroupAvatar { get; private set; } = string.Empty;
 
     public DateTime CreatedDate { get; private set; }
+
+    public DateTime LastChatTime { get; private set; }
 
     public List<ChatMemberModel> ChatMemberList { get; private set; } = new();
 }

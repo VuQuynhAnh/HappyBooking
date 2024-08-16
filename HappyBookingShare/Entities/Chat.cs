@@ -14,4 +14,6 @@ public class Chat : BaseEntity
     public bool IsGroupChat { get; set; }
 
     public string GroupAvatar { get; set; } = string.Empty;
+
+    public DateTime LastChatTime { get; set; }
 }

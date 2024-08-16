@@ -1,0 +1,182 @@
+﻿@using HappyBookingClient.Service.IService
+@using HappyBookingShare.Response.Dtos
+@inject ILanguageService _languageService
+
+<style>
+    .addNewChatDialog .mud-dialog-content {
+        height: 420px;
+    }
+
+    .addNewChatDialog .mud-table-root .mud-table-head {
+        display: none;
+    }
+
+    .addNewChatDialog .mud-table {
+        border-radius: 0;
+    }
+
+    .addNewChatDialog .mud-elevation-1 {
+        box-shadow: none;
+    }
+
+    .addNewChatDialog .mud-table-cell {
+        padding: 1px 0 0 5px;
+        border: none;
+    }
+
+    .addNewChatDialog .userSelectedList {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+
+    .addNewChatDialog .mud-table-root {
+        background: #ffffe6;
+    }
+
+    .addNewChatDialog .userSelectedList .mud-table-root {
+        background: #e6ffe6;
+    }
+
+    .addNewChatDialog .mud-button-text-size-large {
+        padding: 11px 0px;
+    }
+</style>
+<MudDialog Class="addNewChatDialog">
+    <DialogContent>
+        <MudTextField @bind-Value="memberSearchKeyWord"
+                      Placeholder="@_languageService["Search"]"
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      DebounceInterval="850"
+                      OnDebounceIntervalElapsed="SearchAction"
+                      Class="searchBoxStyle my-2" />
+
+        <div class="userSelectedList">
+            <MudDataGrid Items="@userSelectedList"
+                         Filterable="false"
+                         Virtualize="true"
+                         FixedHeader="true"
+                         SortMode="@SortMode.None"
+                         Groupable="false">
+                <Columns>
+                    <TemplateColumn>
+                        <CellTemplate>
+                            <MudBadge Color="context.Item.IsOnline ? Color.Success : Color.Error" Overlap="true" Bordered="true">
+                                <MudAvatar>
+                                    <MudImage Src="@context.Item.AvatarImage" />
+                                </MudAvatar>
+                            </MudBadge>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <PropertyColumn Property="x => x.FullName" />
+                    <TemplateColumn CellClass="d-flex justify-end">
+                        <CellTemplate>
+                            <MudStack Row>
+                                <MudButton Size="@Size.Large"
+                                           Variant="@Variant.Text"
+                                           Color="@Color.Error"
+                                           EndIcon="@Icons.Material.Outlined.Cancel"
+                                           OnClick="(() => RemoveUserToGroupChat(context.Item))" />
+                            </MudStack>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </MudDataGrid>
+        </div>
+        <MudDivider Class="my-2" />
+
+        <MudDataGrid Items="@userFilterList"
+                     T="UserDto"
+                     Filterable="false"
+                     SortMode="@SortMode.None"
+                     Groupable="false"
+                     Virtualize="true"
+                     FixedHeader="true"
+                     Height="200px">
+            <Columns>
+                <TemplateColumn>
+                    <CellTemplate>
+                        <MudBadge Color="context.Item.IsOnline ? Color.Success : Color.Error" Overlap="true" Bordered="true">
+                            <MudAvatar>
+                                <MudImage Src="@context.Item.AvatarImage" />
+                            </MudAvatar>
+                        </MudBadge>
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="x => x.FullName" />
+                <TemplateColumn CellClass="d-flex justify-end">
+                    <CellTemplate>
+                        <MudStack Row>
+                            <MudButton Size="@Size.Large"
+                                       Variant="@Variant.Text"
+                                       Color="@Color.Success"
+                                       EndIcon="@Icons.Material.Filled.Add"
+                                       OnClick="(() => AddUserToGroupChat(context.Item))" />
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary"
+                   OnClick="StartChat">
+            @_languageService["StartChat"]
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private string memberSearchKeyWord = string.Empty;
+    private List<UserDto> userSelectedList = new();
+    private List<UserDto> userFilterList = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _languageService.LoadLanguage();
+            StateHasChanged();
+        }
+    }
+
+    int id = 1;
+    private void SearchAction(string debouncedText)
+    {
+        userFilterList.Clear();
+        userFilterList.Add(new UserDto(id, debouncedText, "email", "", "", "string address", "string avatarImage", 0, false));
+        id++;
+    }
+
+    private async Task StartChat()
+    {
+        long chatId = 0;
+        MudDialog.Close(DialogResult.Ok(chatId));
+    }
+
+    private void AddUserToGroupChat(UserDto user)
+    {
+        if (userSelectedList.Any(item => item.UserId == user.UserId))
+        {
+            return;
+        }
+        userSelectedList.Add(user);
+        userFilterList.Clear();
+        StateHasChanged();
+    }
+
+    private void RemoveUserToGroupChat(UserDto user)
+    {
+        if (userSelectedList.Any(item => item.UserId == user.UserId))
+        {
+            userSelectedList.Remove(user);
+            StateHasChanged();
+        }
+    }
+}

@@ -45,3 +45,25 @@ div.mud-input-slot.mud-input-root-outlined {
     padding: 3px 8px;
     font-size: 14px;
 }
+
+.mud-dialog-container {
+    left: 0;
+}
+
+.mud-dialog .mud-dialog-title {
+    padding: 5px 24px;
+}
+
+    .mud-dialog .mud-dialog-title .mud-button-close {
+        top: -2px;
+    }
+
+.mud-dialog .mud-dialog-content {
+    padding: 0px 14px;
+}
+
+.mud-badge {
+    border-radius: 50%;
+    height: 15px;
+    min-width: 15px;
+}

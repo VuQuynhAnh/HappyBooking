@@ -40,7 +40,8 @@ public class UpdateUserUseCase : IUpdateUserUseCase
                            request.Address,
                            request.AvatarImage,
                            request.Role,
-                           request.Password);
+                           request.Password,
+                           false);
             StatusEnum status = await ValidateUserInformation(userModel);
             if (status != StatusEnum.Successed)
             {
