@@ -52,40 +52,6 @@
                       OnDebounceIntervalElapsed="SearchAction"
                       Class="searchBoxStyle my-2" />
 
-        <div class="userSelectedList">
-            <MudDataGrid Items="@userSelectedList"
-                         Filterable="false"
-                         Virtualize="true"
-                         FixedHeader="true"
-                         SortMode="@SortMode.None"
-                         Groupable="false">
-                <Columns>
-                    <TemplateColumn>
-                        <CellTemplate>
-                            <MudBadge Color="context.Item.IsOnline ? Color.Success : Color.Error" Overlap="true" Bordered="true">
-                                <MudAvatar>
-                                    <MudImage Src="@context.Item.AvatarImage" />
-                                </MudAvatar>
-                            </MudBadge>
-                        </CellTemplate>
-                    </TemplateColumn>
-                    <PropertyColumn Property="x => x.FullName" />
-                    <TemplateColumn CellClass="d-flex justify-end">
-                        <CellTemplate>
-                            <MudStack Row>
-                                <MudButton Size="@Size.Large"
-                                           Variant="@Variant.Text"
-                                           Color="@Color.Error"
-                                           EndIcon="@Icons.Material.Outlined.Cancel"
-                                           OnClick="(() => RemoveUserToGroupChat(context.Item))" />
-                            </MudStack>
-                        </CellTemplate>
-                    </TemplateColumn>
-                </Columns>
-            </MudDataGrid>
-        </div>
-        <MudDivider Class="my-2" />
-
         <MudDataGrid Items="@userFilterList"
                      T="UserDto"
                      Filterable="false"
@@ -119,6 +85,40 @@
             </Columns>
         </MudDataGrid>
 
+        <MudDivider Class="my-2" />
+
+        <div class="userSelectedList">
+            <MudDataGrid Items="@userSelectedList"
+                         Filterable="false"
+                         Virtualize="true"
+                         FixedHeader="true"
+                         SortMode="@SortMode.None"
+                         Groupable="false">
+                <Columns>
+                    <TemplateColumn>
+                        <CellTemplate>
+                            <MudBadge Color="context.Item.IsOnline ? Color.Success : Color.Error" Overlap="true" Bordered="true">
+                                <MudAvatar>
+                                    <MudImage Src="@context.Item.AvatarImage" />
+                                </MudAvatar>
+                            </MudBadge>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <PropertyColumn Property="x => x.FullName" />
+                    <TemplateColumn CellClass="d-flex justify-end">
+                        <CellTemplate>
+                            <MudStack Row>
+                                <MudButton Size="@Size.Large"
+                                           Variant="@Variant.Text"
+                                           Color="@Color.Error"
+                                           EndIcon="@Icons.Material.Outlined.Cancel"
+                                           OnClick="(() => RemoveUserToGroupChat(context.Item))" />
+                            </MudStack>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </MudDataGrid>
+        </div>
 
     </DialogContent>
     <DialogActions>
