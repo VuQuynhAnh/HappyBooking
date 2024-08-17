@@ -1,0 +1,37 @@
+﻿@using HappyBookingClient.Service.IService
+@inject ILanguageService _languageService
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="groupName"
+                      Placeholder="@_languageService["GroupName"]"
+                      Variant="Variant.Outlined"
+                      Class="searchBoxStyle my-2" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Submit">@_languageService["Continue"]</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+    private string groupName = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _languageService.LoadLanguage();
+            StateHasChanged();
+        }
+    }
+
+    private void Submit()
+    {
+        if (!string.IsNullOrEmpty(groupName))
+        {
+            MudDialog.Close(DialogResult.Ok(groupName));
+        }
+    }
+}

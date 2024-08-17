@@ -44,7 +44,7 @@
                             <MudBadge Color="chatItem.Member1vs1Display.UserInformation.IsOnline ? Color.Success : Color.Error"
                                       Overlap="true"
                                       Bordered="true"
-                                      Class="mr-2 float-start">
+                                      Class="mr-3 float-start">
                                 <MudAvatar>
                                     <MudImage Src="@chatItem.Member1vs1Display.UserInformation.AvatarImage"></MudImage>
                                 </MudAvatar>
@@ -69,20 +69,15 @@
 
                     @foreach (var chatItem in groupChatList)
                     {
-                        <MudCard>
-                            <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(chatItem.ChatId, 1))" FullWidth>
-                                <MudCardContent Class="chatUserName">
-                                    <MudText>
-                                        <MudAvatar>
-                                            <MudImage Src="@chatItem.GroupAvatar"></MudImage>
-                                        </MudAvatar>
-
-                                        <MudText Typo="Typo.subtitle1">@chatItem.ChatName</MudText>
-                                        <MudText Typo="Typo.subtitle2">@chatItem.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
-                                    </MudText>
-                                </MudCardContent>
-                            </MudButton>
-                        </MudCard>
+                        <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(chatItem.ChatId, 1))" FullWidth>
+                            <MudAvatar Class="mr-3 float-start">
+                                <MudImage Src="@chatItem.GroupAvatar"></MudImage>
+                            </MudAvatar>
+                            <div class="float-end text-start">
+                                <MudText Typo="Typo.subtitle1">@chatItem.ChatName</MudText>
+                                <MudText Typo="Typo.subtitle2">@chatItem.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
+                            </div>
+                        </MudButton>
                     }
 
                 </MudCollapse>
@@ -125,8 +120,10 @@
 
             await _languageService.LoadLanguage();
             userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
-            await LoadGroupChatList(1);
             await LoadSingleChatList(1);
+            StateHasChanged();
+
+            await LoadGroupChatList(1);
 
             isLoading = false;
             StateHasChanged();
@@ -149,7 +146,7 @@
 
     private async Task OpenAddNewChatDialog()
     {
-        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, MaxWidth = MaxWidth.Medium };
+        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true };
         var dialog = await _dialogService.ShowAsync<AddNewChatDialog>(_languageService["NewChat"], options);
         var result = await dialog.Result;
 
@@ -160,8 +157,11 @@
             {
                 return;
             }
-            await LoadGroupChatList(1);
             await LoadSingleChatList(1);
+            StateHasChanged();
+
+            await LoadGroupChatList(1);
+            StateHasChanged();
         }
     }
 
