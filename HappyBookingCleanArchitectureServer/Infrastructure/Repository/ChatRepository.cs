@@ -142,7 +142,7 @@ public class ChatRepository : IChatRepository
     /// <param name="isGroup"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<bool> SaveChatGroup(long chatId, string name, string avatarUrl, bool isGroup, long userId)
+    public async Task<ChatModel> SaveChatGroup(long chatId, string name, string avatarUrl, bool isGroup, long userId)
     {
         var chat = await _context.ChatRepository.FirstOrDefaultAsync(item => item.ChatId == chatId && item.IsDeleted == 0);
         if (chat == null)
@@ -151,6 +151,7 @@ public class ChatRepository : IChatRepository
             chat.ChatId = 0;
             chat.CreatedDate = DateTime.UtcNow;
             chat.CreatedId = userId;
+            chat.LastChatTime = DateTime.UtcNow;
         }
         chat.ChatName = name;
         chat.GroupAvatar = avatarUrl;
@@ -158,7 +159,12 @@ public class ChatRepository : IChatRepository
         chat.IsDeleted = 0;
         chat.UpdatedDate = DateTime.UtcNow;
         chat.UpdatedId = userId;
-        return await _context.SaveChangesAsync() > 0;
+        if (chat.ChatId == 0)
+        {
+            await _context.ChatRepository.AddAsync(chat);
+        }
+        await _context.SaveChangesAsync();
+        return new ChatModel(chat);
     }
 
     /// <summary>
@@ -342,5 +348,48 @@ public class ChatRepository : IChatRepository
     public async Task<bool> CheckExistChat(long chatId)
     {
         return await _context.ChatRepository.AnyAsync(item => item.ChatId == chatId && item.IsDeleted == 0);
+    }
+
+    /// <summary>
+    /// Get1v1ExistGroupChatId
+    /// </summary>
+    /// <param name="memberIdList"></param>
+    /// <returns></returns>
+    public async Task<long> Get1v1ExistGroupChatId(long firstMemberId, long secondMemberId)
+    {
+        long chatId = 0;
+        var firstChatIdList = await _context.ChatMemberRepository.Where(item => item.MemberId == firstMemberId && item.IsDeleted == 0)
+                                                                 .Select(item => item.ChatId)
+                                                                 .Distinct()
+                                                                 .ToListAsync();
+        if (!firstChatIdList.Any())
+        {
+            return chatId;
+        }
+
+        var commonChatIdList = await _context.ChatMemberRepository.Where(item => item.MemberId == secondMemberId
+                                                                                 && firstChatIdList.Contains(item.ChatId)
+                                                                                 && item.IsDeleted == 0)
+                                                                  .Select(item => item.ChatId)
+                                                                  .Distinct()
+                                                                  .ToListAsync();
+        if (!commonChatIdList.Any())
+        {
+            return chatId;
+        }
+
+        var chatIdResult = await _context.ChatMemberRepository.Where(item => commonChatIdList.Contains(item.ChatId)
+                                                                             && item.IsDeleted == 0)
+                                                              .GroupBy(item => item.ChatId)
+                                                              .Select(item => new { item.Key, Count = item.Count() })
+                                                              .Where(item => item.Count == 2)
+                                                              .ToListAsync();
+        if (!chatIdResult.Any())
+        {
+            return chatId;
+        }
+
+        chatId = chatIdResult.First().Key;
+        return chatId;
     }
 }

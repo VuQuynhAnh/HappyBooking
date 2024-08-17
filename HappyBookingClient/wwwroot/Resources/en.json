@@ -38,5 +38,7 @@
   "DirectMessages": "Direct messages",
   "Spaces": "Spaces",
   "Search": "Search",
-  "StartChat": "Start Chat"
+  "StartChat": "Start Chat",
+  "Unselect": "Unselect",
+  "Select": "Select"
 }

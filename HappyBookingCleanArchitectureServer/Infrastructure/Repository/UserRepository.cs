@@ -24,8 +24,10 @@ public class UserRepository : IUserRepository
     /// <returns></returns>
     public async Task<List<UserModel>> GetAllData(string keyword, int pageIndex, int pageSize)
     {
-        var result = await _context.UserRepository.Where(item => (item.FullName.Contains(keyword)
-                                                                  || item.Address.Contains(keyword)
+        keyword = keyword.ToLower();
+        var result = await _context.UserRepository.Where(item => (item.FullName.ToLower().Contains(keyword)
+                                                                  || item.Address.ToLower().Contains(keyword)
+                                                                  || item.Email.ToLower().Contains(keyword)
                                                                   || item.PhoneNumber.Contains(keyword)
                                                                   || item.CitizenIdentificationNumber.Contains(keyword))
                                                                  && item.IsDeleted == 0)

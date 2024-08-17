@@ -14,6 +14,16 @@ public class ChatModel
         LastChatTime = entity.LastChatTime;
         ChatMemberList = chatMemberList;
     }
+    
+    public ChatModel(Chat entity)
+    {
+        ChatId = entity.ChatId;
+        ChatName = entity.ChatName;
+        IsGroupChat = entity.IsGroupChat;
+        GroupAvatar = entity.GroupAvatar;
+        CreatedDate = entity.CreatedDate;
+        LastChatTime = entity.LastChatTime;
+    }
 
     public ChatModel()
     {

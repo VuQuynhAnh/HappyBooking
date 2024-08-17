@@ -4,7 +4,7 @@ namespace HappyBookingCleanArchitectureServer.Core.Interface.IRepository;
 
 public interface IChatRepository : IRepositoryBase
 {
-    Task<bool> SaveChatGroup(long chatId, string name, string avatarUrl, bool isGroup, long userId);
+    Task<ChatModel> SaveChatGroup(long chatId, string name, string avatarUrl, bool isGroup, long userId);
 
     Task<List<ChatModel>> GetListChatGroupByMember(long memberId, string keyword, bool isGroupChat, int pageIndex, int pageSize);
 
@@ -23,4 +23,6 @@ public interface IChatRepository : IRepositoryBase
     Task<MessageModel> UpdateMessage(long messageId, string content, int messageType, long userId);
 
     Task<bool> CheckExistChat(long chatId);
+
+    Task<long> Get1v1ExistGroupChatId(long firstMemberId, long secondMemberId);
 }

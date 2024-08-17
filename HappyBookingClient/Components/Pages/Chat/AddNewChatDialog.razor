@@ -1,45 +1,57 @@
-﻿@using HappyBookingClient.Service.IService
+﻿@using Blazored.LocalStorage
+@using HappyBookingClient.Service.IService
+@using HappyBookingShare.Common
+@using HappyBookingShare.Request.Chat
+@using HappyBookingShare.Request.Chat.RequestItem
+@using HappyBookingShare.Request.User
 @using HappyBookingShare.Response.Dtos
 @inject ILanguageService _languageService
+@inject IUserService _userService
+@inject IChatService _chatService
+@inject ILocalStorageService _localStorage
 
 <style>
-    .addNewChatDialog .mud-dialog-content {
-        height: 420px;
+    .addNewChatDialog {
+        min-width: 370px;
     }
 
-    .addNewChatDialog .mud-table-root .mud-table-head {
-        display: none;
-    }
+        .addNewChatDialog .mud-dialog-content {
+            height: 420px;
+        }
 
-    .addNewChatDialog .mud-table {
-        border-radius: 0;
-    }
+        .addNewChatDialog .mud-table-root .mud-table-head {
+            display: none;
+        }
 
-    .addNewChatDialog .mud-elevation-1 {
-        box-shadow: none;
-    }
+        .addNewChatDialog .mud-table {
+            border-radius: 0;
+        }
 
-    .addNewChatDialog .mud-table-cell {
-        padding: 1px 0 0 5px;
-        border: none;
-    }
+        .addNewChatDialog .mud-elevation-1 {
+            box-shadow: none;
+        }
 
-    .addNewChatDialog .userSelectedList {
-        max-height: 150px;
-        overflow-y: auto;
-    }
+        .addNewChatDialog .mud-table-cell {
+            padding: 1px 0 0 5px;
+            border: none;
+        }
 
-    .addNewChatDialog .mud-table-root {
-        background: #ffffe6;
-    }
+        .addNewChatDialog .userSelectedList {
+            max-height: 150px;
+            overflow-y: auto;
+        }
 
-    .addNewChatDialog .userSelectedList .mud-table-root {
-        background: #e6ffe6;
-    }
+        .addNewChatDialog .mud-table-root {
+            background: #ffffe6;
+        }
 
-    .addNewChatDialog .mud-button-text-size-large {
-        padding: 11px 0px;
-    }
+        .addNewChatDialog .userSelectedList .mud-table-root {
+            background: #e6ffe6;
+        }
+
+        .addNewChatDialog .mud-button-text-size-large {
+            padding: 14px 0px;
+        }
 </style>
 <MudDialog Class="addNewChatDialog">
     <DialogContent>
@@ -49,6 +61,7 @@
                       Adornment="Adornment.End"
                       AdornmentIcon="@Icons.Material.Filled.Search"
                       DebounceInterval="850"
+                      OnKeyUp="@KeyUpAction"
                       OnDebounceIntervalElapsed="SearchAction"
                       Class="searchBoxStyle my-2" />
 
@@ -70,7 +83,12 @@
                         </MudBadge>
                     </CellTemplate>
                 </TemplateColumn>
-                <PropertyColumn Property="x => x.FullName" />
+                <TemplateColumn>
+                    <CellTemplate>
+                        <MudText Typo="Typo.subtitle1">@context.Item.FullName</MudText>
+                        <MudText Typo="Typo.subtitle2">@context.Item.PhoneNumber</MudText>
+                    </CellTemplate>
+                </TemplateColumn>
                 <TemplateColumn CellClass="d-flex justify-end">
                     <CellTemplate>
                         <MudStack Row>
@@ -104,7 +122,12 @@
                             </MudBadge>
                         </CellTemplate>
                     </TemplateColumn>
-                    <PropertyColumn Property="x => x.FullName" />
+                    <TemplateColumn>
+                        <CellTemplate>
+                            <MudText Typo="Typo.subtitle1">@context.Item.FullName</MudText>
+                            <MudText Typo="Typo.subtitle2">@context.Item.PhoneNumber</MudText>
+                        </CellTemplate>
+                    </TemplateColumn>
                     <TemplateColumn CellClass="d-flex justify-end">
                         <CellTemplate>
                             <MudStack Row>
@@ -136,28 +159,64 @@
     private string memberSearchKeyWord = string.Empty;
     private List<UserDto> userSelectedList = new();
     private List<UserDto> userFilterList = new();
-
+    private UserDto userLogin = new();
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await _languageService.LoadLanguage();
+            userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
             StateHasChanged();
         }
     }
 
-    int id = 1;
-    private void SearchAction(string debouncedText)
+    private async Task KeyUpAction(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SearchAction("");
+        }
+    }
+
+    private async Task SearchAction(string debouncedText)
     {
         userFilterList.Clear();
-        userFilterList.Add(new UserDto(id, debouncedText, "email", "", "", "string address", "string avatarImage", 0, false));
-        id++;
+        if (!string.IsNullOrEmpty(memberSearchKeyWord))
+        {
+            GetListUserRequest request = new()
+                {
+                    KeyWord = memberSearchKeyWord,
+                    PageIndex = 1,
+                    PageSize = 15,
+                };
+            var resposeSearch = await _userService.GetAllUserData(request);
+            userFilterList = (resposeSearch?.Data ?? new())
+                             .Where(item => !userSelectedList.Select(selected => selected.UserId).Contains(item.UserId)
+                                            && userLogin.UserId != item.UserId)
+                             .ToList();
+        }
     }
 
     private async Task StartChat()
     {
-        long chatId = 0;
-        MudDialog.Close(DialogResult.Ok(chatId));
+        if (!userSelectedList.Any())
+        {
+            return;
+        }
+        var groupName = userLogin.FullName + "-" + string.Join("-", userSelectedList.Select(item => item.FullName));
+        List<ChatMemberRequestItem> memberItemList = userSelectedList.Select(item => new ChatMemberRequestItem(item.UserId, 0)).ToList();
+        memberItemList.Add(new ChatMemberRequestItem(userLogin.UserId, 0));
+
+        SaveChatGroupRequest saveChatGroupRequest = new()
+            {
+                ChatId = 0,
+                Name = groupName,
+                AvatarUrl = string.Empty,
+                IsGroup = memberItemList.Count > 2,
+                ChatMemberList = memberItemList
+            };
+        var saveChatResponse = await _chatService.SaveChatGroupAsync(saveChatGroupRequest);
+        MudDialog.Close(DialogResult.Ok(saveChatResponse?.Data.ChatId ?? 0));
     }
 
     private void AddUserToGroupChat(UserDto user)
@@ -167,7 +226,7 @@
             return;
         }
         userSelectedList.Add(user);
-        userFilterList.Clear();
+        userFilterList = userFilterList.Where(item => !userSelectedList.Contains(item)).ToList();
         StateHasChanged();
     }
 

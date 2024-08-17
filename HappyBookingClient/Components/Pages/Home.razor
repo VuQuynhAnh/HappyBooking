@@ -1,25 +1,19 @@
 ﻿@page "/"
+@using Blazored.LocalStorage
 @using HappyBookingClient.Components.Layout
 @using HappyBookingClient.Components.Pages.Chat
 @using HappyBookingClient.Service.IService
+@using HappyBookingShare.Common
 @using HappyBookingShare.Request.Chat
 @using HappyBookingShare.Response.Dtos
 @inject ILanguageService _languageService
 @inject IChatService _chatService
 @inject IDialogService _dialogService
+@inject ILocalStorageService _localStorage
 <style>
-    .chatUserName {
-        font-size: 16px;
-        cursor: pointer;
-    }
-
     .textLeftButton {
         justify-content: left;
     }
-
-        .textLeftButton .mud-card-content {
-            padding: 0 5px;
-        }
 
     .searchBoxStyle .mud-input > input.mud-input-root-outlined {
         padding: 13.5px 14px;
@@ -44,20 +38,24 @@
                 <MudDivider />
                 <MudCollapse Expanded="expandedDirectMessages">
 
-                    <MudCard>
-                        <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(1,1))" FullWidth>
-                            <MudCardContent Class=" chatUserName">
-                                <MudText>
-                                    <MudBadge Color="onlineStatus ? Color.Success : Color.Error" Overlap="true" Bordered="true" Class="mr-2">
-                                        <MudAvatar>
-                                            <MudImage Src="https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp"></MudImage>
-                                        </MudAvatar>
-                                    </MudBadge>
-                                    <span>Story of the day</span>
-                                </MudText>
-                            </MudCardContent>
+                    @foreach (var chatItem in singleChatList)
+                    {
+                        <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(chatItem.ChatId, 1))" FullWidth>
+                            <MudBadge Color="chatItem.Member1vs1Display.UserInformation.IsOnline ? Color.Success : Color.Error"
+                                      Overlap="true"
+                                      Bordered="true"
+                                      Class="mr-2 float-start">
+                                <MudAvatar>
+                                    <MudImage Src="@chatItem.Member1vs1Display.UserInformation.AvatarImage"></MudImage>
+                                </MudAvatar>
+                            </MudBadge>
+
+                            <div class="float-end text-start">
+                                <MudText Typo="Typo.subtitle1">@chatItem.Member1vs1Display.UserInformation.FullName</MudText>
+                                <MudText Typo="Typo.subtitle2">@chatItem.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
+                            </div>
                         </MudButton>
-                    </MudCard>
+                    }
 
                 </MudCollapse>
             </MudStack>
@@ -68,7 +66,25 @@
                 <MudButton Class="textLeftButton" OnClick="(() => OnExpandCollapseClick(1))">@_languageService["Spaces"]</MudButton>
                 <MudDivider />
                 <MudCollapse Expanded="expandedSpaces">
-                    This content is collapsible.
+
+                    @foreach (var chatItem in groupChatList)
+                    {
+                        <MudCard>
+                            <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(chatItem.ChatId, 1))" FullWidth>
+                                <MudCardContent Class="chatUserName">
+                                    <MudText>
+                                        <MudAvatar>
+                                            <MudImage Src="@chatItem.GroupAvatar"></MudImage>
+                                        </MudAvatar>
+
+                                        <MudText Typo="Typo.subtitle1">@chatItem.ChatName</MudText>
+                                        <MudText Typo="Typo.subtitle2">@chatItem.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
+                                    </MudText>
+                                </MudCardContent>
+                            </MudButton>
+                        </MudCard>
+                    }
+
                 </MudCollapse>
             </MudStack>
         </MudPaper>
@@ -93,7 +109,7 @@
     private bool isLoading = false;
     bool expandedDirectMessages = true;
     bool expandedSpaces = true;
-    long userId = 0;
+    private UserDto userLogin = new();
     string messageSearchKeyWord = string.Empty;
     bool onlineStatus = false;
     List<ChatDto> groupChatList = new();
@@ -108,6 +124,7 @@
             StateHasChanged();
 
             await _languageService.LoadLanguage();
+            userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
             await LoadGroupChatList(1);
             await LoadSingleChatList(1);
 
@@ -138,7 +155,13 @@
 
         if (!result.Canceled)
         {
-            var _licenseAccepted = (bool)(result.Data ?? false);
+            var chatId = (long)(result.Data);
+            if (chatId == 0)
+            {
+                return;
+            }
+            await LoadGroupChatList(1);
+            await LoadSingleChatList(1);
         }
     }
 
@@ -148,9 +171,10 @@
         request.PageIndex = pageIndex;
         request.PageSize = 10;
         request.IsGroupChat = true;
-        request.MemberId = userId;
+        request.MemberId = userLogin.UserId;
         var response = await _chatService.GetListChatGroupByMemberAsync(request);
         groupChatList = response?.Data ?? new();
+        StateHasChanged();
     }
 
     private async Task LoadSingleChatList(int pageIndex)
@@ -159,9 +183,14 @@
         request.PageIndex = pageIndex;
         request.PageSize = 10;
         request.IsGroupChat = false;
-        request.MemberId = userId;
+        request.MemberId = userLogin.UserId;
         var response = await _chatService.GetListChatGroupByMemberAsync(request);
         singleChatList = response?.Data ?? new();
+        foreach (var item in singleChatList)
+        {
+            item.Set1vs1Member(userLogin.UserId);
+        }
+        StateHasChanged();
     }
 
     private async Task LoadChatMessage(long chatId, int pageIndex)

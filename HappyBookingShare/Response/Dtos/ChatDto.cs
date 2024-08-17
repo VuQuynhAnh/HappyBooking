@@ -16,6 +16,15 @@ public class ChatDto
         ChatMemberList = model.ChatMemberList.Select(item => new ChatMemberDto(item)).ToList();
     }
 
+    public ChatDto Set1vs1Member(long hostId)
+    {
+        if (ChatMemberList.Count == 2)
+        {
+            Member1vs1Display = ChatMemberList.First(item => item.MemberId != hostId);
+        }
+        return this;
+    }
+
     [JsonConstructor]
     public ChatDto(long chatId, string chatName, bool isGroupChat, string groupAvatar, DateTime createdDate, List<ChatMemberDto> chatMemberList, DateTime lastChatTime)
     {
@@ -52,4 +61,6 @@ public class ChatDto
 
     [JsonPropertyName("lastChatTime")]
     public DateTime LastChatTime { get; private set; }
+
+    public ChatMemberDto Member1vs1Display { get; private set; } = new();
 }

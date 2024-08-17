@@ -31,8 +31,7 @@ public class GetAllUserDataUseCase : IGetAllUserDataUseCase
         StatusEnum status = StatusEnum.Successed;
         try
         {
-            var keyword = request.KeyWord.Equals("_") ? string.Empty : request.KeyWord;
-            var data = await _userRepository.GetAllData(keyword, request.PageIndex, request.PageSize);
+            var data = await _userRepository.GetAllData(request.KeyWord, request.PageIndex, request.PageSize);
             userList = data.Select(item => new UserDto(item)).ToList();
         }
         finally
