@@ -16,6 +16,8 @@ public class UserModel
         Role = entity.Role;
         AvatarImage = entity.AvatarImage;
         IsOnline = entity.IsOnline;
+        LastHeartbeatTime = entity.LastHeartbeatTime;
+        LastLoginTime = entity.LastLoginTime;
     }
 
     public UserModel()
@@ -56,4 +58,8 @@ public class UserModel
     public string Password { get; private set; } = string.Empty;
 
     public bool IsOnline { get; private set; }
+
+    public DateTime LastLoginTime { get; private set; }
+
+    public DateTime LastHeartbeatTime { get; private set; }
 }

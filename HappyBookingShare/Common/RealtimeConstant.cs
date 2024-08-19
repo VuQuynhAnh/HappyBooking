@@ -3,4 +3,5 @@
 public static class RealtimeConstant
 {
     public const string ReceiveMessage = "ReceiveMessage";
+    public const string UserOffline = "UserOffline";
 }

@@ -21,4 +21,5 @@ public static class APIName
     public const string GetChatGroup = "GetChatGroup";
     public const string GetListChatGroupByMember = "GetListChatGroupByMember";
     public const string ImageUploadWithoutAuthorize = "ImageUploadWithoutAuthorize";
+    public const string HeartbeatUser = "HeartbeatUser";
 }

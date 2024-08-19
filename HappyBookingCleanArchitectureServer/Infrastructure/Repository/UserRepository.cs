@@ -121,12 +121,12 @@ public class UserRepository : IUserRepository
     }
 
     /// <summary>
-    /// GetUserByLoginInfor
+    /// Login
     /// </summary>
     /// <param name="userName"></param>
     /// <param name="password"></param>
     /// <returns></returns>
-    public async Task<UserModel> GetUserByLoginInfor(string userName, string password)
+    public async Task<UserModel> Login(string userName, string password)
     {
         var userItem = await _context.UserRepository.FirstOrDefaultAsync(item => item.Password == password
                                                                                  && item.IsDeleted == 0
@@ -137,6 +137,9 @@ public class UserRepository : IUserRepository
         {
             return new();
         }
+        userItem.LastHeartbeatTime = DateTime.UtcNow;
+        userItem.LastLoginTime = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
         return new UserModel(userItem);
     }
 
@@ -234,5 +237,60 @@ public class UserRepository : IUserRepository
         userIdList = userIdList.Distinct().ToList();
         var userIdExist = await _context.UserRepository.CountAsync(item => userIdList.Contains(item.UserId) && item.IsDeleted == 0);
         return userIdList.Count() == userIdExist;
+    }
+
+    /// <summary>
+    /// HeartbeatUser
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public async Task<bool> HeartbeatUser(long userId)
+    {
+        var user = await _context.UserRepository.FirstOrDefaultAsync(item => item.UserId == userId && item.IsDeleted == 0);
+        if (user == null)
+        {
+            return false;
+        }
+        user.IsOnline = true;
+        user.LastHeartbeatTime = DateTime.UtcNow;
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    /// <summary>
+    /// MarkUserAsOffline
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public async Task<bool> MarkUserAsOffline(long userId)
+    {
+        var user = await _context.UserRepository.FirstOrDefaultAsync(item => item.UserId == userId && item.IsDeleted == 0);
+        if (user == null)
+        {
+            return false;
+        }
+        user.IsOnline = false;
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    /// <summary>
+    /// AutoMarkUserAsOffline
+    /// </summary>
+    /// <param name="lastSecond"></param>
+    /// <returns></returns>
+    public async Task<List<long>> AutoMarkUserAsOffline(int lastSecond)
+    {
+        var userList = await _context.UserRepository.Where(item => item.IsDeleted == 0
+                                                                   && item.IsOnline
+                                                                   && (DateTime.UtcNow - item.LastHeartbeatTime).TotalSeconds >= lastSecond)
+                                                    .ToListAsync();
+        List<long> userIdList = new();
+        foreach (var item in userList)
+        {
+            item.IsOnline = false;
+            userIdList.Add(item.UserId);
+        }
+
+        await _context.SaveChangesAsync();
+        return userIdList;
     }
 }

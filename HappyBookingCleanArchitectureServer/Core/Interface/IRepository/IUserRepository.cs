@@ -17,7 +17,7 @@ public interface IUserRepository : IRepositoryBase
 
     Task<UserModel> GetUserByUserIdAndPassword(long userId, string password);
 
-    Task<UserModel> GetUserByLoginInfor(string userName, string password);
+    Task<UserModel> Login(string userName, string password);
 
     Task<bool> SaveUser(long userId, UserModel userModel);
 
@@ -26,4 +26,10 @@ public interface IUserRepository : IRepositoryBase
     Task<string> GenerateRefreshToken(UserModel user);
 
     Task<bool> CheckExistUserList(List<long> userIdList);
+
+    Task<bool> HeartbeatUser(long userId);
+
+    Task<bool> MarkUserAsOffline(long userId);
+
+    Task<List<long>> AutoMarkUserAsOffline(int lastSecond);
 }

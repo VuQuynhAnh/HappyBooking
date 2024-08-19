@@ -31,7 +31,7 @@ public class LoginUseCase : ILoginUseCase
         StatusEnum status = StatusEnum.Successed;
         try
         {
-            var user = await _userRepository.GetUserByLoginInfor(request.UserName, request.Password);
+            var user = await _userRepository.Login(request.UserName, request.Password);
             if (user.UserId > 0)
             {
                 var tokenResponse = await _tokenService.GenerateToken(user);

@@ -38,6 +38,7 @@ public static class SetupDependencyInjection
         services.AddScoped<IUpdateUserUseCase, UpdateUserUseCase>();
         services.AddScoped<IGetUserByUserIdUseCase, GetUserByUserIdUseCase>();
         services.AddScoped<IChangePasswordUseCase, ChangePasswordUseCase>();
+        services.AddScoped<IHeartbeatUserUseCase, HeartbeatUserUseCase>();
 
         // Chat
         services.AddScoped<IAddMemberToGroupUseCase, AddMemberToGroupUseCase>();

@@ -26,4 +26,8 @@ public class User : BaseEntity
     public string Password { get; set; } = string.Empty;
 
     public bool IsOnline { get; set; }
+
+    public DateTime LastLoginTime { get; set; }
+
+    public DateTime LastHeartbeatTime { get; set; }
 }

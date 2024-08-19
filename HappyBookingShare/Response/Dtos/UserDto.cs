@@ -16,6 +16,8 @@ public class UserDto
         AvatarImage = model.AvatarImage;
         Role = model.Role;
         IsOnline = model.IsOnline;
+        LastLoginTime = model.LastLoginTime;
+        LastHeartbeatTime = model.LastHeartbeatTime;
     }
 
     public UserDto()
@@ -23,7 +25,7 @@ public class UserDto
     }
 
     [JsonConstructor]
-    public UserDto(long userId, string fullName, string email, string phoneNumber, string citizenIdentificationNumber, string address, string avatarImage, int role, bool isOnline)
+    public UserDto(long userId, string fullName, string email, string phoneNumber, string citizenIdentificationNumber, string address, string avatarImage, int role, bool isOnline, DateTime lastLoginTime, DateTime lastHeartbeatTime)
     {
         UserId = userId;
         FullName = fullName;
@@ -34,6 +36,8 @@ public class UserDto
         AvatarImage = avatarImage;
         Role = role;
         IsOnline = isOnline;
+        LastHeartbeatTime = lastHeartbeatTime;
+        LastLoginTime = lastLoginTime;
     }
 
     [JsonPropertyName("userId")]
@@ -62,4 +66,10 @@ public class UserDto
 
     [JsonPropertyName("isOnline")]
     public bool IsOnline { get; private set; }
+
+    [JsonPropertyName("lastLoginTime")]
+    public DateTime LastLoginTime { get; set; }
+
+    [JsonPropertyName("lastHeartbeatTime")]
+    public DateTime LastHeartbeatTime { get; set; }
 }

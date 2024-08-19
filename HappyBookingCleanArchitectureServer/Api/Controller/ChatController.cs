@@ -90,7 +90,7 @@ public class ChatController : BaseController
     [HttpGet(APIName.GetMessageList)]
     public async Task<ActionResult<GetMessageListResponse>> GetMessageList([FromQuery] GetMessageListRequest request)
     {
-        var response = await _getMessageListUseCase.GetMessageList(UserId, request);
+        var response = await _getMessageListUseCase.GetMessageList(UserId, request, _hubContext);
         return Ok(response);
     }
 
