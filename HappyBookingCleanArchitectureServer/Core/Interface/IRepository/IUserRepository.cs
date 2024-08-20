@@ -27,7 +27,7 @@ public interface IUserRepository : IRepositoryBase
 
     Task<bool> CheckExistUserList(List<long> userIdList);
 
-    Task<bool> HeartbeatUser(long userId);
+    Task<UserModel> HeartbeatUser(long userId);
 
     Task<bool> MarkUserAsOffline(long userId);
 

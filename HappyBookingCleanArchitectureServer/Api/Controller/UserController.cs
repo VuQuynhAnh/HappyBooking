@@ -4,6 +4,8 @@ using HappyBookingShare.Response.User;
 using HappyBookingShare.Common;
 using HappyBookingShare.Request.User;
 using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.User;
+using HappyBookingShare.Realtime;
+using Microsoft.AspNetCore.SignalR;
 
 namespace HappyBookingCleanArchitectureServer.Api.Controller;
 
@@ -17,6 +19,7 @@ public class UserController : BaseController
     private readonly IUpdateUserUseCase _updateUserUseCase;
     private readonly IChangePasswordUseCase _changePasswordUseCase;
     private readonly IHeartbeatUserUseCase _heartbeatUserUseCase;
+    private readonly IHubContext<ChatHub> _hubContext;
 
     public UserController(IGetAllUserDataUseCase getAllUserDataUseCase,
         IRegisterUserUseCase registerUserUseCase,
@@ -24,7 +27,8 @@ public class UserController : BaseController
         IGetUserByUserIdUseCase getUserByUserIdUseCase,
         IHttpContextAccessor httpContextAccessor,
         IChangePasswordUseCase changePasswordUseCase,
-        IHeartbeatUserUseCase heartbeatUserUseCase) : base(httpContextAccessor)
+        IHubContext<ChatHub> hubContext,
+        IHeartbeatUserUseCase heartbeatUserUseCase) : base(httpContextAccessor, heartbeatUserUseCase, hubContext)
     {
         _getAllUserDataUseCase = getAllUserDataUseCase;
         _registerUserUseCase = registerUserUseCase;
@@ -32,6 +36,7 @@ public class UserController : BaseController
         _getUserByUserIdUseCase = getUserByUserIdUseCase;
         _changePasswordUseCase = changePasswordUseCase;
         _heartbeatUserUseCase = heartbeatUserUseCase;
+        _hubContext = hubContext;
     }
 
     [HttpGet(APIName.GetAllData)]
@@ -44,6 +49,7 @@ public class UserController : BaseController
     [HttpGet(APIName.GetUserByUserId)]
     public async Task<ActionResult<GetListUserResponse>> GetUserByUserId([FromQuery] GetUserByUserIdRequest request)
     {
+        await HeartbeatUser();
         var response = await _getUserByUserIdUseCase.GetUserByUserId(UserId, request);
         return Ok(response);
     }
@@ -59,6 +65,7 @@ public class UserController : BaseController
     [HttpPut(APIName.UpdateUser)]
     public async Task<ActionResult<SaveUserResponse>> UpdateUser([FromBody] UpdateUserRequest request)
     {
+        await HeartbeatUser();
         var response = await _updateUserUseCase.UpdateUser(UserId, request);
         return Ok(response);
     }
@@ -67,13 +74,6 @@ public class UserController : BaseController
     public async Task<ActionResult<SaveUserResponse>> ChangePassword([FromBody] ChangePasswordRequest request)
     {
         var response = await _changePasswordUseCase.ChangePassword(UserId, request);
-        return Ok(response);
-    }
-
-    [HttpPut(APIName.HeartbeatUser)]
-    public async Task<ActionResult<HeartbeatUserResponse>> HeartbeatUser([FromBody] HeartbeatUserRequest request)
-    {
-        var response = await _heartbeatUserUseCase.HeartbeatUser(UserId, request);
         return Ok(response);
     }
 }

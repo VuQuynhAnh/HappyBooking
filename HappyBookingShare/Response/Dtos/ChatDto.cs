@@ -25,6 +25,12 @@ public class ChatDto
         return this;
     }
 
+    public ChatDto ChangeUserMember1vs1Display(UserDto userInfor)
+    {
+        Member1vs1Display.ChangeUserInformation(userInfor);
+        return this;
+    }
+
     [JsonConstructor]
     public ChatDto(long chatId, string chatName, bool isGroupChat, string groupAvatar, DateTime createdDate, List<ChatMemberDto> chatMemberList, DateTime lastChatTime)
     {

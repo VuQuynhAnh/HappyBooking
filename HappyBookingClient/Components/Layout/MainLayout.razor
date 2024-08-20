@@ -1,10 +1,12 @@
 ﻿@using Blazored.LocalStorage
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Common
+@using HappyBookingShare.Request.User
 @using HappyBookingShare.Response.Dtos
 @inherits LayoutComponentBase
 @inject ILocalStorageService _localStorage
 @inject ILanguageService _languageService
+@inject IUserService _userService
 
 <style>
     .styleMudPaper {
@@ -86,15 +88,18 @@
         if (firstRender)
         {
             await _languageService.LoadLanguage();
+            userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
+            avatarUrl = !string.IsNullOrEmpty(userLogin.AvatarImage) ? userLogin.AvatarImage : KeyConstant.DefaultAvata;
+            StateHasChanged();
         }
-        userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
-        avatarUrl = !string.IsNullOrEmpty(userLogin.AvatarImage) ? userLogin.AvatarImage : KeyConstant.DefaultAvata;
-        StateHasChanged();
     }
 
-    public void MudPaperClick()
+    public async Task MudPaperClick()
     {
+        userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
+        avatarUrl = !string.IsNullOrEmpty(userLogin.AvatarImage) ? userLogin.AvatarImage : KeyConstant.DefaultAvata;
         showMudPaper = !showMudPaper;
+        StateHasChanged();
     }
 
     private void CloseNavBar()

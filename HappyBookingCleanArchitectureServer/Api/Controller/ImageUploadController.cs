@@ -1,7 +1,10 @@
 ﻿using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.Image;
+using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.User;
 using HappyBookingShare.Common;
+using HappyBookingShare.Realtime;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace HappyBookingCleanArchitectureServer.Api.Controller;
 
@@ -13,7 +16,13 @@ public class ImageUploadController : BaseController
     private readonly IDeleteImageUseCase _deleteImageUseCase;
     private readonly IUploadImageUseCase _uploadImageUseCase;
 
-    public ImageUploadController(IClearImageNotUsedUseCase clearImageNotUsedUseCase, IDeleteImageUseCase deleteImageUseCase, IUploadImageUseCase uploadImageUseCase, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+    public ImageUploadController(
+        IClearImageNotUsedUseCase clearImageNotUsedUseCase,
+        IDeleteImageUseCase deleteImageUseCase,
+        IUploadImageUseCase uploadImageUseCase,
+        IHubContext<ChatHub> hubContext,
+        IHttpContextAccessor httpContextAccessor,
+        IHeartbeatUserUseCase heartbeatUserUseCase) : base(httpContextAccessor, heartbeatUserUseCase, hubContext)
     {
         _clearImageNotUsedUseCase = clearImageNotUsedUseCase;
         _deleteImageUseCase = deleteImageUseCase;
@@ -33,7 +42,7 @@ public class ImageUploadController : BaseController
     }
 
     [HttpPost(APIName.ImageUploadWithoutAuthorize)]
-    [AllowAnonymous] 
+    [AllowAnonymous]
     public async Task<IActionResult> ImageUploadWithoutAuthorize([FromForm] IFormFile image)
     {
         if (image == null || image.Length == 0)

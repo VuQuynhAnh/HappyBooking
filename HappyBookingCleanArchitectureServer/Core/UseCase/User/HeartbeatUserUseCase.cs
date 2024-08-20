@@ -1,10 +1,12 @@
 ﻿using HappyBookingCleanArchitectureServer.Core.Interface.IRepository;
 using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.User;
 using HappyBookingShare.Common;
-using HappyBookingShare.Request.User;
+using HappyBookingShare.Realtime;
 using HappyBookingShare.Response.Dtos;
 using HappyBookingShare.Response.User;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
+using System.Text.Json;
 
 namespace HappyBookingCleanArchitectureServer.Core.UseCase.User;
 
@@ -19,16 +21,24 @@ public class HeartbeatUserUseCase : IHeartbeatUserUseCase
         _cache = cache;
     }
 
-    public async Task<HeartbeatUserResponse> HeartbeatUser(long userId, HeartbeatUserRequest request)
+    public async Task<HeartbeatUserResponse> HeartbeatUser(long userId, IHubContext<ChatHub> hubContext)
     {
-        try
+        await UpdateStatus(hubContext);
+        UserDto result = new();
+        var heartbeatUserResult = await _userRepository.HeartbeatUser(userId);
+        if (heartbeatUserResult != null)
         {
-            var result = await _userRepository.HeartbeatUser(request.UserId);
-            return new HeartbeatUserResponse(userId, result, StatusEnum.Successed, _cache);
+            result = new UserDto(heartbeatUserResult);
+            string jsonString = JsonSerializer.Serialize(result);
+            await hubContext.Clients.All.SendAsync(RealtimeConstant.UserOnline, jsonString);
         }
-        finally
-        {
-            await _userRepository.ReleaseResource();
-        }
+        return new HeartbeatUserResponse(userId, result, StatusEnum.Successed, _cache);
+    }
+
+    private async Task UpdateStatus(IHubContext<ChatHub> hubContext)
+    {
+        List<long> result = await _userRepository.AutoMarkUserAsOffline(ParamConstant.LastSecond);
+        string jsonString = JsonSerializer.Serialize(result);
+        await hubContext.Clients.All.SendAsync(RealtimeConstant.UserOffline, jsonString);
     }
 }

@@ -26,6 +26,12 @@ public class ChatMemberDto
     {
     }
 
+    public ChatMemberDto ChangeUserInformation(UserDto userDto)
+    {
+        UserInformation = userDto;
+        return this;
+    }
+
     [JsonPropertyName("chatId")]
     public long ChatId { get; private set; }
 

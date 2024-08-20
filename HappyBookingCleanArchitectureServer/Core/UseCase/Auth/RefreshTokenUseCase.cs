@@ -1,18 +1,26 @@
-﻿using HappyBookingCleanArchitectureServer.Core.Interface.IService;
+﻿using HappyBookingCleanArchitectureServer.Core.Interface.IRepository;
+using HappyBookingCleanArchitectureServer.Core.Interface.IService;
 using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.Auth;
 using HappyBookingShare.Common;
+using HappyBookingShare.Entities;
+using HappyBookingShare.Realtime;
 using HappyBookingShare.Request.Auth;
 using HappyBookingShare.Response.Auth;
+using HappyBookingShare.Response.Dtos;
+using Microsoft.AspNetCore.SignalR;
+using System.Text.Json;
 
 namespace HappyBookingCleanArchitectureServer.Core.UseCase.Auth;
 
 public class RefreshTokenUseCase : IRefreshTokenUseCase
 {
     private readonly ITokenService _tokenService;
+    private readonly IUserRepository _userRepository;
 
-    public RefreshTokenUseCase(ITokenService tokenService)
+    public RefreshTokenUseCase(ITokenService tokenService, IUserRepository userRepository)
     {
         _tokenService = tokenService;
+        _userRepository = userRepository;
     }
 
     /// <summary>
@@ -20,7 +28,7 @@ public class RefreshTokenUseCase : IRefreshTokenUseCase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    public async Task<LoginResponse> RefreshToken(RefreshTokenRequest request)
+    public async Task<LoginResponse> RefreshToken(RefreshTokenRequest request, IHubContext<ChatHub> hubContext)
     {
         string token = string.Empty;
         string refeshToken = string.Empty;
@@ -32,6 +40,11 @@ public class RefreshTokenUseCase : IRefreshTokenUseCase
             userId = result.UserId;
             token = result.JwtToken;
             refeshToken = result.RefreshToken;
+
+            var user = await _userRepository.GetUserByUserId(userId);
+            var userDto = new UserDto(user);
+            string jsonString = JsonSerializer.Serialize(userDto);
+            await hubContext.Clients.All.SendAsync(RealtimeConstant.UserOnline, jsonString);
         }
 
         return new LoginResponse(userId, token, refeshToken, status);

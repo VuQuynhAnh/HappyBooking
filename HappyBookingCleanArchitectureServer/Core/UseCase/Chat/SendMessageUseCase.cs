@@ -1,10 +1,13 @@
 ﻿using HappyBookingCleanArchitectureServer.Core.Interface.IRepository;
 using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.Chat;
 using HappyBookingShare.Common;
+using HappyBookingShare.Realtime;
 using HappyBookingShare.Request.Chat;
 using HappyBookingShare.Response.Chat;
 using HappyBookingShare.Response.Dtos;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
+using System.Text.Json;
 
 namespace HappyBookingCleanArchitectureServer.Core.UseCase.Chat;
 
@@ -19,12 +22,15 @@ public class SendMessageUseCase : ISendMessageUseCase
         _cache = cache;
     }
 
-    public async Task<SendMessageResponse> SendMessage(long userId, SendMessageRequest request)
+    public async Task<SendMessageResponse> SendMessage(long userId, SendMessageRequest request, IHubContext<ChatHub> hubContext)
     {
         try
         {
-            var result = await _chatRepository.SendMessage(request.ChatId, request.Content, request.MessageType, userId);
-            return new SendMessageResponse(userId, new MessageDto(result), StatusEnum.Successed, _cache);
+            var messageModel = await _chatRepository.SendMessage(request.ChatId, request.Content, request.MessageType, userId);
+            var result = new MessageDto(messageModel);
+            string jsonString = JsonSerializer.Serialize(result);
+            await hubContext.Clients.All.SendAsync(RealtimeConstant.ReceiveMessage, jsonString);
+            return new SendMessageResponse(userId, result, StatusEnum.Successed, _cache);
         }
         finally
         {

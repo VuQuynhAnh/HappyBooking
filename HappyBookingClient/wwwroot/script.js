@@ -4,6 +4,35 @@
     return url;
 };
 
+window.getWindowSize = () => {
+    let formdv = document.getElementById("idForm");
+    let tooldv = document.getElementById("idToolbar");
+    let item = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        formHeight: formdv == null ? 0 : formdv.offsetHeight,
+        toolbarHeight: tooldv == null ? 0 : tooldv.offsetHeight,
+    };
+    console.log(item);
+    return item;
+};
+
+window.blazorSetElementHeight = function (element, height) {
+    element.style.height = height + 'px';
+}
+
+window.blazorGetScrollTop = function (element) {
+    return element.scrollTop;
+}
+
+window.blazorGetScrollHeight = function (element) {
+    return element.scrollHeight;
+}
+
+window.blazorGetClientHeight = function (element) {
+    return element.clientHeight;
+}
+
 // wwwroot/js/pdfHelper.js
 window.jsPDFHelper = {
     previewPDF: function (data, filename) {

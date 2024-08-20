@@ -4,12 +4,18 @@
 @using HappyBookingClient.Components.Pages.Chat
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Common
+@using HappyBookingShare.Model
 @using HappyBookingShare.Request.Chat
 @using HappyBookingShare.Response.Dtos
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Text.Json
 @inject ILanguageService _languageService
 @inject IChatService _chatService
 @inject IDialogService _dialogService
 @inject ILocalStorageService _localStorage
+@inject IJSRuntime _jSRuntime
+@inject NavigationManager _navigation
+@inject IConfiguration _configuration
 <style>
     .textLeftButton {
         justify-content: left;
@@ -33,55 +39,49 @@
         </MudButton>
 
         <MudPaper Class="pa-4">
-            <MudStack Spacing="1">
-                <MudButton Class="textLeftButton" OnClick="(() => OnExpandCollapseClick(0))">@_languageService["DirectMessages"]</MudButton>
-                <MudDivider />
-                <MudCollapse Expanded="expandedDirectMessages">
+            <MudButton FullWidth Class="textLeftButton" Color="Color.Success">@_languageService["DirectMessages"]</MudButton>
+            <MudDivider />
 
-                    @foreach (var chatItem in singleChatList)
-                    {
-                        <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(chatItem.ChatId, 1))" FullWidth>
-                            <MudBadge Color="chatItem.Member1vs1Display.UserInformation.IsOnline ? Color.Success : Color.Error"
-                                      Overlap="true"
-                                      Bordered="true"
-                                      Class="mr-3 float-start">
-                                <MudAvatar>
-                                    <MudImage Src="@chatItem.Member1vs1Display.UserInformation.AvatarImage"></MudImage>
-                                </MudAvatar>
-                            </MudBadge>
+            <div @ref="scrollSingleChatContainer" style="overflow-y: auto;" @onscroll="OnSingleChatScroll">
+                @foreach (var chatItem in singleChatList)
+                {
+                    <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(chatItem.ChatId, 1))" FullWidth>
+                        <MudBadge Color="chatItem.Member1vs1Display.UserInformation.IsOnline ? Color.Success : Color.Error"
+                                  Overlap="true"
+                                  Bordered="true"
+                                  Class="mr-3 float-start">
+                            <MudAvatar>
+                                <MudImage Src="@chatItem.Member1vs1Display.UserInformation.AvatarImage"></MudImage>
+                            </MudAvatar>
+                        </MudBadge>
 
-                            <div class="float-end text-start">
-                                <MudText Typo="Typo.subtitle1">@chatItem.Member1vs1Display.UserInformation.FullName</MudText>
-                                <MudText Typo="Typo.subtitle2">@chatItem.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
-                            </div>
-                        </MudButton>
-                    }
-
-                </MudCollapse>
-            </MudStack>
+                        <div class="float-end text-start">
+                            <MudText Typo="Typo.subtitle1">@chatItem.Member1vs1Display.UserInformation.FullName</MudText>
+                            <MudText Typo="Typo.subtitle2">@chatItem.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
+                        </div>
+                    </MudButton>
+                }
+            </div>
         </MudPaper>
 
         <MudPaper Class="pa-4 mt-2">
-            <MudStack Spacing="1">
-                <MudButton Class="textLeftButton" OnClick="(() => OnExpandCollapseClick(1))">@_languageService["Spaces"]</MudButton>
-                <MudDivider />
-                <MudCollapse Expanded="expandedSpaces">
+            <MudButton FullWidth Class="textLeftButton" Color="Color.Success">@_languageService["Spaces"]</MudButton>
+            <MudDivider />
 
-                    @foreach (var chatItem in groupChatList)
-                    {
-                        <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(chatItem.ChatId, 1))" FullWidth>
-                            <MudAvatar Class="mr-3 float-start">
-                                <MudImage Src="@chatItem.GroupAvatar"></MudImage>
-                            </MudAvatar>
-                            <div class="float-end text-start">
-                                <MudText Typo="Typo.subtitle1">@chatItem.ChatName</MudText>
-                                <MudText Typo="Typo.subtitle2">@chatItem.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
-                            </div>
-                        </MudButton>
-                    }
-
-                </MudCollapse>
-            </MudStack>
+            <div @ref="scrollGroupChatContainer" style="overflow-y: auto;" @onscroll="OnGroupChatScroll">
+                @foreach (var chatItem in groupChatList)
+                {
+                    <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(chatItem.ChatId, 1))" FullWidth>
+                        <MudAvatar Class="mr-3 float-start">
+                            <MudImage Src="@chatItem.GroupAvatar"></MudImage>
+                        </MudAvatar>
+                        <div class="float-end text-start">
+                            <MudText Typo="Typo.subtitle1">@chatItem.ChatName</MudText>
+                            <MudText Typo="Typo.subtitle2">@chatItem.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
+                        </div>
+                    </MudButton>
+                }
+            </div>
         </MudPaper>
     </MudItem>
 
@@ -102,14 +102,53 @@
 
 @code {
     private bool isLoading = false;
-    bool expandedDirectMessages = true;
-    bool expandedSpaces = true;
     private UserDto userLogin = new();
     string messageSearchKeyWord = string.Empty;
-    bool onlineStatus = false;
+    bool isOnsearch = false;
+    int heightGrid = 250;
     List<ChatDto> groupChatList = new();
     List<ChatDto> singleChatList = new();
     List<MessageDto> messageList = new();
+    private int singleChatPageIndex = 1;
+    private int groupChatPageIndex = 1;
+    private int chatPageSize = 7;
+    private HubConnection hubConnection;
+
+    private ElementReference scrollSingleChatContainer;
+    private ElementReference scrollGroupChatContainer;
+
+    private async Task OnSingleChatScroll()
+    {
+        var scrollTop = await _jSRuntime.InvokeAsync<double>("blazorGetScrollTop", scrollSingleChatContainer);
+        var scrollHeight = await _jSRuntime.InvokeAsync<double>("blazorGetScrollHeight", scrollSingleChatContainer);
+        var clientHeight = await _jSRuntime.InvokeAsync<double>("blazorGetClientHeight", scrollSingleChatContainer);
+
+        if (scrollTop + clientHeight >= scrollHeight - 50 && !isLoading)
+        {
+            await LoadSingleChatList();
+        }
+    }
+
+    private async Task OnGroupChatScroll()
+    {
+        var scrollTop = await _jSRuntime.InvokeAsync<double>("blazorGetScrollTop", scrollGroupChatContainer);
+        var scrollHeight = await _jSRuntime.InvokeAsync<double>("blazorGetScrollHeight", scrollGroupChatContainer);
+        var clientHeight = await _jSRuntime.InvokeAsync<double>("blazorGetClientHeight", scrollGroupChatContainer);
+
+        if (scrollTop + clientHeight >= scrollHeight - 50 && !isLoading)
+        {
+            await LoadGroupChatList();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var dimension = await _jSRuntime.InvokeAsync<WindowDimensions>("getWindowSize");
+        heightGrid = (dimension.Height - dimension.FormHeight - dimension.ToolbarHeight - 275) / 2;
+        await _jSRuntime.InvokeVoidAsync("blazorSetElementHeight", scrollSingleChatContainer, heightGrid);
+        await _jSRuntime.InvokeVoidAsync("blazorSetElementHeight", scrollGroupChatContainer, heightGrid);
+        StateHasChanged();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -120,27 +159,13 @@
 
             await _languageService.LoadLanguage();
             userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
-            await LoadSingleChatList(1);
-            StateHasChanged();
-
-            await LoadGroupChatList(1);
-
+            singleChatPageIndex = 1;
+            groupChatPageIndex = 1;
+            await LoadSingleChatList();
+            await LoadGroupChatList();
+            await RegisterSocketClient();
             isLoading = false;
             StateHasChanged();
-        }
-    }
-
-
-    private void OnExpandCollapseClick(int typeCollapse)
-    {
-        switch (typeCollapse)
-        {
-            case 0:
-                expandedDirectMessages = !expandedDirectMessages;
-                break;
-            case 1:
-                expandedSpaces = !expandedSpaces;
-                break;
         }
     }
 
@@ -157,40 +182,87 @@
             {
                 return;
             }
-            await LoadSingleChatList(1);
-            StateHasChanged();
-
-            await LoadGroupChatList(1);
-            StateHasChanged();
+            singleChatPageIndex = 1;
+            groupChatPageIndex = 1;
+            await LoadSingleChatList();
+            await LoadGroupChatList();
         }
     }
 
-    private async Task LoadGroupChatList(int pageIndex)
+    private async Task LoadGroupChatList()
     {
-        GetListChatGroupByMemberRequest request = new();
-        request.PageIndex = pageIndex;
-        request.PageSize = 10;
-        request.IsGroupChat = true;
-        request.MemberId = userLogin.UserId;
-        var response = await _chatService.GetListChatGroupByMemberAsync(request);
-        groupChatList = response?.Data ?? new();
-        StateHasChanged();
-    }
-
-    private async Task LoadSingleChatList(int pageIndex)
-    {
-        GetListChatGroupByMemberRequest request = new();
-        request.PageIndex = pageIndex;
-        request.PageSize = 10;
-        request.IsGroupChat = false;
-        request.MemberId = userLogin.UserId;
-        var response = await _chatService.GetListChatGroupByMemberAsync(request);
-        singleChatList = response?.Data ?? new();
-        foreach (var item in singleChatList)
+        if (isOnsearch)
         {
-            item.Set1vs1Member(userLogin.UserId);
+            return;
         }
-        StateHasChanged();
+        try
+        {
+            isOnsearch = true;
+            GetListChatGroupByMemberRequest request = new();
+            request.PageIndex = groupChatPageIndex;
+            request.PageSize = chatPageSize;
+            request.IsGroupChat = true;
+            request.MemberId = userLogin.UserId;
+            var response = await _chatService.GetListChatGroupByMemberAsync(request);
+            var resultData = response?.Data ?? new();
+            if (!resultData.Any())
+            {
+                isOnsearch = false;
+                return;
+            }
+            var resultChatIds = resultData.Select(dt => dt.ChatId).ToHashSet();
+
+            groupChatList = groupChatList.Where(item => !resultChatIds.Contains(item.ChatId))
+                                         .Concat(resultData)
+                                         .OrderByDescending(item => item.LastChatTime)
+                                         .ToList();
+            groupChatPageIndex++;
+            StateHasChanged();
+        }
+        finally
+        {
+            isOnsearch = false;
+        }
+    }
+
+    private async Task LoadSingleChatList()
+    {
+        if (isOnsearch)
+        {
+            return;
+        }
+        try
+        {
+            isOnsearch = true;
+            GetListChatGroupByMemberRequest request = new();
+            request.PageIndex = singleChatPageIndex;
+            request.PageSize = chatPageSize;
+            request.IsGroupChat = false;
+            request.MemberId = userLogin.UserId;
+            var response = await _chatService.GetListChatGroupByMemberAsync(request);
+            var resultData = response?.Data ?? new();
+            if (!resultData.Any())
+            {
+                isOnsearch = false;
+                return;
+            }
+            var resultChatIds = resultData.Select(dt => dt.ChatId).ToHashSet();
+
+            singleChatList = singleChatList.Where(item => !resultChatIds.Contains(item.ChatId))
+                                           .Concat(resultData)
+                                           .OrderByDescending(item => item.LastChatTime)
+                                           .ToList();
+            singleChatPageIndex++;
+            foreach (var item in singleChatList)
+            {
+                item.Set1vs1Member(userLogin.UserId);
+            }
+            StateHasChanged();
+        }
+        finally
+        {
+            isOnsearch = false;
+        }
     }
 
     private async Task LoadChatMessage(long chatId, int pageIndex)
@@ -202,5 +274,41 @@
         request.KeyWord = messageSearchKeyWord;
         var response = await _chatService.GetMessageListAsync(request);
         messageList = response?.Data ?? new();
+    }
+
+    private async Task RegisterSocketClient()
+    {
+        string hubUrl = _configuration["SignalR:HubUrl"] ?? string.Empty;
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(hubUrl)
+            .Build();
+
+        // Socket when create donHang
+        hubConnection.On<string>(RealtimeConstant.UserOnline, async (message) =>
+        {
+            // Fetch the new records and update dataList
+            var userSocket = JsonSerializer.Deserialize<UserDto>(message);
+            if (userSocket != null && userSocket.UserId > 0)
+            {
+                var updateUser = singleChatList.FirstOrDefault(item => item.Member1vs1Display.UserInformation.UserId == userSocket.UserId);
+                if (updateUser != null)
+                {
+                    updateUser.ChangeUserMember1vs1Display(userSocket);
+
+                    // Notify Blazor to re-render the component
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+        });
+
+        try
+        {
+            await hubConnection.StartAsync();
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 }

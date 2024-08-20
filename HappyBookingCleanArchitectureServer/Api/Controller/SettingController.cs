@@ -1,8 +1,11 @@
 ﻿using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.Setting;
+using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.User;
 using HappyBookingShare.Common;
+using HappyBookingShare.Realtime;
 using HappyBookingShare.Request.Setting;
 using HappyBookingShare.Response.Setting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace HappyBookingCleanArchitectureServer.Api.Controller;
 
@@ -13,7 +16,12 @@ public class SettingController : BaseController
     private readonly IGetSettingByUserIdUseCase _getSettingByUserIdUseCase;
     private readonly ISaveSettingUseCase _saveSettingUseCase;
 
-    public SettingController(IGetSettingByUserIdUseCase getSettingByUserIdUseCase, ISaveSettingUseCase saveSettingUseCase, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+    public SettingController(
+        IGetSettingByUserIdUseCase getSettingByUserIdUseCase,
+        ISaveSettingUseCase saveSettingUseCase,
+        IHubContext<ChatHub> hubContext,
+        IHttpContextAccessor httpContextAccessor,
+        IHeartbeatUserUseCase heartbeatUserUseCase) : base(httpContextAccessor, heartbeatUserUseCase, hubContext)
     {
         _getSettingByUserIdUseCase = getSettingByUserIdUseCase;
         _saveSettingUseCase = saveSettingUseCase;

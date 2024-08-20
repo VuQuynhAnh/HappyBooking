@@ -2,8 +2,13 @@
 using HappyBookingCleanArchitectureServer.Core.Interface.IService;
 using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.Auth;
 using HappyBookingShare.Common;
+using HappyBookingShare.Realtime;
 using HappyBookingShare.Request.Auth;
 using HappyBookingShare.Response.Auth;
+using HappyBookingShare.Response.Dtos;
+using Microsoft.AspNetCore.SignalR;
+using System.Data;
+using System.Text.Json;
 
 namespace HappyBookingCleanArchitectureServer.Core.UseCase.Auth;
 
@@ -23,7 +28,7 @@ public class LoginUseCase : ILoginUseCase
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    public async Task<LoginResponse> Login(LoginRequest request)
+    public async Task<LoginResponse> Login(LoginRequest request, IHubContext<ChatHub> hubContext)
     {
         string token = string.Empty;
         string refeshToken = string.Empty;
@@ -38,6 +43,9 @@ public class LoginUseCase : ILoginUseCase
                 token = tokenResponse.JwtToken;
                 refeshToken = tokenResponse.RefreshToken;
                 userId = user.UserId;
+                var userDto = new UserDto(user);
+                string jsonString = JsonSerializer.Serialize(userDto);
+                await hubContext.Clients.All.SendAsync(RealtimeConstant.UserOnline, jsonString);
             }
         }
         finally

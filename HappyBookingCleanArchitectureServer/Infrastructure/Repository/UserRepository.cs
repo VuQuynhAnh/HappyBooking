@@ -137,6 +137,7 @@ public class UserRepository : IUserRepository
         {
             return new();
         }
+        userItem.IsOnline = true;
         userItem.LastHeartbeatTime = DateTime.UtcNow;
         userItem.LastLoginTime = DateTime.UtcNow;
         await _context.SaveChangesAsync();
@@ -244,16 +245,17 @@ public class UserRepository : IUserRepository
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<bool> HeartbeatUser(long userId)
+    public async Task<UserModel> HeartbeatUser(long userId)
     {
         var user = await _context.UserRepository.FirstOrDefaultAsync(item => item.UserId == userId && item.IsDeleted == 0);
         if (user == null)
         {
-            return false;
+            return new();
         }
         user.IsOnline = true;
         user.LastHeartbeatTime = DateTime.UtcNow;
-        return await _context.SaveChangesAsync() > 0;
+        await _context.SaveChangesAsync();
+        return new UserModel(user);
     }
 
     /// <summary>
