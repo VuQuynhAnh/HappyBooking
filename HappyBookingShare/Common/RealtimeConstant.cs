@@ -3,6 +3,5 @@
 public static class RealtimeConstant
 {
     public const string ReceiveMessage = "ReceiveMessage";
-    public const string UserOffline = "UserOffline";
-    public const string UserOnline = "UserOnline";
+    public const string UserStatus = "UserStatus";
 }

@@ -284,22 +284,28 @@
             .WithUrl(hubUrl)
             .Build();
 
-        // Socket when create donHang
-        hubConnection.On<string>(RealtimeConstant.UserOnline, async (message) =>
+        hubConnection.On<string>(RealtimeConstant.UserStatus, async (message) =>
         {
-            // Fetch the new records and update dataList
-            var userSocket = JsonSerializer.Deserialize<UserDto>(message);
-            if (userSocket != null && userSocket.UserId > 0)
+            var userSocketList = JsonSerializer.Deserialize<List<UserDto>>(message);
+            if (userSocketList == null || !userSocketList.Any())
             {
-                var updateUser = singleChatList.FirstOrDefault(item => item.Member1vs1Display.UserInformation.UserId == userSocket.UserId);
-                if (updateUser != null)
-                {
-                    updateUser.ChangeUserMember1vs1Display(userSocket);
-
-                    // Notify Blazor to re-render the component
-                    await InvokeAsync(StateHasChanged);
-                }
+                return;
             }
+            var userDictionary = userSocketList.ToDictionary(u => u.UserId);
+            var chatsToUpdate = singleChatList
+                .Where(chat => userDictionary.ContainsKey(chat.Member1vs1Display.UserInformation.UserId))
+                .ToList();
+
+            if (!chatsToUpdate.Any())
+            {
+                return;
+            }
+            foreach (var chat in chatsToUpdate)
+            {
+                var updateUser = userDictionary[chat.Member1vs1Display.UserInformation.UserId];
+                chat.ChangeUserMember1vs1Display(updateUser);
+            }
+            await InvokeAsync(StateHasChanged);
         });
 
         try

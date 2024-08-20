@@ -44,8 +44,8 @@ public class LoginUseCase : ILoginUseCase
                 refeshToken = tokenResponse.RefreshToken;
                 userId = user.UserId;
                 var userDto = new UserDto(user);
-                string jsonString = JsonSerializer.Serialize(userDto);
-                await hubContext.Clients.All.SendAsync(RealtimeConstant.UserOnline, jsonString);
+                string jsonString = JsonSerializer.Serialize(new List<UserDto>() { userDto });
+                await hubContext.Clients.All.SendAsync(RealtimeConstant.UserStatus, jsonString);
             }
         }
         finally

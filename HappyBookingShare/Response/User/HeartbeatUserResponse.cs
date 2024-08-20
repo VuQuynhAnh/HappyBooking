@@ -5,10 +5,10 @@ using System.Text.Json.Serialization;
 
 namespace HappyBookingShare.Response.User;
 
-public class HeartbeatUserResponse : BaseResponse<UserDto>
+public class HeartbeatUserResponse : BaseResponse<List<UserDto>>
 {
     [JsonConstructor]
-    public HeartbeatUserResponse(long userId, UserDto data, StatusEnum status, IMemoryCache cache) : base(userId, data, status, cache)
+    public HeartbeatUserResponse(long userId, List<UserDto> data, StatusEnum status, IMemoryCache cache) : base(userId, data, status, cache)
     {
     }
 }

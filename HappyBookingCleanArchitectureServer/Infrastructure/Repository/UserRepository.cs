@@ -279,20 +279,18 @@ public class UserRepository : IUserRepository
     /// </summary>
     /// <param name="lastSecond"></param>
     /// <returns></returns>
-    public async Task<List<long>> AutoMarkUserAsOffline(int lastSecond)
+    public async Task<List<UserModel>> AutoMarkUserAsOffline(int lastSecond)
     {
         var userList = await _context.UserRepository.Where(item => item.IsDeleted == 0
                                                                    && item.IsOnline
                                                                    && (DateTime.UtcNow - item.LastHeartbeatTime).TotalSeconds >= lastSecond)
                                                     .ToListAsync();
-        List<long> userIdList = new();
         foreach (var item in userList)
         {
             item.IsOnline = false;
-            userIdList.Add(item.UserId);
         }
 
         await _context.SaveChangesAsync();
-        return userIdList;
+        return userList.Select(item => new UserModel(item)).ToList();
     }
 }

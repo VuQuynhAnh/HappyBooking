@@ -42,9 +42,12 @@ public class RefreshTokenUseCase : IRefreshTokenUseCase
             refeshToken = result.RefreshToken;
 
             var user = await _userRepository.GetUserByUserId(userId);
-            var userDto = new UserDto(user);
-            string jsonString = JsonSerializer.Serialize(userDto);
-            await hubContext.Clients.All.SendAsync(RealtimeConstant.UserOnline, jsonString);
+            if (user.UserId > 0)
+            {
+                var userDto = new UserDto(user);
+                string jsonString = JsonSerializer.Serialize(new List<UserDto>() { userDto });
+                await hubContext.Clients.All.SendAsync(RealtimeConstant.UserStatus, jsonString);
+            }
         }
 
         return new LoginResponse(userId, token, refeshToken, status);

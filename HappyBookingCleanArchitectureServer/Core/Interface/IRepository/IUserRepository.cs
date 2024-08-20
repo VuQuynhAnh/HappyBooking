@@ -31,5 +31,5 @@ public interface IUserRepository : IRepositoryBase
 
     Task<bool> MarkUserAsOffline(long userId);
 
-    Task<List<long>> AutoMarkUserAsOffline(int lastSecond);
+    Task<List<UserModel>> AutoMarkUserAsOffline(int lastSecond);
 }

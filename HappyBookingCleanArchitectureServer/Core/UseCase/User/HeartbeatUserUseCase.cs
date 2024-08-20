@@ -23,22 +23,15 @@ public class HeartbeatUserUseCase : IHeartbeatUserUseCase
 
     public async Task<HeartbeatUserResponse> HeartbeatUser(long userId, IHubContext<ChatHub> hubContext)
     {
-        await UpdateStatus(hubContext);
-        UserDto result = new();
-        var heartbeatUserResult = await _userRepository.HeartbeatUser(userId);
-        if (heartbeatUserResult != null)
+        var userStatusList = await _userRepository.AutoMarkUserAsOffline(ParamConstant.LastSecond);
+        var onlineUserResult = await _userRepository.HeartbeatUser(userId);
+        if (onlineUserResult != null)
         {
-            result = new UserDto(heartbeatUserResult);
-            string jsonString = JsonSerializer.Serialize(result);
-            await hubContext.Clients.All.SendAsync(RealtimeConstant.UserOnline, jsonString);
+            userStatusList.Add(onlineUserResult);
         }
-        return new HeartbeatUserResponse(userId, result, StatusEnum.Successed, _cache);
-    }
-
-    private async Task UpdateStatus(IHubContext<ChatHub> hubContext)
-    {
-        List<long> result = await _userRepository.AutoMarkUserAsOffline(ParamConstant.LastSecond);
+        var result = userStatusList.Select(item => new UserDto(item)).ToList();
         string jsonString = JsonSerializer.Serialize(result);
-        await hubContext.Clients.All.SendAsync(RealtimeConstant.UserOffline, jsonString);
+        await hubContext.Clients.All.SendAsync(RealtimeConstant.UserStatus, jsonString);
+        return new HeartbeatUserResponse(userId, result, StatusEnum.Successed, _cache);
     }
 }
