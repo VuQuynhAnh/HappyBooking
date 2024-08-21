@@ -9,6 +9,7 @@
 @using HappyBookingShare.Response.Dtos
 @using Microsoft.AspNetCore.SignalR.Client
 @using System.Text.Json
+@using System.Globalization
 @inject ILanguageService _languageService
 @inject IChatService _chatService
 @inject IDialogService _dialogService
@@ -23,6 +24,10 @@
 
     .searchBoxStyle .mud-input > input.mud-input-root-outlined {
         padding: 13.5px 14px;
+    }
+
+    .chatSelected {
+        background: #d3e3fd;
     }
 </style>
 
@@ -45,7 +50,9 @@
             <div @ref="scrollSingleChatContainer" style="overflow-y: auto;" @onscroll="OnSingleChatScroll">
                 @foreach (var chatItem in singleChatList)
                 {
-                    <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(chatItem.ChatId, 1))" FullWidth>
+                    <MudButton Class="@($"textLeftButton {(selectedChatId == chatItem.ChatId ? "chatSelected" : "")}")"
+                               OnClick="(() => ChatGroupClick(chatItem.ChatId))"
+                               FullWidth>
                         <MudBadge Color="chatItem.Member1vs1Display.UserInformation.IsOnline ? Color.Success : Color.Error"
                                   Overlap="true"
                                   Bordered="true"
@@ -71,7 +78,9 @@
             <div @ref="scrollGroupChatContainer" style="overflow-y: auto;" @onscroll="OnGroupChatScroll">
                 @foreach (var chatItem in groupChatList)
                 {
-                    <MudButton Class="textLeftButton" OnClick="(() => LoadChatMessage(chatItem.ChatId, 1))" FullWidth>
+                    <MudButton Class="@($"textLeftButton {(selectedChatId == chatItem.ChatId ? "chatSelected" : "")}")"
+                               OnClick="(() => ChatGroupClick(chatItem.ChatId))"
+                               FullWidth>
                         <MudAvatar Class="mr-3 float-start">
                             <MudImage Src="@chatItem.GroupAvatar"></MudImage>
                         </MudAvatar>
@@ -93,6 +102,83 @@
                       AdornmentIcon="@Icons.Material.Filled.Search"
                       Class="searchBoxStyle" />
 
+        <div class="chat-container mt-2">
+            <div class="message-list" @ref="scrollChatMessageContainer">
+
+                @foreach (var message in messageList)
+                {
+                    if (message.CreatedId != userLogin.UserId)
+                    {
+                        <!-- Left Message -->
+                        <div class="message-left">
+                            <div class="avatar">
+                                <img src="@message.CreateUser.AvatarImage" alt="Avatar">
+                            </div>
+                            <div class="message-container">
+                                <div class="sender-name">@message.CreateUser.FullName</div>
+                                <div class="message-content">
+                                    @switch (@message.MessageType)
+                                    {
+                                        case TypeMessageConstant.Image:
+                                            <img src="@message.Content" alt="Image Message" class="message-image" />
+                                            break;
+                                        case TypeMessageConstant.File:
+                                            <div class="message-text">@message.Content</div>
+                                            break;
+                                        case TypeMessageConstant.Video:
+                                            <div class="message-text">@message.Content</div>
+                                            break;
+                                        default:
+                                            <div class="message-text">@message.Content</div>
+                                            break;
+                                    }
+                                    <div class="message-time">@message.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss tt", CultureInfo.InvariantCulture)</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Right Message -->
+                        <div class="message-right">
+                            <div class="message-content">
+                                @switch (@message.MessageType)
+                                {
+                                    case TypeMessageConstant.Image:
+                                        <img src="@message.Content" alt="Image Message" class="message-image" />
+                                        break;
+                                    case TypeMessageConstant.File:
+                                        <div class="message-text">@message.Content</div>
+                                        break;
+                                    case TypeMessageConstant.Video:
+                                        <div class="message-text">@message.Content</div>
+                                        break;
+                                    default:
+                                        <div class="message-text">@message.Content</div>
+                                        break;
+                                }
+                                <div class="message-time">@message.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss tt", CultureInfo.InvariantCulture)</div>
+                            </div>
+                            <div class="avatar">
+                                <img src="@message.CreateUser.AvatarImage" alt="Avatar">
+                            </div>
+                        </div>
+                    }
+
+                }
+
+            </div>
+
+            <div class="input-container">
+                <MudTextField @bind-Value="messageInput"
+                              Placeholder="@_languageService["TypeAMessage"]"
+                              Variant="Variant.Outlined"
+                              OnKeyUp="@SendMessageKeyUpAction"
+                              Class="searchBoxStyle" />
+                <MudIconButton Icon="@Icons.Material.Filled.Send" OnClick="(await => SendMessage())"></MudIconButton>
+            </div>
+        </div>
+
     </MudItem>
 
 
@@ -103,19 +189,66 @@
 @code {
     private bool isLoading = false;
     private UserDto userLogin = new();
-    string messageSearchKeyWord = string.Empty;
-    bool isOnsearch = false;
-    int heightGrid = 250;
-    List<ChatDto> groupChatList = new();
-    List<ChatDto> singleChatList = new();
-    List<MessageDto> messageList = new();
+    private string messageSearchKeyWord = string.Empty;
+    private bool isOnsearch = false;
+    private List<ChatDto> groupChatList = new();
+    private List<ChatDto> singleChatList = new();
+    private List<MessageDto> messageList = new();
     private int singleChatPageIndex = 1;
     private int groupChatPageIndex = 1;
+    private int messagePageIndex = 1;
     private int chatPageSize = 7;
+    private int messagePageSize = 20;
     private HubConnection hubConnection;
+    private string messageInput = string.Empty;
+    private long selectedChatId = 0;
+    private int selectedMessageType = TypeMessageConstant.Message;
 
     private ElementReference scrollSingleChatContainer;
     private ElementReference scrollGroupChatContainer;
+    private ElementReference scrollChatMessageContainer;
+
+    private async Task SendMessageKeyUpAction(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendMessage();
+            Console.WriteLine($"Message Input after Send: {messageInput}");
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        try
+        {
+            if (selectedChatId == 0 || string.IsNullOrEmpty(messageInput))
+            {
+                return;
+            }
+            var request = new SendMessageRequest()
+                {
+                    ChatId = selectedChatId,
+                    Content = messageInput,
+                    MessageType = selectedMessageType
+                };
+            var sendMessageResponse = await _chatService.SendMessageAsync(request);
+            var messageDto = sendMessageResponse?.Data ?? new();
+            if (messageDto == null || messageDto.MessageId == 0 || messageList.Any(item => item.MessageId == messageDto.MessageId))
+            {
+                return;
+            }
+            messageList.Add(messageDto);
+            messageList = messageList.OrderByDescending(item => item.CreatedDate).ToList();
+        }
+        finally
+        {
+            messageInput = string.Empty;
+            selectedMessageType = TypeMessageConstant.Message;
+
+            Console.WriteLine("State is being changed.");
+            await InvokeAsync(StateHasChanged);
+        }
+    }
 
     private async Task OnSingleChatScroll()
     {
@@ -144,9 +277,12 @@
     protected override async Task OnInitializedAsync()
     {
         var dimension = await _jSRuntime.InvokeAsync<WindowDimensions>("getWindowSize");
-        heightGrid = (dimension.Height - dimension.FormHeight - dimension.ToolbarHeight - 275) / 2;
+        var heightContainer = dimension.Height - dimension.FormHeight - dimension.ToolbarHeight;
+        var heightGrid = (heightContainer - 275) / 2;
+        var heightMessageChat = heightContainer - 205;
         await _jSRuntime.InvokeVoidAsync("blazorSetElementHeight", scrollSingleChatContainer, heightGrid);
         await _jSRuntime.InvokeVoidAsync("blazorSetElementHeight", scrollGroupChatContainer, heightGrid);
+        await _jSRuntime.InvokeVoidAsync("blazorSetElementHeight", scrollChatMessageContainer, heightMessageChat);
         StateHasChanged();
     }
 
@@ -265,12 +401,19 @@
         }
     }
 
-    private async Task LoadChatMessage(long chatId, int pageIndex)
+    private async Task ChatGroupClick(long chatId)
+    {
+        selectedChatId = chatId;
+        messagePageIndex = 1;
+        await LoadChatMessage();
+    }
+
+    private async Task LoadChatMessage()
     {
         GetMessageListRequest request = new();
-        request.PageIndex = pageIndex;
-        request.PageSize = 10;
-        request.ChatId = chatId;
+        request.PageIndex = messagePageIndex;
+        request.PageSize = messagePageSize;
+        request.ChatId = selectedChatId;
         request.KeyWord = messageSearchKeyWord;
         var response = await _chatService.GetMessageListAsync(request);
         messageList = response?.Data ?? new();
@@ -305,6 +448,18 @@
                 var updateUser = userDictionary[chat.Member1vs1Display.UserInformation.UserId];
                 chat.ChangeUserMember1vs1Display(updateUser);
             }
+            await InvokeAsync(StateHasChanged);
+        });
+
+        hubConnection.On<string>(RealtimeConstant.ReceiveMessage, async (message) =>
+        {
+            var messageSocket = JsonSerializer.Deserialize<MessageDto>(message);
+            if (messageSocket == null || messageSocket.MessageId == 0 || messageList.Any(item => item.MessageId == messageSocket.MessageId))
+            {
+                return;
+            }
+            messageList.Add(messageSocket);
+            messageList = messageList.OrderByDescending(item => item.CreatedDate).ToList();
             await InvokeAsync(StateHasChanged);
         });
 

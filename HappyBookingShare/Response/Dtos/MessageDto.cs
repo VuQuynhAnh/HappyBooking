@@ -5,6 +5,10 @@ namespace HappyBookingShare.Response.Dtos;
 
 public class MessageDto
 {
+    public MessageDto()
+    {
+    }
+
     public MessageDto(MessageModel model)
     {
         MessageId = model.MessageId;
@@ -61,10 +65,10 @@ public class MessageDto
     public long UpdatedId { get; private set; }
 
     [JsonPropertyName("createUser")]
-    public UserDto CreateUser { get; set; }
+    public UserDto CreateUser { get; set; } = new();
 
     [JsonPropertyName("updateUser")]
-    public UserDto UpdateUser { get; set; }
+    public UserDto UpdateUser { get; set; } = new();
 
     [JsonPropertyName("messageHistoryList")]
     public List<MessageHistoryDto> MessageHistoryList { get; private set; } = new();

@@ -114,3 +114,134 @@
 .cursorPointer {
     cursor: pointer;
 }
+
+/*Chat style*/
+
+.chat-container {
+    width: 100%;
+    height: calc(100% - 55px);
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.message-list {
+    flex-direction: column-reverse;
+    overflow-y: auto;
+    display: flex;
+}
+
+.message-left,
+.message-right {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.message-left {
+    justify-content: flex-start;
+}
+
+.message-right {
+    justify-content: flex-end;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    position: relative;
+    top: -15px;
+    flex-shrink: 0;
+}
+
+    .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        text-align: center;
+        text-indent: 10000px;
+    }
+
+.message-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.message-content {
+    min-width: 270px;
+    max-width: 70%;
+    padding: 10px;
+    position: relative;
+}
+
+    .message-content img.message-image {
+        width: 100%;
+        object-fit: cover;
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 5px;
+    }
+
+.message-left .message-content {
+    background-color: #f1f0f0;
+    margin-left: 10px;
+    border-radius: 0px 20px 20px 20px;
+}
+
+.message-right .message-content {
+    background-color: #e1ffc7;
+    text-align: left;
+    margin-right: 10px;
+    border-radius: 20px 0px 20px 20px;
+}
+
+.message-left .message-time {
+    text-align: left;
+}
+
+.message-right .message-time {
+    text-align: right;
+}
+
+.sender-name {
+    font-weight: bold;
+    margin: 0 0 5px 10px;
+}
+
+.message-text {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.message-time {
+    font-size: 12px;
+    color: #777;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    border-top: 1px solid #ddd;
+    position: absolute;
+    width: calc(66% - 75px);
+    bottom: 20px;
+    background: #fff;
+}
+
+@media screen and (max-width: 960px) {
+    .input-container {
+        width: calc(100% - 95px);
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .input-container {
+        width: calc(100% - 70px);
+    }
+}
