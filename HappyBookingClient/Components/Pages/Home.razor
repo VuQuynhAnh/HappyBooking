@@ -173,7 +173,7 @@
                 <MudTextField @bind-Value="messageInput"
                               Placeholder="@_languageService["TypeAMessage"]"
                               Variant="Variant.Outlined"
-                              OnKeyUp="@SendMessageKeyUpAction"
+                              OnKeyUp="@(async e => await SendMessageKeyUpAction(e))"
                               Class="searchBoxStyle" />
                 <MudIconButton Icon="@Icons.Material.Filled.Send" OnClick="(await => SendMessage())"></MudIconButton>
             </div>
@@ -212,42 +212,36 @@
     {
         if (e.Key == "Enter")
         {
-            await SendMessage();
-            Console.WriteLine($"Message Input after Send: {messageInput}");
+            // await SendMessage();
         }
     }
 
     private async Task SendMessage()
     {
-        try
+        if (selectedChatId == 0 || string.IsNullOrEmpty(messageInput))
         {
-            if (selectedChatId == 0 || string.IsNullOrEmpty(messageInput))
-            {
-                return;
-            }
-            var request = new SendMessageRequest()
-                {
-                    ChatId = selectedChatId,
-                    Content = messageInput,
-                    MessageType = selectedMessageType
-                };
-            var sendMessageResponse = await _chatService.SendMessageAsync(request);
-            var messageDto = sendMessageResponse?.Data ?? new();
-            if (messageDto == null || messageDto.MessageId == 0 || messageList.Any(item => item.MessageId == messageDto.MessageId))
-            {
-                return;
-            }
-            messageList.Add(messageDto);
-            messageList = messageList.OrderByDescending(item => item.CreatedDate).ToList();
+            return;
         }
-        finally
-        {
-            messageInput = string.Empty;
-            selectedMessageType = TypeMessageConstant.Message;
 
-            Console.WriteLine("State is being changed.");
-            await InvokeAsync(StateHasChanged);
+        var request = new SendMessageRequest()
+            {
+                ChatId = selectedChatId,
+                Content = messageInput,
+                MessageType = selectedMessageType
+            };
+        var sendMessageResponse = await _chatService.SendMessageAsync(request);
+        messageInput = string.Empty;
+        selectedMessageType = TypeMessageConstant.Message;
+        await InvokeAsync(StateHasChanged);
+        var messageDto = sendMessageResponse?.Data ?? new();
+
+        if (messageDto == null || messageDto.MessageId == 0 || messageList.Any(item => item.MessageId == messageDto.MessageId))
+        {
+            return;
         }
+
+        messageList.Add(messageDto);
+        messageList = messageList.OrderByDescending(item => item.CreatedDate).ToList();
     }
 
     private async Task OnSingleChatScroll()
