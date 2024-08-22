@@ -38,6 +38,10 @@
     .chatButton:hover {
         background: #e6ffe6;
     }
+
+    .mud-avatar.mud-avatar-medium {
+        font-size: 15px;
+    }
 </style>
 
 <MudGrid Justify="Justify.Center">
@@ -146,14 +150,19 @@
                                     <MudText Typo="Typo.subtitle2">@selectedChatGroup.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
                                 </div>
                             </MudButton>
+
+                            <MudSpacer />
+
+                            <MudAvatarGroup Max="1" Spacing="4" MaxColor="Color.Success" @onclick="(await => ManagerMember())">
+                                @foreach (var member in selectedChatGroup.ChatMemberList)
+                                {
+                                    <MudAvatar Size="Size.Medium">
+                                        <MudImage Src="@member.UserInformation.AvatarImage" />
+                                    </MudAvatar>
+                                }
+                            </MudAvatarGroup>
                         }
                     }
-
-                    <MudSpacer />
-                    <MudIconButton Icon="@Icons.Material.Outlined.Notifications" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.PushPin" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
                 </MudToolBar>
             </MudPaper>
 
@@ -218,7 +227,6 @@
                             </div>
                         </div>
                     }
-
                 }
 
             </div>
@@ -300,6 +308,11 @@
         selectedMessageType = TypeMessageConstant.File;
         await _jSRuntime.InvokeVoidAsync("openFileDialog", "messageInputFile");
         StateHasChanged();
+    }
+
+    private async Task ManagerMember()
+    {
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task UploadFiles(InputFileChangeEventArgs eventArg)
