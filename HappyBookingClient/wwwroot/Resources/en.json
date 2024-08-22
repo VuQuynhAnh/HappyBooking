@@ -43,5 +43,6 @@
   "Select": "Select",
   "GroupName": "GroupName",
   "Continue": "Continue",
-  "TypeAMessage": "Type a message..."
+  "TypeAMessage": "Type a message...",
+  "Warning": "Warning"
 }

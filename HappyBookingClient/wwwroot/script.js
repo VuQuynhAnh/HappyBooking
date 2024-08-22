@@ -13,7 +13,6 @@ window.getWindowSize = () => {
         formHeight: formdv == null ? 0 : formdv.offsetHeight,
         toolbarHeight: tooldv == null ? 0 : tooldv.offsetHeight,
     };
-    console.log(item);
     return item;
 };
 
@@ -31,6 +30,15 @@ window.blazorGetScrollHeight = function (element) {
 
 window.blazorGetClientHeight = function (element) {
     return element.clientHeight;
+}
+
+function openFileDialog(inputElementId) {
+    const inputElement = document.getElementById(inputElementId);
+    if (inputElement) {
+        inputElement.click();
+    } else {
+        console.error(`Element with ID ${inputElementId} not found.`);
+    }
 }
 
 // wwwroot/js/pdfHelper.js

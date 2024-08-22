@@ -119,9 +119,9 @@
 
 .chat-container {
     width: 100%;
-    height: calc(100% - 55px);
+    height: calc(100% - 60px);
     background-color: #ffffff;
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -229,19 +229,37 @@
     margin-top: 20px;
     border-top: 1px solid #ddd;
     position: absolute;
-    width: calc(66% - 75px);
+    width: calc(66% - 60px);
     bottom: 20px;
     background: #fff;
 }
 
+    .input-container .mud-icon-button {
+        padding: 5px;
+    }
+
+    .input-style {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        outline: none;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+
+    .input-style:focus {
+        border-color: #007bff;
+    }
+
 @media screen and (max-width: 960px) {
     .input-container {
-        width: calc(100% - 95px);
+        width: calc(100% - 80px);
     }
 }
 
 @media screen and (max-width: 640px) {
     .input-container {
-        width: calc(100% - 70px);
+        width: calc(100% - 55px);
     }
 }

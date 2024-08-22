@@ -21,7 +21,7 @@ namespace HappyBookingClient.Service
         public CultureInfo CurrentCulture { get; private set; } = new CultureInfo(LanguageCode.VN);
         public Dictionary<string, string> Translations { get; private set; } = new();
 
-        public event Action OnChange;
+        public event Action? OnChange;
 
         public async Task LoadLanguage()
         {
@@ -39,7 +39,7 @@ namespace HappyBookingClient.Service
             {
                 var baseUrl = _configuration["ApiSettings:BaseAddress"];
                 var json = await _httpClient.GetStringAsync($"{baseUrl}Resources/{languageCode}.json");
-                Translations = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                Translations = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new();
             }
             catch (Exception ex)
             {

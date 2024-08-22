@@ -18,7 +18,7 @@
             <span>@_languageService["ProfilePicture"]</span>
 
             <div class="avatar-edit">
-                <InputFile id="imageUpload" OnChange="LoadFiles" />
+                <InputFile id="imageUpload" OnChange="LoadFiles" accept="image/*" />
                 <label for="imageUpload"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> @_languageService["Edit"]</label>
             </div>
             <div class="avatar-preview">
@@ -180,6 +180,7 @@
         if (file.Size > maxFileSize)
         {
             ShowAlert(_languageService["MaxImageSizeIs3MB"], Severity.Warning);
+            return;
         }
 
         memoryStream = new MemoryStream();
