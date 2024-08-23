@@ -35,12 +35,28 @@
         background: #ccffcc;
     }
 
-    .chatButton:hover {
-        background: #e6ffe6;
+    .chatButton {
+        border-radius: 0;
     }
+
+        .chatButton:hover {
+            background: #e6ffe6;
+        }
 
     .mud-avatar.mud-avatar-medium {
         font-size: 15px;
+    }
+
+    .chatGroupItemStyle {
+        padding: 0;
+        width: calc(100% - 10px);
+    }
+
+    .moreChatButton {
+        margin-top: 8px;
+        border-radius: 0;
+        padding: 0;
+        height: 60px;
     }
 </style>
 
@@ -63,23 +79,31 @@
             <div @ref="scrollSingleChatContainer" style="overflow-y: auto;" @onscroll="OnSingleChatScroll">
                 @foreach (var chatItem in singleChatList)
                 {
-                    <MudButton Class="@($"textLeftButton chatButton {(selectedChatId == chatItem.ChatId ? "chatSelected" : "")}")"
-                               OnClick="(() => ChatGroupClick(chatItem))"
-                               FullWidth>
-                        <MudBadge Color="chatItem.Member1vs1Display.UserInformation.IsOnline ? Color.Success : Color.Error"
-                                  Overlap="true"
-                                  Bordered="true"
-                                  Class="mr-3 float-start">
-                            <MudAvatar>
-                                <MudImage Src="@chatItem.Member1vs1Display.UserInformation.AvatarImage"></MudImage>
-                            </MudAvatar>
-                        </MudBadge>
-
-                        <div class="float-end text-start">
-                            <MudText Typo="Typo.subtitle1">@chatItem.Member1vs1Display.UserInformation.FullName</MudText>
-                            <MudText Typo="Typo.subtitle2">@chatItem.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
-                        </div>
-                    </MudButton>
+                    <MudCard Class="@($"chatButton {(selectedChatId == chatItem.ChatId ? "chatSelected" : "")}")">
+                        <MudCardHeader Class="chatGroupItemStyle">
+                            <CardHeaderContent>
+                                <MudButton Class="textLeftButton chatButton"
+                                           OnClick="(await => ChatGroupClick(chatItem))"
+                                           FullWidth>
+                                    <MudBadge Color="chatItem.Member1vs1Display.UserInformation.IsOnline ? Color.Success : Color.Error"
+                                              Overlap="true"
+                                              Bordered="true"
+                                              Class="mr-3 float-start">
+                                        <MudAvatar>
+                                            <MudImage Src="@chatItem.Member1vs1Display.UserInformation.AvatarImage"></MudImage>
+                                        </MudAvatar>
+                                    </MudBadge>
+                                    <div class="float-end text-start">
+                                        <MudText Typo="Typo.subtitle1" Class="text-truncate">@chatItem.Member1vs1Display.UserInformation.FullName</MudText>
+                                        <MudText Typo="Typo.subtitle2">@chatItem.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
+                                    </div>
+                                </MudButton>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default" Class="moreChatButton" />
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                    </MudCard>
                 }
             </div>
         </MudPaper>
@@ -87,21 +111,75 @@
         <MudPaper Class="pa-4 mt-2">
             <MudButton FullWidth Class="textLeftButton" Color="Color.Success">@_languageService["Spaces"]</MudButton>
             <MudDivider />
+            @if (hoverChatGroup.ChatId > 0)
+            {
+                <div class="toolTipGroupChat">
+                    <MudCard>
+                        <MudCardHeader Class="px-2">
+                            <CardHeaderContent>
+                                <MudAvatar Class="mr-3 float-start">
+                                    <MudImage Src="@hoverChatGroup.GroupAvatar"></MudImage>
+                                </MudAvatar>
+                                <div class="text-start">
+                                    <b class="font-size-16">@hoverChatGroup.ChatName</b> <small><i>(@hoverChatGroup.ChatMemberList.Count @_languageService["Members"])</i></small>
+                                </div>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent Class="pt-0">
+                            <MudGrid Spacing="1">
+                                @foreach (var memberItem in hoverChatGroup.ChatMemberList.Take(5))
+                                {
+                                    <MudItem xs="6">
+                                        <MudBadge Color="memberItem.UserInformation.IsOnline ? Color.Success : Color.Error"
+                                                  Overlap="true"
+                                                  Bordered="true"
+                                                  Class="mr-1 float-start">
+                                            <MudAvatar Size="Size.Small">
+                                                <MudImage Src="@memberItem.UserInformation.AvatarImage"></MudImage>
+                                            </MudAvatar>
+                                        </MudBadge>
+                                        <div class="float-end text-start">
+                                            <div class="mt-1 small-text-truncate">@memberItem.UserInformation.FullName</div>
+                                        </div>
+                                    </MudItem>
+                                }
+                                @if (hoverChatGroup.ChatMemberList.Count - 5 > 0)
+                                {
+                                    <MudItem xs="6" Class="d-flex align-center">
+                                        <MudText Color="Color.Primary">+ @(hoverChatGroup.ChatMemberList.Count - 5) @_languageService["Members"]</MudText>
+                                    </MudItem>
+                                }
+                            </MudGrid>
+                        </MudCardContent>
+                    </MudCard>
+                </div>
+            }
 
             <div @ref="scrollGroupChatContainer" style="overflow-y: auto;" @onscroll="OnGroupChatScroll">
                 @foreach (var chatItem in groupChatList)
                 {
-                    <MudButton Class="@($"textLeftButton chatButton {(selectedChatId == chatItem.ChatId ? "chatSelected" : "")}")"
-                               OnClick="(() => ChatGroupClick(chatItem))"
-                               FullWidth>
-                        <MudAvatar Class="mr-3 float-start">
-                            <MudImage Src="@chatItem.GroupAvatar"></MudImage>
-                        </MudAvatar>
-                        <div class="float-end text-start">
-                            <MudText Typo="Typo.subtitle1">@chatItem.ChatName</MudText>
-                            <MudText Typo="Typo.subtitle2">@chatItem.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
-                        </div>
-                    </MudButton>
+                    <MudCard Class="@($"chatButton {(selectedChatId == chatItem.ChatId ? "chatSelected" : "")}")">
+                        <MudCardHeader Class="chatGroupItemStyle">
+                            <CardHeaderContent>
+                                <MudButton Class="textLeftButton chatButton"
+                                           OnClick="(await => ChatGroupClick(chatItem))"
+                                           @onmouseover="await => ChatGroupHover(chatItem)"
+                                           @onmouseout="() => hoverChatGroup = new()"
+                                           FullWidth>
+                                    <MudAvatar Class="mr-3 float-start">
+                                        <MudImage Src="@chatItem.GroupAvatar"></MudImage>
+                                    </MudAvatar>
+                                    <div class="float-end text-start">
+                                        <MudText Typo="Typo.subtitle1" Class="text-truncate">@chatItem.ChatName</MudText>
+                                        <MudText Typo="Typo.subtitle2">@chatItem.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
+                                    </div>
+                                </MudButton>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default" Class="moreChatButton" />
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                    </MudCard>
                 }
             </div>
         </MudPaper>
@@ -134,7 +212,7 @@
                                 </MudBadge>
 
                                 <div class="float-end text-start">
-                                    <MudText Typo="Typo.subtitle1">@selectedChatGroup.Member1vs1Display.UserInformation.FullName</MudText>
+                                    <MudText Typo="Typo.subtitle1" Class="text-truncate">@selectedChatGroup.Member1vs1Display.UserInformation.FullName</MudText>
                                     <MudText Typo="Typo.subtitle2">@selectedChatGroup.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
                                 </div>
                             </MudButton>
@@ -146,7 +224,7 @@
                                     <MudImage Src="@selectedChatGroup.GroupAvatar"></MudImage>
                                 </MudAvatar>
                                 <div class="float-end text-start">
-                                    <MudText Typo="Typo.subtitle1">@selectedChatGroup.ChatName</MudText>
+                                    <MudText Typo="Typo.subtitle1" Class="text-truncate">@selectedChatGroup.ChatName</MudText>
                                     <MudText Typo="Typo.subtitle2">@selectedChatGroup.LastChatTime.ToString("dd/MM/yyyy HH:mm:ss")</MudText>
                                 </div>
                             </MudButton>
@@ -283,6 +361,7 @@
     private IBrowserFile? file = null;
     private long maxFileSize = 3 * 1024 * 1024; // 3 MB
     private ChatDto selectedChatGroup = new();
+    private ChatDto hoverChatGroup = new();
 
     private ElementReference scrollSingleChatContainer;
     private ElementReference scrollGroupChatContainer;
@@ -588,6 +667,12 @@
         await LoadChatMessage();
     }
 
+    private async Task ChatGroupHover(ChatDto chatDto)
+    {
+        hoverChatGroup = chatDto;
+        await InvokeAsync(StateHasChanged);
+    }
+
     private async Task LoadChatMessage()
     {
         if (isOnsearch)
@@ -632,8 +717,8 @@
         string hubUrl = _configuration["SignalR:HubUrl"] ?? string.Empty;
 
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(hubUrl)
-            .Build();
+        .WithUrl(hubUrl)
+        .Build();
 
         hubConnection.On<string>(RealtimeConstant.UserStatus, async (message) =>
         {
@@ -644,8 +729,8 @@
             }
             var userDictionary = userSocketList.ToDictionary(u => u.UserId);
             var chatsToUpdate = singleChatList
-                .Where(chat => userDictionary.ContainsKey(chat.Member1vs1Display.UserInformation.UserId))
-                .ToList();
+        .Where(chat => userDictionary.ContainsKey(chat.Member1vs1Display.UserInformation.UserId))
+        .ToList();
 
             if (!chatsToUpdate.Any())
             {

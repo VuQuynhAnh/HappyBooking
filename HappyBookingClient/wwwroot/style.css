@@ -238,28 +238,73 @@
         padding: 5px;
     }
 
-    .input-style {
-        flex: 1;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        outline: none;
-        box-sizing: border-box;
-        font-size: 14px;
-    }
+.input-style {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    box-sizing: border-box;
+    font-size: 14px;
+}
 
     .input-style:focus {
         border-color: #007bff;
     }
 
+.text-truncate {
+    width: 16vw;
+}
+
+.toolTipGroupChat {
+    position: fixed;
+    bottom: 75px;
+    background: white;
+    left: calc(33% + 160px);
+    z-index: 1;
+    width: 300px;
+}
+
+.small-text-truncate {
+    width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+}
+
+.font-size-16 {
+    font-size: 16px;
+}
+
+
+
+
 @media screen and (max-width: 960px) {
     .input-container {
         width: calc(100% - 80px);
+    }
+
+    .text-truncate {
+        width: 48vw;
+    }
+
+    .toolTipGroupChat {
+        bottom: 15px;
+        left: 10px;
     }
 }
 
 @media screen and (max-width: 640px) {
     .input-container {
         width: calc(100% - 55px);
+    }
+
+    .text-truncate {
+        width: 53vw;
+    }
+
+    .toolTipGroupChat {
+        left: 50%;
     }
 }
