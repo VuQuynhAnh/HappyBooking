@@ -265,6 +265,34 @@
     width: 300px;
 }
 
+.imageMessagePreview {
+    position: fixed;
+    bottom: 75px;
+    background: white;
+    left: calc(33% + 160px);
+    z-index: 1;
+    width: 300px;
+    background-color: #e1ffc7;
+    text-align: left;
+    padding: 5px;
+    border-radius: 20px;
+}
+
+    .imageMessagePreview img {
+        width: 100%;
+        object-fit: cover;
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 5px;
+    }
+
+    .imageMessagePreview .cancelImageMessageButton {
+        position: fixed;
+        left: calc(33% + 415px);
+        top: auto;
+        padding: 5px;
+    }
+
 .small-text-truncate {
     width: 100px;
     white-space: nowrap;
@@ -307,4 +335,12 @@
     .toolTipGroupChat {
         left: 50%;
     }
+
+    .imageMessagePreview {
+        left: 20px;
+    }
+
+        .imageMessagePreview .cancelImageMessageButton {
+            left: 280px;
+        }
 }

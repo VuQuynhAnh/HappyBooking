@@ -116,10 +116,12 @@
                 <div class="toolTipGroupChat">
                     <MudCard>
                         <MudCardHeader Class="px-2">
-                            <CardHeaderContent>
-                                <MudAvatar Class="mr-3 float-start">
+                            <CardHeaderAvatar>
+                                <MudAvatar Class="float-start">
                                     <MudImage Src="@hoverChatGroup.GroupAvatar"></MudImage>
                                 </MudAvatar>
+                            </CardHeaderAvatar>
+                            <CardHeaderContent>
                                 <div class="text-start">
                                     <b class="font-size-16">@hoverChatGroup.ChatName</b> <small><i>(@hoverChatGroup.ChatMemberList.Count @_languageService["Members"])</i></small>
                                 </div>
@@ -309,6 +311,17 @@
 
             </div>
 
+            @if (selectedMessageType != TypeMessageConstant.Text && !string.IsNullOrEmpty(messageInput))
+            {
+                <div class="imageMessagePreview">
+                    @if (selectedMessageType == TypeMessageConstant.Image)
+                    {
+                        <MudIconButton Class="cancelImageMessageButton" Icon="@Icons.Material.Filled.Cancel" OnClick="ResetChat" />
+                        <MudImage Src="@messageInput" />
+                    }
+                </div>
+            }
+
             <div class="input-container">
                 <InputFile id="messageInputFile" hidden OnChange="UploadFiles" accept=".pdf, .docx, .xlsx, .doc, .xls" />
                 <InputFile id="messageInputImage" hidden OnChange="UploadFiles" accept="image/*" />
@@ -487,6 +500,7 @@
         messageInputReadonly = false;
         file = null;
         memoryStream = null;
+        StateHasChanged();
     }
 
     private async Task OnMessageChatScroll()
