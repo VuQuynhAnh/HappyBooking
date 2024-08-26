@@ -7,10 +7,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Content Remove="Components\Pages\Chat\GroupChatManageDialog.razor" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.7" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.8" />
@@ -20,18 +16,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\HappyBookingShare\HappyBookingShare.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <UpToDateCheckInput Remove="Components\Pages\Chat\GroupChatManageDialog.razor" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <_ContentIncludedByDefault Remove="Components\Pages\Chat\GroupChatManageDialog.razor" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Include="Components\Pages\Chat\GroupChatManageDialog.razor" />
 	</ItemGroup>
 
 </Project>

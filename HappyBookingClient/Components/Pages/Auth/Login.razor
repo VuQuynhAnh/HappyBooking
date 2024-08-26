@@ -54,7 +54,7 @@
 
 @code {
     public LoginRequest request { get; set; } = new();
-    private MudForm form;
+    private MudForm? form;
     private bool isShowAlert = false;
     private Severity severity = Severity.Normal;
     private string message = string.Empty;

@@ -100,7 +100,10 @@
                                 </MudButton>
                             </CardHeaderContent>
                             <CardHeaderActions>
-                                <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default" Class="moreChatButton" />
+                                <MudIconButton Icon="@Icons.Material.Filled.MoreVert"
+                                               OnClick="(await => ViewChatDetail(chatItem))"
+                                               Color="Color.Default"
+                                               Class="moreChatButton" />
                             </CardHeaderActions>
                         </MudCardHeader>
                     </MudCard>
@@ -178,7 +181,10 @@
                                 </MudButton>
                             </CardHeaderContent>
                             <CardHeaderActions>
-                                <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default" Class="moreChatButton" />
+                                <MudIconButton Icon="@Icons.Material.Filled.MoreVert"
+                                               Color="Color.Default"
+                                               OnClick="(await => ViewChatDetail(chatItem))"
+                                               Class="moreChatButton" />
                             </CardHeaderActions>
                         </MudCardHeader>
                     </MudCard>
@@ -404,6 +410,18 @@
 
     private async Task ManagerMember()
     {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ViewChatDetail(ChatDto chatDto)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<GroupChatEditDialog>
+                {
+                    { x => x.ChatDto, chatDto },
+                };
+        var resultDialog = await _dialogService.ShowAsync<GroupChatEditDialog>(chatDto.ChatName, parameters, options);
+
         await InvokeAsync(StateHasChanged);
     }
 

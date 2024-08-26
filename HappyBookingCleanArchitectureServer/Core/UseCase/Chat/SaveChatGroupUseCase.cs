@@ -42,7 +42,7 @@ public class SaveChatGroupUseCase : ISaveChatGroupUseCase
             {
                 chatId = await _chatRepository.Get1v1ExistGroupChatId(chatMemberList[0].MemberId, chatMemberList[1].MemberId);
             }
-            var chatResponse = await _chatRepository.SaveChatGroup(chatId, request.Name, request.AvatarUrl, request.IsGroup, userId);
+            var chatResponse = await _chatRepository.SaveChatGroup(chatId, request.ChatName, request.AvatarUrl, request.IsGroup, userId);
             if (chatMemberList.Any())
             {
                 var addMemberToGroupResponse = await _chatRepository.AddMemberToGroup(chatResponse.ChatId, chatMemberList, userId);

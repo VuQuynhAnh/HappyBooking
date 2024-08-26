@@ -1,0 +1,68 @@
+﻿@using Blazored.LocalStorage
+@using HappyBookingClient.Service.IService
+@using HappyBookingShare.Request.Chat
+@using HappyBookingShare.Request.Chat.RequestItem
+@using HappyBookingShare.Response.Dtos
+@inject ILanguageService _languageService
+@inject IChatService _chatService
+@inject ILocalStorageService _localStorage
+@inject IDialogService _dialogService
+
+<MudDialog>
+    <DialogContent>
+        <MudForm Model="@request" @ref="@form" ValidationDelay="0">
+            <MudCardContent>
+                <MudTextField @bind-Value="request.ChatName"
+                              Immediate="true"
+                              Label="User name"
+                              Adornment="Adornment.Start"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              Class="pt-0" />
+
+                <MudTextField @bind-Value="request.AvatarUrl"
+                              Immediate="true"
+                              Class="mt-5"
+                              Label="Password"
+                              Variant="Variant.Outlined"
+                              Required="true" />
+            </MudCardContent>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance? MudDialog { get; set; }
+
+    [Parameter]
+    public ChatDto ChatDto { get; set; } = new();
+    private SaveChatGroupRequest request = new();
+    private MudForm? form;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _languageService.LoadLanguage();
+            request.ChatId = ChatDto.ChatId;
+            request.ChatName = ChatDto.ChatName;
+            request.AvatarUrl = ChatDto.GroupAvatar;
+            request.IsGroup = ChatDto.IsGroupChat;
+            request.ChatMemberList = ChatDto.ChatMemberList.Select(item => new ChatMemberRequestItem(item.MemberId, item.ChatRole)).ToList();
+
+
+            StateHasChanged();
+        }
+    }
+
+    private void Cancel() => MudDialog?.Cancel();
+
+    private void Submit()
+    {
+    }
+}
