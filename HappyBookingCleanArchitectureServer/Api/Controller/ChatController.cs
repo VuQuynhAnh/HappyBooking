@@ -71,7 +71,7 @@ public class ChatController : BaseController
     public async Task<ActionResult<SaveChatGroupResponse>> SaveChatGroup([FromBody] SaveChatGroupRequest request)
     {
         await HeartbeatUser();
-        var response = await _saveChatGroupUseCase.SaveChatGroup(UserId, request);
+        var response = await _saveChatGroupUseCase.SaveChatGroup(UserId, request, _hubContext);
         return Ok(response);
     }
 

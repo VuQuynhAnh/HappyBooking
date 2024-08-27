@@ -46,5 +46,6 @@
   "TypeAMessage": "Type a message...",
   "Warning": "Warning",
   "Members": "Members",
-  "ChatName": "Chat name"
+  "ChatName": "Chat name",
+  "UpdateChatGroup": "Update chat group"
 }

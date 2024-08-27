@@ -101,7 +101,6 @@
                             </CardHeaderContent>
                             <CardHeaderActions>
                                 <MudIconButton Icon="@Icons.Material.Filled.MoreVert"
-                                               OnClick="(await => ViewChatDetail(chatItem))"
                                                Color="Color.Default"
                                                Class="moreChatButton" />
                             </CardHeaderActions>
@@ -239,7 +238,7 @@
 
                             <MudSpacer />
 
-                            <MudAvatarGroup Max="1" Spacing="4" MaxColor="Color.Success" @onclick="(await => ManagerMember())">
+                            <MudAvatarGroup Max="1" Spacing="4" MaxColor="Color.Success" @onclick="(await => ViewChatDetail(selectedChatGroup))">
                                 @foreach (var member in selectedChatGroup.ChatMemberList)
                                 {
                                     <MudAvatar Size="Size.Medium">
@@ -408,11 +407,6 @@
         StateHasChanged();
     }
 
-    private async Task ManagerMember()
-    {
-        await InvokeAsync(StateHasChanged);
-    }
-
     private async Task ViewChatDetail(ChatDto chatDto)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
@@ -420,9 +414,64 @@
                 {
                     { x => x.ChatDto, chatDto },
                 };
-        var resultDialog = await _dialogService.ShowAsync<GroupChatEditDialog>(chatDto.ChatName, parameters, options);
+        var resultDialog = await _dialogService.ShowAsync<GroupChatEditDialog>(@_languageService["UpdateChatGroup"], parameters, options);
+        var result = await resultDialog.Result;
 
+        if (!result.Canceled)
+        {
+            var chatResult = (ChatDto)(result.Data);
+            if (chatResult.ChatId == 0)
+            {
+                return;
+            }
+            await LoadGroupChatItem(chatResult);
+        }
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task LoadGroupChatItem(ChatDto chatDto)
+    {
+        try
+        {
+            if (selectedChatGroup.ChatId == chatDto.ChatId)
+            {
+                selectedChatGroup = chatDto;
+            }
+            int index = groupChatList.FindIndex(item => item.ChatId == chatDto.ChatId);
+            if (index != -1)
+            {
+                groupChatList[index] = chatDto;
+                groupChatList = groupChatList.OrderByDescending(item => item.LastChatTime).ToList();
+            }
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task ChangeLastChatTime(MessageDto messageDto)
+    {
+        try
+        {
+            int index = singleChatList.FindIndex(item => item.ChatId == messageDto.ChatId);
+            if (index != -1)
+            {
+                singleChatList[index].ChangeLastChatTime(messageDto.CreatedDate);
+                singleChatList = singleChatList.OrderByDescending(item => item.LastChatTime).ToList();
+                return;
+            }
+            index = groupChatList.FindIndex(item => item.ChatId == messageDto.ChatId);
+            if (index != -1)
+            {
+                groupChatList[index].ChangeLastChatTime(messageDto.CreatedDate);
+                groupChatList = groupChatList.OrderByDescending(item => item.LastChatTime).ToList();
+            }
+        }
+        finally
+        {
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task UploadFiles(InputFileChangeEventArgs eventArg)
@@ -760,9 +809,7 @@
                 return;
             }
             var userDictionary = userSocketList.ToDictionary(u => u.UserId);
-            var chatsToUpdate = singleChatList
-        .Where(chat => userDictionary.ContainsKey(chat.Member1vs1Display.UserInformation.UserId))
-        .ToList();
+            var chatsToUpdate = singleChatList.Where(chat => userDictionary.ContainsKey(chat.Member1vs1Display.UserInformation.UserId)).ToList();
 
             if (!chatsToUpdate.Any())
             {
@@ -785,6 +832,18 @@
             }
             messageList.Add(messageSocket);
             messageList = messageList.OrderByDescending(item => item.CreatedDate).ToList();
+            await ChangeLastChatTime(messageSocket);
+            await InvokeAsync(StateHasChanged);
+        });
+
+        hubConnection.On<string>(RealtimeConstant.ChatGroupUpdate, async (message) =>
+        {
+            var chatSocket = JsonSerializer.Deserialize<ChatDto>(message);
+            if (chatSocket == null || chatSocket.ChatId == 0)
+            {
+                return;
+            }
+            await LoadGroupChatItem(chatSocket);
             await InvokeAsync(StateHasChanged);
         });
 

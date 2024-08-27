@@ -46,5 +46,6 @@
   "TypeAMessage": "Nhập tin nhắn...",
   "Warning": "Cảnh báo",
   "Members": "Thành viên",
-  "ChatName": "Tên nhóm chat"
+  "ChatName": "Tên nhóm chat",
+  "UpdateChatGroup": "Cập nhật nhóm chat"
 }

@@ -2,10 +2,13 @@
 using HappyBookingCleanArchitectureServer.Core.Interface.IUseCase.Chat;
 using HappyBookingShare.Common;
 using HappyBookingShare.Model;
+using HappyBookingShare.Realtime;
 using HappyBookingShare.Request.Chat;
 using HappyBookingShare.Response.Chat;
 using HappyBookingShare.Response.Dtos;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
+using System.Text.Json;
 
 namespace HappyBookingCleanArchitectureServer.Core.UseCase.Chat;
 
@@ -22,7 +25,7 @@ public class SaveChatGroupUseCase : ISaveChatGroupUseCase
         _userRepository = userRepository;
     }
 
-    public async Task<SaveChatGroupResponse> SaveChatGroup(long userId, SaveChatGroupRequest request)
+    public async Task<SaveChatGroupResponse> SaveChatGroup(long userId, SaveChatGroupRequest request, IHubContext<ChatHub> hubContext)
     {
         try
         {
@@ -47,7 +50,11 @@ public class SaveChatGroupUseCase : ISaveChatGroupUseCase
             {
                 var addMemberToGroupResponse = await _chatRepository.AddMemberToGroup(chatResponse.ChatId, chatMemberList, userId);
             }
-            return new SaveChatGroupResponse(userId, new ChatDto(chatResponse), StatusEnum.Successed, _cache);
+
+            var chatResult = await _chatRepository.GetChatGroup(chatId, userId);
+            string jsonString = JsonSerializer.Serialize(chatResult);
+            await hubContext.Clients.All.SendAsync(RealtimeConstant.ChatGroupUpdate, jsonString);
+            return new SaveChatGroupResponse(userId, new ChatDto(chatResult), StatusEnum.Successed, _cache);
         }
         finally
         {

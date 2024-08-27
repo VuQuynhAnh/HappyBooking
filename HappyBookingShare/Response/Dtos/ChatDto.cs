@@ -31,6 +31,12 @@ public class ChatDto
         return this;
     }
 
+    public ChatDto ChangeLastChatTime(DateTime lastChatTime)
+    {
+        LastChatTime = lastChatTime;
+        return this;
+    }
+
     [JsonConstructor]
     public ChatDto(long chatId, string chatName, bool isGroupChat, string groupAvatar, DateTime createdDate, List<ChatMemberDto> chatMemberList, DateTime lastChatTime)
     {
