@@ -8,13 +8,13 @@
 @inject ILocalStorageService _localStorage
 @inject IDialogService _dialogService
 
-<MudDialog>
+<MudDialog Class="addNewChatDialog">
     <DialogContent>
         <MudForm Model="@request" @ref="@form" ValidationDelay="0">
             <MudCardContent>
                 <MudTextField @bind-Value="request.ChatName"
                               Immediate="true"
-                              Label="User name"
+                              Label="@_languageService["ChatName"]"
                               Adornment="Adornment.Start"
                               Variant="Variant.Outlined"
                               Required="true"
@@ -23,7 +23,7 @@
                 <MudTextField @bind-Value="request.AvatarUrl"
                               Immediate="true"
                               Class="mt-5"
-                              Label="Password"
+                              Label="@_languageService["ChatName"]"
                               Variant="Variant.Outlined"
                               Required="true" />
             </MudCardContent>

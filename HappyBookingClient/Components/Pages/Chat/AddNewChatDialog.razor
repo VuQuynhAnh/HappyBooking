@@ -156,7 +156,7 @@
 
 @code {
     [CascadingParameter]
-    private MudDialogInstance MudDialog { get; set; }
+    private MudDialogInstance? MudDialog { get; set; }
 
     private string memberSearchKeyWord = string.Empty;
     private List<UserDto> userSelectedList = new();
@@ -236,7 +236,7 @@
                     ChatMemberList = memberItemList
                 };
             var saveChatResponse = await _chatService.SaveChatGroupAsync(saveChatGroupRequest);
-            MudDialog.Close(DialogResult.Ok(saveChatResponse?.Data.ChatId ?? 0));
+            MudDialog?.Close(DialogResult.Ok(saveChatResponse?.Data.ChatId ?? 0));
         }
         finally
         {
