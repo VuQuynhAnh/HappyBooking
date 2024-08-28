@@ -150,47 +150,64 @@
         <div class="userSelectedList">
             @foreach (var chatMember in chatMemberSelectedList)
             {
-                <div class="userSelectedItem">
-                    <MudBadge Class="userSelectedAvatar"
-                              Color="chatMember.UserInformation.IsOnline ? Color.Success : Color.Error" Overlap="true" Bordered="true">
-                        <MudAvatar>
-                            <MudImage Src="@chatMember.UserInformation.AvatarImage" />
-                        </MudAvatar>
-                    </MudBadge>
-                    <div class="userSelectedName">
-                        <MudText Typo="Typo.subtitle1">@chatMember.UserInformation.FullName</MudText>
-                        <MudText Typo="Typo.subtitle2">@chatMember.UserInformation.PhoneNumber</MudText>
-                    </div>
-                    @if (chatMember.MemberId != userLogin.UserId)
-                    {
-                        <select @onchange="(e) => UpdateChatRole(chatMember, e)">
-                            <option value="@ChatRoleConstant.Member">@_languageService["Member"]</option>
-                            <option value="@ChatRoleConstant.Manager">@_languageService["Manager"]</option>
-                            <option value="@ChatRoleConstant.ViewOnly">@_languageService["ViewOnly"]</option>
-                        </select>
-                        <div class="userSelectedButton">
-                            <MudButton Size="@Size.Large"
-                                       FullWidth
-                                       Variant="@Variant.Text"
-                                       Color="@Color.Error"
-                                       EndIcon="@Icons.Material.Outlined.Cancel"
-                                       OnClick="(() => RemoveUserToGroupChat(chatMember))" />
+                @if (chatMember.IsDeleted == 0)
+                {
+                    <div class="userSelectedItem">
+                        <MudBadge Class="userSelectedAvatar"
+                                  Color="chatMember.UserInformation.IsOnline ? Color.Success : Color.Error" Overlap="true" Bordered="true">
+                            <MudAvatar>
+                                <MudImage Src="@chatMember.UserInformation.AvatarImage" />
+                            </MudAvatar>
+                        </MudBadge>
+                        <div class="userSelectedName">
+                            <MudText Typo="Typo.subtitle1">@chatMember.UserInformation.FullName</MudText>
+                            <MudText Typo="Typo.subtitle2">@chatMember.UserInformation.PhoneNumber</MudText>
                         </div>
-                    }
-                    else
-                    {
-                        <span>@_languageService["Manager"]</span>
-                    }
-                </div>
+                        @if (chatMember.MemberId != userLogin.UserId)
+                        {
+                            <select @onchange="(e) => UpdateChatRole(chatMember, e)">
+                                <option value="@ChatRoleConstant.Member">@_languageService["Member"]</option>
+                                <option value="@ChatRoleConstant.Manager">@_languageService["Manager"]</option>
+                                <option value="@ChatRoleConstant.ViewOnly">@_languageService["ViewOnly"]</option>
+                            </select>
+                            <div class="userSelectedButton">
+                                <MudButton Size="@Size.Large"
+                                           FullWidth
+                                           Variant="@Variant.Text"
+                                           Color="@Color.Error"
+                                           EndIcon="@Icons.Material.Outlined.Cancel"
+                                           OnClick="(() => RemoveUserToGroupChat(chatMember))" />
+                            </div>
+                        }
+                        else
+                        {
+                            <span>@_languageService["Manager"]</span>
+                        }
+                    </div>
+                }
             }
         </div>
 
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Primary"
-                   OnClick="StartChat">
-            @_languageService["StartChat"]
-        </MudButton>
+        @if (IsAddNew)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Size="Size.Small"
+                       Color="Color.Success"
+                       OnClick="StartNewChat">
+                @_languageService["StartChat"]
+            </MudButton>
+        }
+        else
+        {
+            <MudButton Variant="Variant.Filled"
+                       Size="Size.Small"
+                       Color="Color.Success"
+                       OnClick="Continue">
+                @_languageService["Continue"]
+            </MudButton>
+        }
     </DialogActions>
 </MudDialog>
 
@@ -200,11 +217,17 @@
     [CascadingParameter]
     private MudDialogInstance? MudDialog { get; set; }
 
+    [Parameter]
+    public bool IsAddNew { get; set; } = false;
+
+    [Parameter]
+    public ChatDto ChatDto { get; set; } = new();
     private string memberSearchKeyWord = string.Empty;
     private List<ChatMemberRequestInputTable> chatMemberSelectedList = new();
     private List<UserDto> userFilterList = new();
     private UserDto userLogin = new();
     private bool isLoading = false;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -212,6 +235,10 @@
             await _languageService.LoadLanguage();
             userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
             chatMemberSelectedList.Add(new ChatMemberRequestInputTable(userLogin.UserId, ChatRoleConstant.Manager, userLogin));
+            if (ChatDto.ChatId > 0)
+            {
+                chatMemberSelectedList.AddRange(ChatDto.ChatMemberList.Where(item => item.MemberId != userLogin.UserId).Select(item => new ChatMemberRequestInputTable(item.MemberId, item.ChatRole, item.UserInformation)));
+            }
             StateHasChanged();
         }
     }
@@ -245,13 +272,13 @@
             var resposeSearch = await _userService.GetAllUserData(request);
             userFilterList.Clear();
             userFilterList = (resposeSearch?.Data ?? new())
-                             .Where(item => !chatMemberSelectedList.Select(selected => selected.MemberId).Contains(item.UserId)
+                             .Where(item => !chatMemberSelectedList.Where(item => item.IsDeleted == 0).Select(selected => selected.MemberId).Contains(item.UserId)
                                             && userLogin.UserId != item.UserId)
                              .ToList();
         }
     }
 
-    private async Task StartChat()
+    private async Task StartNewChat()
     {
         if (!chatMemberSelectedList.Any())
         {
@@ -294,22 +321,46 @@
         }
     }
 
+    private void Continue()
+    {
+        var memberItemList = chatMemberSelectedList.Select(item => new ChatMemberRequestItem(item.MemberId, item.ChatRole, item.IsDeleted)).ToList();
+        MudDialog?.Close(DialogResult.Ok(memberItemList));
+    }
+
     private void AddUserToGroupChat(UserDto userDto)
     {
-        if (chatMemberSelectedList.Any(item => item.MemberId == userDto.UserId) || chatMemberSelectedList.Any(item => item.MemberId == userDto.UserId))
+        var chatMemberExist = chatMemberSelectedList.FirstOrDefault(item => item.MemberId == userDto.UserId);
+        if (chatMemberExist != null)
         {
-            return;
+            if (IsAddNew)
+            {
+                return;
+            }
+            if (chatMemberExist.IsDeleted == 1)
+            {
+                chatMemberExist.IsDeleted = 0;
+            }
+            else
+            {
+                chatMemberSelectedList.Add(new ChatMemberRequestInputTable(userDto.UserId, ChatRoleConstant.Manager, userDto));
+            }
+            userFilterList = userFilterList.Where(item => !chatMemberSelectedList.Where(item => item.IsDeleted == 0).Select(item => item.MemberId).Contains(item.UserId)).ToList();
+            StateHasChanged();
         }
-        chatMemberSelectedList.Add(new ChatMemberRequestInputTable(userDto.UserId, ChatRoleConstant.Manager, userDto));
-        userFilterList = userFilterList.Where(item => !chatMemberSelectedList.Select(item => item.MemberId).Contains(item.UserId)).ToList();
-        StateHasChanged();
     }
 
     private async Task RemoveUserToGroupChat(ChatMemberRequestInputTable member)
     {
         if (chatMemberSelectedList.Any(item => item.MemberId == member.MemberId))
         {
-            chatMemberSelectedList.Remove(member);
+            if (IsAddNew)
+            {
+                chatMemberSelectedList.Remove(member);
+            }
+            else
+            {
+                member.IsDeleted = 1;
+            }
             await SearchAction("");
             StateHasChanged();
         }

@@ -49,5 +49,6 @@
   "ChatName": "Tên nhóm chat",
   "UpdateChatGroup": "Cập nhật nhóm chat",
   "Member": "Thành viên",
-  "ViewOnly": "Chỉ xem"
+  "ViewOnly": "Chỉ xem",
+  "MemberManagement": "Quản lý thành viên"
 }

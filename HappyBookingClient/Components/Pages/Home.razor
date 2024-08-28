@@ -649,7 +649,11 @@
     private async Task OpenAddNewChatDialog()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true };
-        var dialog = await _dialogService.ShowAsync<AddNewChatDialog>(_languageService["NewChat"], options);
+        var parameters = new DialogParameters<ChatMemberDialog>
+                {
+                    { x => x.IsAddNew, true },
+                };
+        var dialog = await _dialogService.ShowAsync<ChatMemberDialog>(_languageService["NewChat"], parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)

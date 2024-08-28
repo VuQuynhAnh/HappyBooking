@@ -14,6 +14,8 @@ public class ChatMemberRequestInputTable
     public long MemberId { get; set; }
 
     public int ChatRole { get; set; }
+
+    public int IsDeleted { get; set; }
     
     public UserDto UserInformation { get; set; } = new();
 }

@@ -49,5 +49,6 @@
   "ChatName": "Chat name",
   "UpdateChatGroup": "Update chat group",
   "Member": "Member",
-  "ViewOnly": "Viewer"
+  "ViewOnly": "Viewer",
+  "MemberManagement": "Member management"
 }

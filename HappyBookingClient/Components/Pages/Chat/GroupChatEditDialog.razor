@@ -38,8 +38,18 @@
                               Variant="Variant.Outlined"
                               Required="true"
                               Class="pt-0 mt-2" />
+
+                <MudButton Size="Size.Large"
+                           Class="my-2"
+                           Variant="Variant.Outlined"
+                           EndIcon="@Icons.Material.Outlined.People"
+                           Color="Color.Default"
+                           FullWidth
+                           OnClick="OpenManagerMemberChatDialog">
+                    @_languageService["MemberManagement"]
+                </MudButton>
             </MudCardContent>
-        </MudForm>
+        </MudForm> 
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled"
@@ -131,6 +141,27 @@
             if (response != null)
             {
                 request.AvatarUrl = response.Data;
+            }
+        }
+    }
+
+    private async Task OpenManagerMemberChatDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true };
+        var parameters = new DialogParameters<ChatMemberDialog>
+                {
+                    { x => x.IsAddNew, false },
+                    { x => x.ChatDto, ChatDto },
+                };
+        var dialog = await _dialogService.ShowAsync<ChatMemberDialog>(_languageService["MemberManagement"], parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var chatMemberListResult = (List<ChatMemberRequestItem>)(result.Data);
+            if (chatMemberListResult.Any())
+            {
+                request.ChatMemberList = chatMemberListResult;
             }
         }
     }
