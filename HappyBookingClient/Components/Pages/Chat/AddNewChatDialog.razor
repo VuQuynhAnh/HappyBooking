@@ -14,7 +14,7 @@
 
 <style>
     .addNewChatDialog {
-        width: 370px;
+        width: 410px;
     }
 
         .addNewChatDialog .mud-dialog-content {
@@ -48,24 +48,65 @@
             overflow-y: auto;
         }
 
-            .addNewChatDialog .userFilterList .mud-icon-root.mud-svg-icon {
-                position: absolute;
-                right: 10px;
-                top: 20px;
+        .addNewChatDialog .userSelectedList .userSelectedItem {
+            width: 100%;
+            height: fit-content;
+            padding: 2px 0;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f2f2f2;
+        }
+
+            .addNewChatDialog .userSelectedList .userSelectedItem .userSelectedAvatar {
+                width: 40px;
+                margin-right: 5px;
+                float: left;
             }
 
-            .addNewChatDialog .userFilterList .mud-button-root {
-                background: #ffffe6;
-                border-radius: 0;
+            .addNewChatDialog .userSelectedList .userSelectedItem .userSelectedName {
+                width: calc(100% - 15px - 45px - 50px);
+                float: left;
             }
 
-                .addNewChatDialog .userFilterList .mud-button-root:hover {
-                    background: #ffffcc;
+            .addNewChatDialog .userSelectedList .userSelectedItem select {
+                width: fit-content;
+                -webkit-appearance: none; /* Remove default arrow */
+                -moz-appearance: none; /* Remove Firefox default arrow */
+                appearance: none; /* Remove default arrow */
+                background-image: none; /* Remove the arrow icon background */
+            }
+
+                .addNewChatDialog .userSelectedList .userSelectedItem select::-ms-expand {
+                    display: none; /* Remove the arrow in IE */
                 }
 
-        .addNewChatDialog .userSelectedList .mud-table-root {
-            background: #e6ffe6;
+            .addNewChatDialog .userSelectedList .userSelectedItem .userSelectedButton {
+                float: right;
+            }
+
+            .addNewChatDialog .userSelectedList .userSelectedItem .mud-button-text-size-large {
+                padding: 14px 14px 14px 0;
+            }
+
+            .addNewChatDialog .userSelectedList .userSelectedItem .mud-button {
+                min-width: 20px;
+            }
+
+        .addNewChatDialog .userFilterList .mud-icon-root.mud-svg-icon {
+            position: absolute;
+            right: 10px;
+            top: 20px;
         }
+
+        .addNewChatDialog .userFilterList .mud-button-root {
+            background: #ffffe6;
+            border-radius: 0;
+            border-bottom: 1px solid #f2f2f2;
+        }
+
+            .addNewChatDialog .userFilterList .mud-button-root:hover {
+                background: #ffffcc;
+            }
 
         .addNewChatDialog .mud-button-text-size-large {
             padding: 14px 0px;
@@ -80,6 +121,7 @@
                       AdornmentIcon="@Icons.Material.Filled.Search"
                       DebounceInterval="850"
                       OnKeyUp="@KeyUpAction"
+                      FullWidth
                       OnDebounceIntervalElapsed="SearchAction"
                       Class="searchBoxStyle my-2" />
 
@@ -106,41 +148,41 @@
         <MudDivider Class="my-2" />
 
         <div class="userSelectedList">
-            <MudDataGrid Items="@userSelectedList"
-                         Filterable="false"
-                         Virtualize="true"
-                         FixedHeader="true"
-                         SortMode="@SortMode.None"
-                         Groupable="false">
-                <Columns>
-                    <TemplateColumn>
-                        <CellTemplate>
-                            <MudBadge Color="context.Item.IsOnline ? Color.Success : Color.Error" Overlap="true" Bordered="true">
-                                <MudAvatar>
-                                    <MudImage Src="@context.Item.AvatarImage" />
-                                </MudAvatar>
-                            </MudBadge>
-                        </CellTemplate>
-                    </TemplateColumn>
-                    <TemplateColumn>
-                        <CellTemplate>
-                            <MudText Typo="Typo.subtitle1">@context.Item.FullName</MudText>
-                            <MudText Typo="Typo.subtitle2">@context.Item.PhoneNumber</MudText>
-                        </CellTemplate>
-                    </TemplateColumn>
-                    <TemplateColumn CellClass="d-flex justify-end">
-                        <CellTemplate>
-                            <MudStack Row>
-                                <MudButton Size="@Size.Large"
-                                           Variant="@Variant.Text"
-                                           Color="@Color.Error"
-                                           EndIcon="@Icons.Material.Outlined.Cancel"
-                                           OnClick="(() => RemoveUserToGroupChat(context.Item))" />
-                            </MudStack>
-                        </CellTemplate>
-                    </TemplateColumn>
-                </Columns>
-            </MudDataGrid>
+            @foreach (var chatMember in chatMemberSelectedList)
+            {
+                <div class="userSelectedItem">
+                    <MudBadge Class="userSelectedAvatar"
+                              Color="chatMember.UserInformation.IsOnline ? Color.Success : Color.Error" Overlap="true" Bordered="true">
+                        <MudAvatar>
+                            <MudImage Src="@chatMember.UserInformation.AvatarImage" />
+                        </MudAvatar>
+                    </MudBadge>
+                    <div class="userSelectedName">
+                        <MudText Typo="Typo.subtitle1">@chatMember.UserInformation.FullName</MudText>
+                        <MudText Typo="Typo.subtitle2">@chatMember.UserInformation.PhoneNumber</MudText>
+                    </div>
+                    @if (chatMember.MemberId != userLogin.UserId)
+                    {
+                        <select @onchange="(e) => UpdateChatRole(chatMember, e)">
+                            <option value="@ChatRoleConstant.Member">@_languageService["Member"]</option>
+                            <option value="@ChatRoleConstant.Manager">@_languageService["Manager"]</option>
+                            <option value="@ChatRoleConstant.ViewOnly">@_languageService["ViewOnly"]</option>
+                        </select>
+                        <div class="userSelectedButton">
+                            <MudButton Size="@Size.Large"
+                                       FullWidth
+                                       Variant="@Variant.Text"
+                                       Color="@Color.Error"
+                                       EndIcon="@Icons.Material.Outlined.Cancel"
+                                       OnClick="(() => RemoveUserToGroupChat(chatMember))" />
+                        </div>
+                    }
+                    else
+                    {
+                        <span>@_languageService["Manager"]</span>
+                    }
+                </div>
+            }
         </div>
 
     </DialogContent>
@@ -159,7 +201,7 @@
     private MudDialogInstance? MudDialog { get; set; }
 
     private string memberSearchKeyWord = string.Empty;
-    private List<UserDto> userSelectedList = new();
+    private List<ChatMemberRequestInputTable> chatMemberSelectedList = new();
     private List<UserDto> userFilterList = new();
     private UserDto userLogin = new();
     private bool isLoading = false;
@@ -169,7 +211,16 @@
         {
             await _languageService.LoadLanguage();
             userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
+            chatMemberSelectedList.Add(new ChatMemberRequestInputTable(userLogin.UserId, ChatRoleConstant.Manager, userLogin));
             StateHasChanged();
+        }
+    }
+
+    private void UpdateChatRole(ChatMemberRequestInputTable chatMember, ChangeEventArgs e)
+    {
+        if (int.TryParse(e?.Value?.ToString(), out var newRole))
+        {
+            chatMember.ChatRole = newRole;
         }
     }
 
@@ -194,7 +245,7 @@
             var resposeSearch = await _userService.GetAllUserData(request);
             userFilterList.Clear();
             userFilterList = (resposeSearch?.Data ?? new())
-                             .Where(item => !userSelectedList.Select(selected => selected.UserId).Contains(item.UserId)
+                             .Where(item => !chatMemberSelectedList.Select(selected => selected.MemberId).Contains(item.UserId)
                                             && userLogin.UserId != item.UserId)
                              .ToList();
         }
@@ -202,16 +253,15 @@
 
     private async Task StartChat()
     {
-        if (!userSelectedList.Any())
+        if (!chatMemberSelectedList.Any())
         {
             return;
         }
         try
         {
             isLoading = true;
-            var groupName = userLogin.FullName + "-" + string.Join("-", userSelectedList.Select(item => item.FullName));
-            var memberItemList = userSelectedList.Select(item => new ChatMemberRequestItem(item.UserId, 0)).ToList();
-            if (memberItemList.Count > 1)
+            var groupName = userLogin.FullName + "-" + string.Join("-", chatMemberSelectedList.Select(item => item.UserInformation.FullName));
+            if (chatMemberSelectedList.Count > 1)
             {
                 var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true };
 
@@ -225,7 +275,7 @@
                 groupName = (string)(result.Data);
 
             }
-            memberItemList.Add(new ChatMemberRequestItem(userLogin.UserId, 0));
+            var memberItemList = chatMemberSelectedList.Select(item => new ChatMemberRequestItem(item.MemberId, item.ChatRole)).ToList();
 
             SaveChatGroupRequest saveChatGroupRequest = new()
                 {
@@ -244,22 +294,22 @@
         }
     }
 
-    private void AddUserToGroupChat(UserDto user)
+    private void AddUserToGroupChat(UserDto userDto)
     {
-        if (userSelectedList.Any(item => item.UserId == user.UserId))
+        if (chatMemberSelectedList.Any(item => item.MemberId == userDto.UserId) || chatMemberSelectedList.Any(item => item.MemberId == userDto.UserId))
         {
             return;
         }
-        userSelectedList.Add(user);
-        userFilterList = userFilterList.Where(item => !userSelectedList.Contains(item)).ToList();
+        chatMemberSelectedList.Add(new ChatMemberRequestInputTable(userDto.UserId, ChatRoleConstant.Manager, userDto));
+        userFilterList = userFilterList.Where(item => !chatMemberSelectedList.Select(item => item.MemberId).Contains(item.UserId)).ToList();
         StateHasChanged();
     }
 
-    private async Task RemoveUserToGroupChat(UserDto user)
+    private async Task RemoveUserToGroupChat(ChatMemberRequestInputTable member)
     {
-        if (userSelectedList.Any(item => item.UserId == user.UserId))
+        if (chatMemberSelectedList.Any(item => item.MemberId == member.MemberId))
         {
-            userSelectedList.Remove(user);
+            chatMemberSelectedList.Remove(member);
             await SearchAction("");
             StateHasChanged();
         }

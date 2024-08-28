@@ -42,8 +42,15 @@
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" Class="mr-2" Size="Size.Small" Color="Color.Success" OnClick="(await => Submit())">@_languageService["Save"]</MudButton>
-        <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Default" OnClick="Cancel">@_languageService["Cancel"]</MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Size="Size.Small"
+                   Color="Color.Success"
+                   OnClick="(await => Submit())">@_languageService["Save"]</MudButton>
+        <MudButton Variant="Variant.Outlined"
+                   Class="mr-4"
+                   Size="Size.Small"
+                   Color="Color.Default"
+                   OnClick="Cancel">@_languageService["Cancel"]</MudButton>
     </DialogActions>
 </MudDialog>
 

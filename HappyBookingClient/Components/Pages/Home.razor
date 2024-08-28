@@ -441,11 +441,16 @@
             if (index != -1)
             {
                 groupChatList[index] = chatDto;
-                groupChatList = groupChatList.OrderByDescending(item => item.LastChatTime).ToList();
+                return;
+            }
+            if (chatDto.ChatMemberList.Any(item => item.MemberId == userLogin.UserId))
+            {
+                groupChatList.Add(chatDto);
             }
         }
         finally
         {
+            groupChatList = groupChatList.OrderByDescending(item => item.LastChatTime).ToList();
             await InvokeAsync(StateHasChanged);
         }
     }

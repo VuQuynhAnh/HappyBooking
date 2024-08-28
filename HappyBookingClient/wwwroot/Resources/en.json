@@ -47,5 +47,7 @@
   "Warning": "Warning",
   "Members": "Members",
   "ChatName": "Chat name",
-  "UpdateChatGroup": "Update chat group"
+  "UpdateChatGroup": "Update chat group",
+  "Member": "Member",
+  "ViewOnly": "Viewer"
 }

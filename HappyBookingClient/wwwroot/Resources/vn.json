@@ -47,5 +47,7 @@
   "Warning": "Cảnh báo",
   "Members": "Thành viên",
   "ChatName": "Tên nhóm chat",
-  "UpdateChatGroup": "Cập nhật nhóm chat"
+  "UpdateChatGroup": "Cập nhật nhóm chat",
+  "Member": "Thành viên",
+  "ViewOnly": "Chỉ xem"
 }

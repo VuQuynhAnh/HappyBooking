@@ -51,10 +51,11 @@ public class SaveChatGroupUseCase : ISaveChatGroupUseCase
                 var addMemberToGroupResponse = await _chatRepository.AddMemberToGroup(chatResponse.ChatId, chatMemberList, userId);
             }
 
-            var chatResult = await _chatRepository.GetChatGroup(chatId, userId);
-            string jsonString = JsonSerializer.Serialize(chatResult);
+            var chatResult = await _chatRepository.GetChatGroup(chatResponse.ChatId, userId);
+            var result = new ChatDto(chatResult);
+            string jsonString = JsonSerializer.Serialize(result);
             await hubContext.Clients.All.SendAsync(RealtimeConstant.ChatGroupUpdate, jsonString);
-            return new SaveChatGroupResponse(userId, new ChatDto(chatResult), StatusEnum.Successed, _cache);
+            return new SaveChatGroupResponse(userId, result, StatusEnum.Successed, _cache);
         }
         finally
         {
