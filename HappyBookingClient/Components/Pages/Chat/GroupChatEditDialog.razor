@@ -2,6 +2,7 @@
 @using HappyBookingClient.Components.Layout
 @using HappyBookingClient.Components.Pages.CommonDialog
 @using HappyBookingClient.Service.IService
+@using HappyBookingShare.Common
 @using HappyBookingShare.Request.Chat
 @using HappyBookingShare.Request.Chat.RequestItem
 @using HappyBookingShare.Response.Dtos
@@ -17,7 +18,7 @@
 
 <style>
     .groupChatEditDialog {
-        width: 370px;
+        width: 400px;
     }
 </style>
 
@@ -27,17 +28,18 @@
             <MudCardContent>
                 <InputFile id="chatAvatarUrlImage" hidden OnChange="UploadFiles" accept="image/*" />
                 <MudButton FullWidth OnClick="(await => AddFile())">
-                    <MudAvatar Style="height:175px; width:175px;" Color="Color.Primary">
+                    <MudAvatar Style="height:190px; width:190px;" Color="Color.Primary">
                         <MudImage Src="@request.AvatarUrl"></MudImage>
                     </MudAvatar>
                 </MudButton>
+
                 <MudTextField @bind-Value="request.ChatName"
                               Immediate="true"
                               Label="@_languageService["ChatName"]"
                               Adornment="Adornment.Start"
                               Variant="Variant.Outlined"
                               Required="true"
-                              Class="pt-0 mt-2" />
+                              Class="pt-0 mt-3" />
 
                 <MudButton Size="Size.Large"
                            Class="my-2"
@@ -52,6 +54,23 @@
         </MudForm>
     </DialogContent>
     <DialogActions>
+        @if (isManager)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Size="Size.Small"
+                       Color="Color.Error"
+                       Class="float-start"
+                       OnClick="DeleteChat">
+                @_languageService["Delete"]
+            </MudButton>
+        }
+        <MudButton Variant="Variant.Filled"
+                   Size="Size.Small"
+                   Color="Color.Warning"
+                   Class="float-start"
+                   OnClick="LeaveGroupChat">
+            @_languageService["LeaveGroupChat"]
+        </MudButton>
         <MudButton Variant="Variant.Filled"
                    Size="Size.Small"
                    Color="Color.Success"
@@ -72,24 +91,80 @@
     [Parameter]
     public ChatDto ChatDto { get; set; } = new();
     private SaveChatGroupRequest request = new();
+    private UserDto userLogin = new();
     private MudForm? form;
     private MemoryStream? memoryStream = null;
     private IBrowserFile? file = null;
     private long maxFileSize = 3 * 1024 * 1024; // 3 MB
     private bool isLoading = false;
+    private bool isManager = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await _languageService.LoadLanguage();
+            userLogin = await _localStorage.GetItemAsync<UserDto>(KeyConstant.UserLogin) ?? new();
+
             request.ChatId = ChatDto.ChatId;
             request.ChatName = ChatDto.ChatName;
             request.AvatarUrl = ChatDto.GroupAvatar;
             request.IsGroup = ChatDto.IsGroupChat;
             request.ChatMemberList = ChatDto.ChatMemberList.Select(item => new ChatMemberRequestItem(item.MemberId, item.ChatRole, 0)).ToList();
+            isManager = (ChatDto.ChatMemberList.FirstOrDefault(item => item.MemberId == userLogin.UserId)?.ChatRole ?? -1) == ChatRoleConstant.Manager;
             StateHasChanged();
         }
+    }
+
+    private async Task DeleteChat()
+    {
+        var parameters = new DialogParameters<ConfirmDialog>
+                {
+                    { x => x.ContentText, @_languageService["AreYouSure"] },
+                    { x => x.SubmitText, @_languageService["Continue"] },
+                    { x => x.CancelText, @_languageService["Cancel"] }
+                };
+        var dialogResult = await _dialogService.ShowAsync<ConfirmDialog>(@_languageService["Confirm"], parameters);
+        var result = await dialogResult.Result;
+
+        if (result.Canceled)
+        {
+            return;
+        }
+
+        SaveChatGroupRequest saveChatGroupRequest = new()
+            {
+                ChatId = ChatDto.ChatId,
+                IsDeleted = true
+            };
+        var saveChatResponse = await _chatService.SaveChatGroupAsync(saveChatGroupRequest);
+        MudDialog?.Close(DialogResult.Ok(new ChatDto()));
+    }
+
+    private async Task LeaveGroupChat()
+    {
+        var parameters = new DialogParameters<ConfirmDialog>
+                {
+                    { x => x.ContentText, @_languageService["AreYouSure"] },
+                    { x => x.SubmitText, @_languageService["Continue"] },
+                    { x => x.CancelText, @_languageService["Cancel"] }
+                };
+
+        var dialogResult = await _dialogService.ShowAsync<ConfirmDialog>(@_languageService["Confirm"], parameters);
+        var result = await dialogResult.Result;
+
+        if (result.Canceled)
+        {
+            return;
+        }
+
+        LeaveChatGroupRequest leaveChatGroupRequest = new()
+            {
+                ChatId = ChatDto.ChatId,
+                MemberId = userLogin.UserId
+            };
+        var saveChatResponse = await _chatService.LeaveChatGroupAsync(leaveChatGroupRequest);
+        MudDialog?.Close(DialogResult.Ok(new ChatDto()));
     }
 
     private async Task AddFile()

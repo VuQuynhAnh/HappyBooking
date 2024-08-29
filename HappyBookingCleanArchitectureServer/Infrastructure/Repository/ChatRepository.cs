@@ -408,4 +408,23 @@ public class ChatRepository : IChatRepository
         chatId = chatIdResult.First().Key;
         return chatId;
     }
+
+    /// <summary>
+    /// DeleteChatGroup
+    /// </summary>
+    /// <param name="chatId"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public async Task<bool> DeleteChatGroup(long chatId, long userId)
+    {
+        var chatGroup = await _context.ChatRepository.FirstOrDefaultAsync(item => item.ChatId == chatId && item.IsDeleted == 0);
+        if (chatGroup == null)
+        {
+            return false;
+        }
+        chatGroup.IsDeleted = 1;
+        chatGroup.UpdatedDate = DateTime.UtcNow;
+        chatGroup.UpdatedId = userId;
+        return await _context.SaveChangesAsync() > 0;
+    }
 }

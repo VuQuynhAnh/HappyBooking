@@ -437,15 +437,43 @@
             {
                 selectedChatGroup = chatDto;
             }
+
+            // update chat group if exist in list
             int index = groupChatList.FindIndex(item => item.ChatId == chatDto.ChatId);
             if (index != -1)
             {
                 groupChatList[index] = chatDto;
                 return;
             }
+
+            // add new chat group if not exist in list
             if (chatDto.ChatMemberList.Any(item => item.MemberId == userLogin.UserId))
             {
                 groupChatList.Add(chatDto);
+            }
+        }
+        finally
+        {
+            groupChatList = groupChatList.OrderByDescending(item => item.LastChatTime).ToList();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task DeleteGroupChatItem(long chatId)
+    {
+        try
+        {
+            int index = groupChatList.FindIndex(item => item.ChatId == chatId);
+            if (index != -1)
+            {
+                groupChatList.RemoveAt(index);
+                return;
+            }
+            index = singleChatList.FindIndex(item => item.ChatId == chatId);
+            if (index != -1)
+            {
+                singleChatList.RemoveAt(index);
+                return;
             }
         }
         finally
@@ -853,6 +881,17 @@
                 return;
             }
             await LoadGroupChatItem(chatSocket);
+            await InvokeAsync(StateHasChanged);
+        });
+
+        hubConnection.On<string>(RealtimeConstant.ChatGroupDeleted, async (message) =>
+        {
+            var chatIdSocket = JsonSerializer.Deserialize<long>(message);
+            if (chatIdSocket == 0)
+            {
+                return;
+            }
+            await DeleteGroupChatItem(chatIdSocket);
             await InvokeAsync(StateHasChanged);
         });
 

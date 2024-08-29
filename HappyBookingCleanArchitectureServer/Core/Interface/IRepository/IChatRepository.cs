@@ -6,6 +6,8 @@ public interface IChatRepository : IRepositoryBase
 {
     Task<ChatModel> SaveChatGroup(long chatId, string name, string avatarUrl, bool isGroup, long userId);
 
+    Task<bool> DeleteChatGroup(long chatId, long userId);
+
     Task<List<ChatModel>> GetListChatGroupByMember(long memberId, string keyword, bool isGroupChat, int pageIndex, int pageSize);
 
     Task<ChatModel> GetChatGroup(long chatId, long memberId);

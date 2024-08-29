@@ -202,23 +202,6 @@
         }
         else
         {
-            @if (isManager)
-            {
-                <MudButton Variant="Variant.Filled"
-                           Size="Size.Small"
-                           Color="Color.Error"
-                           Class="float-start"
-                           OnClick="DeleteChat">
-                    @_languageService["Delete"]
-                </MudButton>
-            }
-            <MudButton Variant="Variant.Filled"
-                       Size="Size.Small"
-                       Color="Color.Warning"
-                       Class="float-start"
-                       OnClick="LeaveGroupChat">
-                @_languageService["LeaveGroupChat"]
-            </MudButton>
             <MudButton Variant="Variant.Filled"
                        Size="Size.Small"
                        Color="Color.Success"
@@ -245,12 +228,12 @@
 
     [Parameter]
     public ChatDto ChatDto { get; set; } = new();
+
     private string memberSearchKeyWord = string.Empty;
     private List<ChatMemberRequestInputTable> chatMemberSelectedList = new();
     private List<UserDto> userFilterList = new();
     private UserDto userLogin = new();
     private bool isLoading = false;
-    private bool isManager = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -351,57 +334,6 @@
     {
         var memberItemList = chatMemberSelectedList.Select(item => new ChatMemberRequestItem(item.MemberId, item.ChatRole, item.IsDeleted)).ToList();
         MudDialog?.Close(DialogResult.Ok(memberItemList));
-    }
-
-    private async Task DeleteChat()
-    {
-        var parameters = new DialogParameters<ConfirmDialog>
-                {
-                    { x => x.ContentText, @_languageService["AreYouSure"] },
-                    { x => x.SubmitText, @_languageService["Continue"] },
-                    { x => x.CancelText, @_languageService["Cancel"] }
-                };
-        var dialogResult = await _dialogService.ShowAsync<ConfirmDialog>(@_languageService["Confirm"], parameters);
-        var result = await dialogResult.Result;
-
-        if (result.Canceled)
-        {
-            return;
-        }
-
-        SaveChatGroupRequest saveChatGroupRequest = new()
-            {
-                ChatId = ChatDto.ChatId,
-                IsDeleted = true
-            };
-        var saveChatResponse = await _chatService.SaveChatGroupAsync(saveChatGroupRequest);
-        MudDialog?.Close(DialogResult.Ok(saveChatResponse?.Data.ChatId ?? 0));
-    }
-
-    private async Task LeaveGroupChat()
-    {
-        var parameters = new DialogParameters<ConfirmDialog>
-                {
-                    { x => x.ContentText, @_languageService["AreYouSure"] },
-                    { x => x.SubmitText, @_languageService["Continue"] },
-                    { x => x.CancelText, @_languageService["Cancel"] }
-                };
-
-        var dialogResult = await _dialogService.ShowAsync<ConfirmDialog>(@_languageService["Confirm"], parameters);
-        var result = await dialogResult.Result;
-
-        if (result.Canceled)
-        {
-            return;
-        }
-
-        LeaveChatGroupRequest leaveChatGroupRequest = new()
-            {
-                ChatId = ChatDto.ChatId,
-                MemberId = userLogin.UserId
-            };
-        var saveChatResponse = await _chatService.LeaveChatGroupAsync(leaveChatGroupRequest);
-        MudDialog?.Close(DialogResult.Ok(saveChatResponse?.Data));
     }
 
     private void AddUserToGroupChat(UserDto userDto)

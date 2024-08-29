@@ -29,6 +29,15 @@ public class SaveChatGroupUseCase : ISaveChatGroupUseCase
     {
         try
         {
+            if (request.IsDeleted)
+            {
+                var deleteChatResult = await _chatRepository.DeleteChatGroup(request.ChatId, userId);
+                if (deleteChatResult)
+                {
+                    await hubContext.Clients.All.SendAsync(RealtimeConstant.ChatGroupDeleted, request.ChatId);
+                }
+                return new SaveChatGroupResponse(userId, new(), StatusEnum.Successed, _cache);
+            }
             List<ChatMemberModel> chatMemberList = new();
             if (request.ChatMemberList.Any())
             {
