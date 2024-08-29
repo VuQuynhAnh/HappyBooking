@@ -16,35 +16,51 @@ public class ChatRepository : IChatRepository
     }
 
     /// <summary>
-    /// AddMemberToGroup
+    /// SaveGroupMember
     /// </summary>
     /// <param name="chatId"></param>
-    /// <param name="chatMemberList"></param>
+    /// <param name="chatMemberModelList"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<bool> AddMemberToGroup(long chatId, List<ChatMemberModel> chatMemberList, long userId)
+    public async Task<bool> SaveGroupMember(long chatId, List<ChatMemberModel> chatMemberModelList, long userId)
     {
-        var memberIdExist = await _context.ChatMemberRepository.Where(item => item.ChatId == chatId
-                                                                              && item.IsDeleted == 0)
-                                                               .Select(item => item.MemberId)
-                                                               .Distinct()
-                                                               .ToListAsync();
+        List<ChatMember> memberAddNewList = new();
+        var memberExistList = await _context.ChatMemberRepository.Where(item => item.ChatId == chatId
+                                                                                && item.IsDeleted == 0).ToListAsync();
 
-        var memberAddNew = chatMemberList.Where(item => !memberIdExist.Contains(item.MemberId))
-                                         .Select(item => new ChatMember()
-                                         {
-                                             Id = 0,
-                                             ChatId = chatId,
-                                             MemberId = item.MemberId,
-                                             ChatRole = item.ChatRole,
-                                             IsDeleted = 0,
-                                             CreatedDate = DateTime.UtcNow,
-                                             CreatedId = userId,
-                                             UpdatedDate = DateTime.UtcNow,
-                                             UpdatedId = userId,
-                                         }).ToList();
+        foreach (var model in chatMemberModelList)
+        {
+            var memberEntity = memberExistList.FirstOrDefault(item => item.MemberId == model.MemberId);
+            if (memberEntity == null)
+            {
+                if (model.IsDeleted != 0)
+                {
+                    continue;
+                }
+                memberEntity = new ChatMember()
+                {
+                    Id = 0,
+                    ChatId = chatId,
+                    MemberId = model.MemberId,
+                    ChatRole = model.ChatRole,
+                    IsDeleted = 0,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedId = userId,
+                    UpdatedDate = DateTime.UtcNow,
+                    UpdatedId = userId,
+                };
+                memberAddNewList.Add(memberEntity);
+                continue;
+            }
+            if (model.IsDeleted == 1)
+            {
+                memberEntity.IsDeleted = 1;
+                memberEntity.UpdatedDate = DateTime.UtcNow;
+                memberEntity.UpdatedId = userId;
+            }
+        }
 
-        await _context.ChatMemberRepository.AddRangeAsync(memberAddNew);
+        await _context.ChatMemberRepository.AddRangeAsync(memberAddNewList);
         return await _context.SaveChangesAsync() > 0;
     }
 

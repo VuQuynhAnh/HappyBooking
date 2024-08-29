@@ -1,5 +1,6 @@
 ﻿@using Blazored.LocalStorage
 @using HappyBookingClient.Components.Layout
+@using HappyBookingClient.Components.Pages.CommonDialog
 @using HappyBookingClient.Service.IService
 @using HappyBookingShare.Common
 @using HappyBookingShare.Request.Chat
@@ -18,7 +19,7 @@
     }
 
         .addNewChatDialog .mud-dialog-content {
-            height: 420px;
+            height: 470px;
         }
 
         .addNewChatDialog .mud-table-root .mud-table-head {
@@ -39,7 +40,7 @@
         }
 
         .addNewChatDialog .userSelectedList {
-            max-height: 150px;
+            max-height: 200px;
             overflow-y: auto;
         }
 
@@ -201,6 +202,23 @@
         }
         else
         {
+            @if (isManager)
+            {
+                <MudButton Variant="Variant.Filled"
+                           Size="Size.Small"
+                           Color="Color.Error"
+                           Class="float-start"
+                           OnClick="DeleteChat">
+                    @_languageService["Delete"]
+                </MudButton>
+            }
+            <MudButton Variant="Variant.Filled"
+                       Size="Size.Small"
+                       Color="Color.Warning"
+                       Class="float-start"
+                       OnClick="LeaveGroupChat">
+                @_languageService["LeaveGroupChat"]
+            </MudButton>
             <MudButton Variant="Variant.Filled"
                        Size="Size.Small"
                        Color="Color.Success"
@@ -208,6 +226,11 @@
                 @_languageService["Continue"]
             </MudButton>
         }
+        <MudButton Variant="Variant.Outlined"
+                   Class="mr-4"
+                   Size="Size.Small"
+                   Color="Color.Default"
+                   OnClick="Cancel">@_languageService["Cancel"]</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -227,6 +250,7 @@
     private List<UserDto> userFilterList = new();
     private UserDto userLogin = new();
     private bool isLoading = false;
+    private bool isManager = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -278,6 +302,8 @@
         }
     }
 
+    private void Cancel() => MudDialog?.Cancel();
+
     private async Task StartNewChat()
     {
         if (!chatMemberSelectedList.Any())
@@ -288,7 +314,7 @@
         {
             isLoading = true;
             var groupName = userLogin.FullName + "-" + string.Join("-", chatMemberSelectedList.Select(item => item.UserInformation.FullName));
-            if (chatMemberSelectedList.Count > 1)
+            if (chatMemberSelectedList.Count(item => item.IsDeleted == 0) > 2)
             {
                 var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true };
 
@@ -302,7 +328,7 @@
                 groupName = (string)(result.Data);
 
             }
-            var memberItemList = chatMemberSelectedList.Select(item => new ChatMemberRequestItem(item.MemberId, item.ChatRole)).ToList();
+            var memberItemList = chatMemberSelectedList.Select(item => new ChatMemberRequestItem(item.MemberId, item.ChatRole, 0)).ToList();
 
             SaveChatGroupRequest saveChatGroupRequest = new()
                 {
@@ -327,6 +353,57 @@
         MudDialog?.Close(DialogResult.Ok(memberItemList));
     }
 
+    private async Task DeleteChat()
+    {
+        var parameters = new DialogParameters<ConfirmDialog>
+                {
+                    { x => x.ContentText, @_languageService["AreYouSure"] },
+                    { x => x.SubmitText, @_languageService["Continue"] },
+                    { x => x.CancelText, @_languageService["Cancel"] }
+                };
+        var dialogResult = await _dialogService.ShowAsync<ConfirmDialog>(@_languageService["Confirm"], parameters);
+        var result = await dialogResult.Result;
+
+        if (result.Canceled)
+        {
+            return;
+        }
+
+        SaveChatGroupRequest saveChatGroupRequest = new()
+            {
+                ChatId = ChatDto.ChatId,
+                IsDeleted = true
+            };
+        var saveChatResponse = await _chatService.SaveChatGroupAsync(saveChatGroupRequest);
+        MudDialog?.Close(DialogResult.Ok(saveChatResponse?.Data.ChatId ?? 0));
+    }
+
+    private async Task LeaveGroupChat()
+    {
+        var parameters = new DialogParameters<ConfirmDialog>
+                {
+                    { x => x.ContentText, @_languageService["AreYouSure"] },
+                    { x => x.SubmitText, @_languageService["Continue"] },
+                    { x => x.CancelText, @_languageService["Cancel"] }
+                };
+
+        var dialogResult = await _dialogService.ShowAsync<ConfirmDialog>(@_languageService["Confirm"], parameters);
+        var result = await dialogResult.Result;
+
+        if (result.Canceled)
+        {
+            return;
+        }
+
+        LeaveChatGroupRequest leaveChatGroupRequest = new()
+            {
+                ChatId = ChatDto.ChatId,
+                MemberId = userLogin.UserId
+            };
+        var saveChatResponse = await _chatService.LeaveChatGroupAsync(leaveChatGroupRequest);
+        MudDialog?.Close(DialogResult.Ok(saveChatResponse?.Data));
+    }
+
     private void AddUserToGroupChat(UserDto userDto)
     {
         var chatMemberExist = chatMemberSelectedList.FirstOrDefault(item => item.MemberId == userDto.UserId);
@@ -340,13 +417,13 @@
             {
                 chatMemberExist.IsDeleted = 0;
             }
-            else
-            {
-                chatMemberSelectedList.Add(new ChatMemberRequestInputTable(userDto.UserId, ChatRoleConstant.Manager, userDto));
-            }
-            userFilterList = userFilterList.Where(item => !chatMemberSelectedList.Where(item => item.IsDeleted == 0).Select(item => item.MemberId).Contains(item.UserId)).ToList();
-            StateHasChanged();
         }
+        else
+        {
+            chatMemberSelectedList.Add(new ChatMemberRequestInputTable(userDto.UserId, ChatRoleConstant.Manager, userDto));
+        }
+        userFilterList = userFilterList.Where(item => !chatMemberSelectedList.Where(item => item.IsDeleted == 0).Select(item => item.MemberId).Contains(item.UserId)).ToList();
+        StateHasChanged();
     }
 
     private async Task RemoveUserToGroupChat(ChatMemberRequestInputTable member)

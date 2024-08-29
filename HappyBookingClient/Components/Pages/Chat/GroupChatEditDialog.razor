@@ -49,7 +49,7 @@
                     @_languageService["MemberManagement"]
                 </MudButton>
             </MudCardContent>
-        </MudForm> 
+        </MudForm>
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled"
@@ -87,7 +87,7 @@
             request.ChatName = ChatDto.ChatName;
             request.AvatarUrl = ChatDto.GroupAvatar;
             request.IsGroup = ChatDto.IsGroupChat;
-            request.ChatMemberList = ChatDto.ChatMemberList.Select(item => new ChatMemberRequestItem(item.MemberId, item.ChatRole)).ToList();
+            request.ChatMemberList = ChatDto.ChatMemberList.Select(item => new ChatMemberRequestItem(item.MemberId, item.ChatRole, 0)).ToList();
             StateHasChanged();
         }
     }

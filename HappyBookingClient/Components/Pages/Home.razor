@@ -835,7 +835,7 @@
         hubConnection.On<string>(RealtimeConstant.ReceiveMessage, async (message) =>
         {
             var messageSocket = JsonSerializer.Deserialize<MessageDto>(message);
-            if (messageSocket == null || messageSocket.MessageId == 0 || messageList.Any(item => item.MessageId == messageSocket.MessageId))
+            if (messageSocket == null || messageSocket.MessageId == 0 || messageList.Any(item => item.MessageId == messageSocket.MessageId) || messageSocket.ChatId != selectedChatId)
             {
                 return;
             }

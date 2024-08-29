@@ -10,7 +10,7 @@ public interface IChatRepository : IRepositoryBase
 
     Task<ChatModel> GetChatGroup(long chatId, long memberId);
 
-    Task<bool> AddMemberToGroup(long chatId, List<ChatMemberModel> chatMemberList, long userId);
+    Task<bool> SaveGroupMember(long chatId, List<ChatMemberModel> chatMemberModelList, long userId);
 
     Task<bool> LeaveChatGroup(long chatId, long memberId, long userId);
 

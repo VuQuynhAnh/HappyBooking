@@ -2,12 +2,6 @@
 
 public class ChatMemberRequestItem
 {
-    public ChatMemberRequestItem(long memberId, int chatRole)
-    {
-        MemberId = memberId;
-        ChatRole = chatRole;
-    }
-
     public ChatMemberRequestItem(long memberId, int chatRole, int isDeleted)
     {
         MemberId = memberId;

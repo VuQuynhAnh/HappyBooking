@@ -50,5 +50,9 @@
   "UpdateChatGroup": "Cập nhật nhóm chat",
   "Member": "Thành viên",
   "ViewOnly": "Chỉ xem",
-  "MemberManagement": "Quản lý thành viên"
+  "MemberManagement": "Quản lý thành viên",
+  "Delete": "Xoá",
+  "LeaveGroupChat": "Rời khỏi nhóm",
+  "AreYouSure": "Bạn có chắc chắn không?",
+  "Confirm": "Xác nhận"
 }

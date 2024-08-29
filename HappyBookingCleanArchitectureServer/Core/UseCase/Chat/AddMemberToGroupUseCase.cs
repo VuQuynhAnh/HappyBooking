@@ -30,8 +30,8 @@ public class AddMemberToGroupUseCase : IAddMemberToGroupUseCase
             {
                 return new AddMemberToGroupResponse(userId, false, validateResult, _cache);
             }
-            var chatMemberList = request.ChatMemberList.Select(item => new ChatMemberModel(item.MemberId, item.ChatRole)).ToList();
-            var addMemberResult = await _chatRepository.AddMemberToGroup(request.ChatId, chatMemberList, userId);
+            var chatMemberList = request.ChatMemberList.Select(item => new ChatMemberModel(item.MemberId, item.ChatRole, item.IsDeleted)).ToList();
+            var addMemberResult = await _chatRepository.SaveGroupMember(request.ChatId, chatMemberList, userId);
             return new AddMemberToGroupResponse(userId, addMemberResult, StatusEnum.Successed, _cache);
         }
         finally

@@ -12,5 +12,7 @@ public class SaveChatGroupRequest
 
     public bool IsGroup { get; set; }
 
+    public bool IsDeleted { get; set; } = false;
+
     public List<ChatMemberRequestItem> ChatMemberList { get; set; } = new();
 }

@@ -36,19 +36,20 @@ public class SaveChatGroupUseCase : ISaveChatGroupUseCase
                 {
                     return new SaveChatGroupResponse(userId, new ChatDto(), StatusEnum.InvalidParam, _cache);
                 }
-                chatMemberList = request.ChatMemberList.Select(item => new ChatMemberModel(item.MemberId, item.ChatRole)).ToList();
+                chatMemberList = request.ChatMemberList.Select(item => new ChatMemberModel(item.MemberId, item.ChatRole, item.IsDeleted)).ToList();
             }
             var chatId = request.ChatId;
 
             // if chat is 1vs1, get old chatId
-            if (chatId == 0 && chatMemberList.Count == 2)
+            if (chatId == 0 && chatMemberList.Count(item => item.IsDeleted == 0) == 2)
             {
+                chatMemberList = chatMemberList.Where(item => item.IsDeleted == 0).ToList();
                 chatId = await _chatRepository.Get1v1ExistGroupChatId(chatMemberList[0].MemberId, chatMemberList[1].MemberId);
             }
             var chatResponse = await _chatRepository.SaveChatGroup(chatId, request.ChatName, request.AvatarUrl, request.IsGroup, userId);
             if (chatMemberList.Any())
             {
-                var addMemberToGroupResponse = await _chatRepository.AddMemberToGroup(chatResponse.ChatId, chatMemberList, userId);
+                var addMemberToGroupResponse = await _chatRepository.SaveGroupMember(chatResponse.ChatId, chatMemberList, userId);
             }
 
             var chatResult = await _chatRepository.GetChatGroup(chatResponse.ChatId, userId);

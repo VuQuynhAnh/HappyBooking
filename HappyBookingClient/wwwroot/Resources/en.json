@@ -50,5 +50,9 @@
   "UpdateChatGroup": "Update chat group",
   "Member": "Member",
   "ViewOnly": "Viewer",
-  "MemberManagement": "Member management"
+  "MemberManagement": "Member management",
+  "Delete": "Delete",
+  "LeaveGroupChat": "Leave group chat",
+  "AreYouSure": "Are you sure?",
+  "Confirm": "Confirm"
 }
