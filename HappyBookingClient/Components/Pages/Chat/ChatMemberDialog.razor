@@ -191,9 +191,15 @@
 
     </DialogContent>
     <DialogActions>
+        <MudButton Variant="Variant.Outlined"
+                   Class="mt-2"
+                   Size="Size.Small"
+                   Color="Color.Default"
+                   OnClick="Cancel">@_languageService["Cancel"]</MudButton>
         @if (IsAddNew)
         {
             <MudButton Variant="Variant.Filled"
+                       Class="mr-4 mt-2"
                        Size="Size.Small"
                        Color="Color.Success"
                        OnClick="StartNewChat">
@@ -203,17 +209,13 @@
         else
         {
             <MudButton Variant="Variant.Filled"
+                       Class="mr-4 mt-2"
                        Size="Size.Small"
                        Color="Color.Success"
                        OnClick="Continue">
                 @_languageService["Continue"]
             </MudButton>
         }
-        <MudButton Variant="Variant.Outlined"
-                   Class="mr-4"
-                   Size="Size.Small"
-                   Color="Color.Default"
-                   OnClick="Cancel">@_languageService["Cancel"]</MudButton>
     </DialogActions>
 </MudDialog>
 

@@ -10,7 +10,7 @@ public interface IChatRepository : IRepositoryBase
 
     Task<List<ChatModel>> GetListChatGroupByMember(long memberId, string keyword, bool isGroupChat, int pageIndex, int pageSize);
 
-    Task<ChatModel> GetChatGroup(long chatId, long memberId);
+    Task<ChatModel> GetChatGroup(long chatId);
 
     Task<bool> SaveGroupMember(long chatId, List<ChatMemberModel> chatMemberModelList, long userId);
 
@@ -25,6 +25,8 @@ public interface IChatRepository : IRepositoryBase
     Task<MessageModel> UpdateMessage(long messageId, string content, int messageType, long userId);
 
     Task<bool> CheckExistChat(long chatId);
+
+    Task<bool> CheckExistMemberInGroupChat(long chatId, long memberId);
 
     Task<long> Get1v1ExistGroupChatId(long firstMemberId, long secondMemberId);
 }

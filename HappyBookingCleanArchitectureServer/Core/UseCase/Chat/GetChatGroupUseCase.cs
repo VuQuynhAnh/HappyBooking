@@ -23,7 +23,11 @@ public class GetChatGroupUseCase : IGetChatGroupUseCase
     {
         try
         {
-            var result = await _chatRepository.GetChatGroup(request.ChatId, request.MemberId);
+            if (!await _chatRepository.CheckExistMemberInGroupChat(request.ChatId, request.MemberId))
+            {
+                return new GetChatGroupResponse(userId, new ChatDto(), StatusEnum.InvalidParam, _cache);
+            }
+            var result = await _chatRepository.GetChatGroup(request.ChatId);
             return new GetChatGroupResponse(userId, new ChatDto(result), StatusEnum.Successed, _cache);
         }
         finally

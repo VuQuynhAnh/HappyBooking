@@ -187,17 +187,9 @@ public class ChatRepository : IChatRepository
     /// GetChatGroup
     /// </summary>
     /// <param name="chatId"></param>
-    /// <param name="memberId"></param>
     /// <returns></returns>
-    public async Task<ChatModel> GetChatGroup(long chatId, long memberId)
+    public async Task<ChatModel> GetChatGroup(long chatId)
     {
-        var isMemberExistInGroup = await _context.ChatMemberRepository.AnyAsync(item => item.ChatId == chatId
-                                                                                        && item.MemberId == memberId
-                                                                                        && item.IsDeleted == 0);
-        if (!isMemberExistInGroup)
-        {
-            return new();
-        }
 
         var chat = await _context.ChatRepository.FirstOrDefaultAsync(item => item.ChatId == chatId && item.IsDeleted == 0);
         if (chat == null)
@@ -212,6 +204,20 @@ public class ChatRepository : IChatRepository
                                     select new ChatMemberModel(chatMember, userJoinMember)
                                     ).ToListAsync();
         return new ChatModel(chat, chatMemberList);
+    }
+
+    /// <summary>
+    /// CheckExistMemberInGroupChat
+    /// </summary>
+    /// <param name="chatId"></param>
+    /// <param name="memberId"></param>
+    /// <returns></returns>
+    public async Task<bool> CheckExistMemberInGroupChat(long chatId, long memberId)
+    {
+        var isMemberExistInGroup = await _context.ChatMemberRepository.AnyAsync(item => item.ChatId == chatId
+                                                                                        && item.MemberId == memberId
+                                                                                        && item.IsDeleted == 0);
+        return isMemberExistInGroup;
     }
 
     /// <summary>

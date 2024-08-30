@@ -18,12 +18,31 @@
 
 <style>
     .groupChatEditDialog {
-        width: 400px;
+        width: 380px;
     }
 </style>
 
 <MudDialog Class="groupChatEditDialog">
     <DialogContent>
+        @if (isManager)
+        {
+            <MudButton Variant="Variant.Outlined"
+                       Size="Size.Small"
+                       Color="Color.Error"
+                       Class="float-start mx-2 mb-2"
+                       StartIcon="@Icons.Material.Filled.Delete"
+                       OnClick="DeleteChat">
+                @_languageService["Delete"]
+            </MudButton>
+        }
+        <MudButton Variant="Variant.Outlined"
+                   Size="Size.Small"
+                   Color="Color.Warning"
+                   Class="float-end"
+                   StartIcon="@Icons.Material.Filled.Logout"
+                   OnClick="LeaveGroupChat">
+            @_languageService["LeaveGroupChat"]
+        </MudButton>
         <MudForm Model="@request" @ref="@form" ValidationDelay="0">
             <MudCardContent>
                 <InputFile id="chatAvatarUrlImage" hidden OnChange="UploadFiles" accept="image/*" />
@@ -42,7 +61,7 @@
                               Class="pt-0 mt-3" />
 
                 <MudButton Size="Size.Large"
-                           Class="my-2"
+                           Class="mt-3"
                            Variant="Variant.Outlined"
                            EndIcon="@Icons.Material.Outlined.People"
                            Color="Color.Default"
@@ -54,32 +73,16 @@
         </MudForm>
     </DialogContent>
     <DialogActions>
-        @if (isManager)
-        {
-            <MudButton Variant="Variant.Filled"
-                       Size="Size.Small"
-                       Color="Color.Error"
-                       Class="float-start"
-                       OnClick="DeleteChat">
-                @_languageService["Delete"]
-            </MudButton>
-        }
-        <MudButton Variant="Variant.Filled"
-                   Size="Size.Small"
-                   Color="Color.Warning"
-                   Class="float-start"
-                   OnClick="LeaveGroupChat">
-            @_languageService["LeaveGroupChat"]
-        </MudButton>
-        <MudButton Variant="Variant.Filled"
-                   Size="Size.Small"
-                   Color="Color.Success"
-                   OnClick="(await => Submit())">@_languageService["Save"]</MudButton>
         <MudButton Variant="Variant.Outlined"
-                   Class="mr-4"
                    Size="Size.Small"
                    Color="Color.Default"
                    OnClick="Cancel">@_languageService["Cancel"]</MudButton>
+
+        <MudButton Variant="Variant.Filled"
+                   Class="mr-4"
+                   Size="Size.Small"
+                   Color="Color.Success"
+                   OnClick="(await => Submit())">@_languageService["Save"]</MudButton>
     </DialogActions>
 </MudDialog>
 

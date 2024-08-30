@@ -12,7 +12,7 @@ public static class APIName
     public const string GetUserByUserId = "GetUserByUserId";
     public const string ChangePassword = "ChangePassword";
     public const string AddMemberToGroup = "AddMemberToGroup";
-    public const string LeaveChatGroup = "LeaveChatGroup";
+    public const string LeaveChatGroup = "LeaveGroupChat";
     public const string SaveChatGroup = "SaveChatGroup";
     public const string SendMessage = "SendMessage";
     public const string UpdateMessage = "UpdateMessage";

@@ -34,7 +34,7 @@ public class SaveChatGroupUseCase : ISaveChatGroupUseCase
                 var deleteChatResult = await _chatRepository.DeleteChatGroup(request.ChatId, userId);
                 if (deleteChatResult)
                 {
-                    await hubContext.Clients.All.SendAsync(RealtimeConstant.ChatGroupDeleted, request.ChatId);
+                    await hubContext.Clients.All.SendAsync(RealtimeConstant.ChatGroupDeleted, request.ChatId.ToString());
                 }
                 return new SaveChatGroupResponse(userId, new(), StatusEnum.Successed, _cache);
             }
@@ -61,7 +61,7 @@ public class SaveChatGroupUseCase : ISaveChatGroupUseCase
                 var addMemberToGroupResponse = await _chatRepository.SaveGroupMember(chatResponse.ChatId, chatMemberList, userId);
             }
 
-            var chatResult = await _chatRepository.GetChatGroup(chatResponse.ChatId, userId);
+            var chatResult = await _chatRepository.GetChatGroup(chatResponse.ChatId);
             var result = new ChatDto(chatResult);
             string jsonString = JsonSerializer.Serialize(result);
             await hubContext.Clients.All.SendAsync(RealtimeConstant.ChatGroupUpdate, jsonString);

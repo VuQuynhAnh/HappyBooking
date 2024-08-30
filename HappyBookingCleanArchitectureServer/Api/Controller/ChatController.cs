@@ -63,7 +63,7 @@ public class ChatController : BaseController
     public async Task<ActionResult<LeaveChatGroupResponse>> LeaveChatGroup([FromBody] LeaveChatGroupRequest request)
     {
         await HeartbeatUser();
-        var response = await _leaveChatGroupUseCase.LeaveChatGroup(UserId, request);
+        var response = await _leaveChatGroupUseCase.LeaveChatGroup(UserId, request, _hubContext);
         return Ok(response);
     }
 
