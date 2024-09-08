@@ -199,12 +199,16 @@
     </MudItem>
 
     <MudItem md="8" sm="12" xs="12">
-        <MudTextField @bind-Value="messageSearchKeyWord"
-                      Placeholder="@_languageService["Search"]"
-                      Variant="Variant.Outlined"
-                      Adornment="Adornment.End"
-                      AdornmentIcon="@Icons.Material.Filled.Search"
-                      Class="searchBoxStyle" />
+        <div class="input-container search-message-position mt-2">
+            <input type="text"
+                   @bind="messageSearchKeyWord"
+                   placeholder="@_languageService["Search"]"
+                   @onkeyup="SearchMessageAction"
+                   class="input-style" />
+
+            <MudIconButton Icon="@Icons.Material.Filled.Search"
+                           OnClick="(await => SearchMessageClick())" />
+        </div>
 
         <div class="chat-container mt-2">
             <MudPaper Elevation="25">
@@ -282,6 +286,20 @@
                                         case TypeMessageConstant.Video:
                                             <div class="message-text">@message.Content</div>
                                             break;
+                                        case TypeMessageConstant.Call:
+                                            <div class="message-text">
+                                                <b>@message.CreateUser.FullName</b>
+                                                @_languageService["StartedAVideoCall"]
+                                            </div>
+                                            <MudButton class="mt-1 mb-2 float-end"
+                                                       Href="@message.Content"
+                                                       Target="_blank"
+                                                       Variant="Variant.Filled"
+                                                       StartIcon="@Icons.Material.Filled.VideoCall"
+                                                       Color="Color.Primary">
+                                                @_languageService["ClickToJoinCall"]
+                                            </MudButton>
+                                            break;
                                         default:
                                             <div class="message-text">@message.Content</div>
                                             break;
@@ -306,6 +324,20 @@
                                         break;
                                     case TypeMessageConstant.Video:
                                         <div class="message-text">@message.Content</div>
+                                        break;
+                                    case TypeMessageConstant.Call:
+                                        <div class="message-text">
+                                            <b>@message.CreateUser.FullName</b>
+                                            @_languageService["StartedAVideoCall"]
+                                        </div>
+                                        <MudButton class="mt-1 mb-2 float-end"
+                                                   Href="@message.Content"
+                                                   Target="_blank"
+                                                   Variant="Variant.Filled"
+                                                   StartIcon="@Icons.Material.Filled.VideoCall"
+                                                   Color="Color.Primary">
+                                            @_languageService["ClickToJoinCall"]
+                                        </MudButton>
                                         break;
                                     default:
                                         <div class="message-text">@message.Content</div>
@@ -332,27 +364,26 @@
                     }
                 </div>
             }
-
-            <div class="input-container">
+            h
+            <div class="input-container send-message-position">
                 <InputFile id="messageInputFile" hidden OnChange="UploadFiles" accept=".pdf, .docx, .xlsx, .doc, .xls" />
                 <InputFile id="messageInputImage" hidden OnChange="UploadFiles" accept="image/*" />
                 <MudIconButton Icon="@Icons.Material.Filled.AttachFile"
-                               OnClick="(await => AddFile())"
-                               Class="mt-2" />
+                               OnClick="(await => AddFile())" />
                 <MudIconButton Icon="@Icons.Material.Filled.Image"
-                               OnClick="(await => AddImage())"
-                               Class="mt-2" />
+                               OnClick="(await => AddImage())" />
+                <MudIconButton Icon="@Icons.Material.Filled.VideoCall"
+                               OnClick="(await => StartCall())" />
 
                 <input type="text"
                        @bind="messageInput"
                        readonly="@messageInputReadonly"
                        placeholder="@_languageService["TypeAMessage"]"
                        @onkeyup="SendMessageKeyUpAction"
-                       class="input-style mt-2" />
+                       class="input-style" />
 
                 <MudIconButton Icon="@Icons.Material.Filled.Send"
-                               OnClick="(await => SendMessage())"
-                               Class="mt-2" />
+                               OnClick="(await => SendMessage())" />
             </div>
         </div>
 
@@ -391,12 +422,44 @@
     private ElementReference scrollGroupChatContainer;
     private ElementReference scrollChatMessageContainer;
 
+    private async Task StartCall()
+    {
+        string groupId = Guid.NewGuid().ToString();
+        string callLink = $"{_navigation.BaseUri}group-video-call?groupId={groupId}";
+
+        // Gửi liên kết này vào nhóm chat
+        messageInput = callLink;
+        selectedMessageType = TypeMessageConstant.Call;
+        await SendMessage();
+    }
+
     private async Task SendMessageKeyUpAction(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
             await SendMessage();
         }
+    }
+
+    private async Task SearchMessageAction(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            messageList.Clear();
+            messagePageIndex = 1;
+            await LoadChatMessage();
+        }
+    }
+
+    private async Task SearchMessageClick()
+    {
+        if (string.IsNullOrEmpty(messageSearchKeyWord))
+        {
+            return;
+        }
+        messageList.Clear();
+        messagePageIndex = 1;
+        await LoadChatMessage();
     }
 
     private async Task AddImage()
@@ -852,7 +915,7 @@
 
     private async Task RegisterSocketClient()
     {
-        string hubUrl = _configuration["SignalR:HubUrl"] ?? string.Empty;
+        string hubUrl = _configuration["SignalR:ChatHubUrl"] ?? string.Empty;
 
         hubConnection = new HubConnectionBuilder()
         .WithUrl(hubUrl)

@@ -54,5 +54,8 @@
   "Delete": "Xoá",
   "LeaveGroupChat": "Rời khỏi nhóm",
   "AreYouSure": "Bạn có chắc chắn không?",
-  "Confirm": "Xác nhận"
+  "Confirm": "Xác nhận",
+  "Chat": "Trò chuyện",
+  "StartedAVideoCall": "Đã bắt đầu 1 cuộc gọi video",
+  "ClickToJoinCall": "Click vào để tham gia cuộc họp"
 }

@@ -226,22 +226,29 @@
 .input-container {
     display: flex;
     align-items: center;
-    margin-top: 20px;
-    border-top: 1px solid #ddd;
-    position: absolute;
-    width: calc(66% - 60px);
-    bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     background: #fff;
 }
 
-    .input-container .mud-icon-button {
-        padding: 5px;
-    }
+.search-message-position {
+    width: 100%;
+}
+
+.send-message-position {
+    position: absolute;
+    margin-top: 20px;
+    width: calc(66% - 60px);
+    bottom: 20px;
+}
+
+.input-container .mud-icon-button {
+    padding: 5px;
+}
 
 .input-style {
     flex: 1;
     padding: 10px;
-    border: 1px solid #ccc;
     border-radius: 4px;
     outline: none;
     box-sizing: border-box;
@@ -309,7 +316,7 @@
 
 
 @media screen and (max-width: 960px) {
-    .input-container {
+    .send-message-position {
         width: calc(100% - 80px);
     }
 
@@ -324,7 +331,7 @@
 }
 
 @media screen and (max-width: 640px) {
-    .input-container {
+    .send-message-position {
         width: calc(100% - 55px);
     }
 

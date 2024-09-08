@@ -6,4 +6,5 @@ public static class TypeMessageConstant
     public const int Image = 1;
     public const int File = 2;
     public const int Video = 3;
+    public const int Call = 4;
 }

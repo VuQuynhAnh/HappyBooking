@@ -1,0 +1,74 @@
+﻿@page "/group-video-call"
+@using HappyBookingShare.Common
+@using Microsoft.AspNetCore.SignalR.Client
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject IConfiguration _configuration
+
+<h3>Gọi Video Nhóm</h3>
+<video id="localVideo" autoplay></video>
+
+@code {
+    private string groupId = string.Empty;
+    private HubConnection? hubConnection;
+    private string connectionId = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = new Uri(Navigation.Uri);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        groupId = query["groupId"] ?? string.Empty;
+        string hubUrl = _configuration["SignalR:VideoCallHubUrl"] ?? string.Empty;
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(hubUrl)
+            .Build();
+
+        hubConnection.On<string, string>(RealtimeConstant.ReceiveOffer, async (offer, senderConnectionId) =>
+        {
+            await JS.InvokeVoidAsync("setupNewPeerConnection", senderConnectionId);
+            var answer = await JS.InvokeAsync<string>("createAnswer", offer, senderConnectionId);
+            await hubConnection.SendAsync(RealtimeConstant.VideoCallSendAnswer, groupId, answer, senderConnectionId);
+        });
+
+        hubConnection.On<string, string>(RealtimeConstant.ReceiveAnswer, async (answer, senderConnectionId) =>
+        {
+            await JS.InvokeVoidAsync("setRemoteDescription", answer, senderConnectionId);
+        });
+
+        hubConnection.On<string, string>(RealtimeConstant.ReceiveCandidate, async (candidate, senderConnectionId) =>
+        {
+            await JS.InvokeVoidAsync("addIceCandidate", candidate, senderConnectionId);
+        });
+
+        hubConnection.On<string>(RealtimeConstant.UserJoined, async (newConnectionId) =>
+        {
+            if (newConnectionId != connectionId)
+            {
+                await JS.InvokeVoidAsync("setupNewPeerConnection", newConnectionId);
+                var offer = await JS.InvokeAsync<string>("createOffer", newConnectionId);
+                await hubConnection.SendAsync(RealtimeConstant.SendOffer, groupId, offer, connectionId);
+            }
+        });
+
+        await hubConnection.StartAsync();
+        connectionId = hubConnection.ConnectionId ?? string.Empty;
+        await hubConnection.SendAsync(RealtimeConstant.JoinGroup, groupId);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !string.IsNullOrEmpty(groupId))
+        {
+            var dotNetHelper = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("startVideoCall", connectionId, dotNetHelper);
+        }
+    }
+
+    [JSInvokable]
+    public Task NotifyReadyForConnection(string connectionId)
+    {
+        // Thông báo đến các kết nối khác về việc người dùng đã sẵn sàng nhận kết nối
+        return hubConnection!.SendAsync(RealtimeConstant.UserJoined, connectionId);
+    }
+}

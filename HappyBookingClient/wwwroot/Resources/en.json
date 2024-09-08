@@ -54,5 +54,8 @@
   "Delete": "Delete",
   "LeaveGroupChat": "Leave group chat",
   "AreYouSure": "Are you sure?",
-  "Confirm": "Confirm"
+  "Confirm": "Confirm",
+  "Chat": "Chat",
+  "StartedAVideoCall": "Started a video call",
+  "ClickToJoinCall": "Click here to join"
 }
